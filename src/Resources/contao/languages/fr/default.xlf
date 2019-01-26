@@ -1,0 +1,14 @@
+<?xml version="1.0" ?><xliff version="1.1">
+  <file datatype="php" original="src/Resources/contao/languages/en/default.php" source-language="en" target-language="fr">
+    <body>
+      <trans-unit id="CTE.grid-start">
+        <source>Grid | Start</source>
+        <target>Grille | Début</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-stop">
+        <source>Grid | Stop</source>
+        <target>Grille | Fin</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
