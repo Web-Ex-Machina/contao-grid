@@ -16,3 +16,6 @@ nbproject/
 # Distribution
 /dist
 /build
+
+# Dev
+sftp-config*
