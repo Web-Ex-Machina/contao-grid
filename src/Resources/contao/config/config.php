@@ -18,3 +18,6 @@ array_insert($GLOBALS['TL_CTE'], count($GLOBALS['TL_CTE'])+1, array(
 
 // Add Hook
 $GLOBALS['TL_HOOKS']['getContentElement'][] = array('WEM\GridBundle\Classes\Hooks', 'wrapGridElements');
+
+// Add Backend Wizard
+$GLOBALS['BE_FFL']['gridElementWizard'] = 'WEM\GridBundle\Widgets\GridElementWizard';

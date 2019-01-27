@@ -60,6 +60,15 @@
         <source>Enter the number of columns</source>
         <target>Indiquez le nombre de colonnes</target>
       </trans-unit>
+
+      <trans-unit id="tl_content.grid_items.0">
+        <source>Items</source>
+        <target>Éléments</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_items.1">
+        <source>Add - if you want - settings to each item in the grid</source>
+        <target>Indiquez - si souhaité - des paramètres à chaque élément de la grille</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
