@@ -37,24 +37,29 @@ class GridStart extends \ContentElement
 		$arrWrapperClasses = [];
 		$arrElementClasses = [];
 
-		$arrCols = unserialize($this->grid_cols);
-		$arrRows = unserialize($this->grid_rows);
+		$cols = unserialize($this->grid_cols);
+		$rows = unserialize($this->grid_rows);
 
 		switch($this->grid_preset){
 			case 'bs3':
 				$arrWrapperClasses[] = $this->grid_row_class;
-				foreach($arrCols as $col){
+				foreach($cols as $col){
 					$arrElementClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
 				}
 			break;
 
 			case 'bs4':
 				$arrWrapperClasses[] = $this->grid_row_class;
-				foreach($arrCols as $col){
-					if('all' == $col['key'])
-						$arrElementClasses[] = sprintf("col-%d", 12 / $col['value']);
-					else
-						$arrElementClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
+				if(1 == count($cols)){
+					$arrElementClasses[] = sprintf("col-%d", 12 / $cols[0]['value']);
+				}
+				else{
+					foreach($cols as $col){
+						if('all' == $col['key'])
+							$arrElementClasses[] = sprintf("col-%d", 12 / $col['value']);
+						else
+							$arrElementClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
+					}
 				}
 
 				// In BS4, we need row class in the wrapper
@@ -66,18 +71,28 @@ class GridStart extends \ContentElement
 				$arrWrapperClasses[] = "d-grid";
 				$arrElementClasses[] = 'item-grid';
 
-				foreach($arrCols as $col){
-					if('all' == $col['key'])
-						$arrWrapperClasses[] = sprintf("cols-%d", 12 / $col['value']);
-					else
-						$arrWrapperClasses[] = sprintf("cols-%s-%d", $col['key'], 12 / $col['value']);
+				if(1 == count($cols)){
+					$arrWrapperClasses[] = sprintf("cols-%d", 12 / $cols[0]['value']);
+				}
+				else{
+					foreach($cols as $col){
+						if('all' == $col['key'])
+							$arrWrapperClasses[] = sprintf("cols-%d", 12 / $col['value']);
+						else
+							$arrWrapperClasses[] = sprintf("cols-%s-%d", $col['key'], 12 / $col['value']);
+					}
 				}
 
-				foreach($arrRows as $row){
-					if('all' == $row['key'])
-						$arrWrapperClasses[] = sprintf("rows-%d", $row['value']);
-					else
-						$arrWrapperClasses[] = sprintf("rows-%s-%d", $row['key'], $row['value']);
+				if(1 == count($rows)){
+					$arrWrapperClasses[] = sprintf("rows-%d", $rows[0]['value']);
+				}
+				else{
+					foreach($rows as $row){
+						if('all' == $row['key'])
+							$arrWrapperClasses[] = sprintf("rows-%d", $row['value']);
+						else
+							$arrWrapperClasses[] = sprintf("rows-%s-%d", $row['key'], $row['value']);
+					}
 				}
 			break;
 
