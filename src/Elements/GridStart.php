@@ -37,14 +37,27 @@ class GridStart extends \ContentElement
 		$arrWrapperClasses = [];
 		$arrElementClasses = [];
 
+		$arrCols = unserialize($this->grid_cols);
+		$arrWrapperClasses[] = $this->grid_row_class;
+
 		switch($this->grid_preset){
 			case 'bs3':
-				$arrWrapperClasses[] = "row"; // TODO > handle row or container, by asking in backend
+				foreach($arrCols as $col){
+					$arrElementClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
+				}
 			break;
 
 			case 'bs4':
-				$arrWrapperClasses[] = "row"; // TODO > handle row or container, by asking in backend
-				$arrElementClasses[] = sprintf("col-%d", 12 / $this->grid_cols);
+				foreach($arrCols as $col){
+					if('all' == $col['key'])
+						$arrElementClasses[] = sprintf("col-%d", 12 / $col['value']);
+					else
+						$arrElementClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
+				}
+
+				// In BS4, we need row class in the wrapper
+				if(!in_array('row', $arrWrapperClasses))
+					$arrWrapperClasses[] = 'row';
 			break;
 
 			case 'cssgrid':

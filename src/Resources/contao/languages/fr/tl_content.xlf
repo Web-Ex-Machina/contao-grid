@@ -1,0 +1,65 @@
+<?xml version="1.0" ?><xliff version="1.1">
+  <file datatype="php" original="src/Resources/contao/languages/en/tl_content.php" source-language="en" target-language="fr">
+    <body>
+      <trans-unit id="tl_content.grid_legend">
+        <source>Grid settings</source>
+        <target>Paramètres de la grille</target>
+      </trans-unit>
+
+      <trans-unit id="tl_content.grid_preset.0">
+        <source>Preset</source>
+        <target>Preset</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_preset.1">
+        <source>Select the grid preset</source>
+        <target>Sélectionner le format de grille</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_preset.bs3">
+        <source>Bootstrap 3</source>
+        <target>Bootstrap 3</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_preset.bs4">
+        <source>Bootstrap 4</source>
+        <target>Bootstrap 4</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_preset.cssgrid">
+        <source>CSS Grid</source>
+        <target>CSS Grid</target>
+      </trans-unit>
+
+      <trans-unit id="tl_content.grid_rows.0">
+        <source>Rows</source>
+        <target>Lignes</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_rows.1">
+        <source>Enter the number of rows</source>
+        <target>Indiquez le nombre de lignes</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.0">
+        <source>Row class</source>
+        <target>Classe de la ligne</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.1">
+        <source>Select the row class</source>
+        <target>Sélectionner la classe de la ligne</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.row">
+        <source>Row</source>
+        <target>Row</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.container">
+        <source>Container</source>
+        <target>Container</target>
+      </trans-unit>
+
+      <trans-unit id="tl_content.grid_cols.0">
+        <source>Columns</source>
+        <target>Colonnes</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_cols.1">
+        <source>Enter the number of columns</source>
+        <target>Indiquez le nombre de colonnes</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
