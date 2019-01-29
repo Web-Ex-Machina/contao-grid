@@ -16,6 +16,7 @@ namespace WEM\GridBundle\Classes;
 class Hooks extends \Controller
 {
 	protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
+	
 	/**
 	 * getContentElement Hook : Check if the element is in a Grid and wrap them
 	 */

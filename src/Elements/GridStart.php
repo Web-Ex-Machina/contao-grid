@@ -54,8 +54,9 @@ class GridStart extends \ContentElement
 					$arrElementClasses[] = sprintf("col-%d", 12 / $cols[0]['value']);
 				}
 				else{
-					foreach($cols as $col){
-						if('all' == $col['key'])
+					foreach($cols as $k => $col){
+						// Quickfix : we need the first col to be generic, no matter what is the breakpoint
+						if(0 == $k)
 							$arrElementClasses[] = sprintf("col-%d", 12 / $col['value']);
 						else
 							$arrElementClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
