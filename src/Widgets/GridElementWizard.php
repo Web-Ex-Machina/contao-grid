@@ -10,6 +10,8 @@
 
 namespace WEM\GridBundle\Widgets;
 
+use WEM\GridBundle\Helper\GridBuilder;
+
 class GridElementWizard extends \Widget
 {
 	/**
@@ -87,49 +89,7 @@ class GridElementWizard extends \Widget
 		$blnGridStart = false;
 		$blnGridStop = false;
 
-		try{
-			$cols = unserialize($this->activeRecord->grid_cols);
-		}
-		catch(\Exception $e){
-			$cols = $this->activeRecord->grid_cols;
-		}
-
-		try{
-			$rows = unserialize($this->activeRecord->grid_rows);
-		}
-		catch(\Exception $e){
-			$rows = $this->activeRecord->grid_rows;
-		}
-
-		$arrWrapperClasses[] = "d-grid";
-		$arrElementClasses[] = 'item-grid';
-
-		if(1 == count($cols)){
-			$arrWrapperClasses[] = sprintf("cols-%d", $cols[0]['value']);
-		}
-		else{
-			foreach($cols as $k => $col){
-				// Quickfix : we need the first col to be generic, no matter what is the breakpoint
-				if(0 == $k)
-					$arrWrapperClasses[] = sprintf("cols-%d", $col['value']);
-				else
-					$arrWrapperClasses[] = sprintf("cols-%s-%d", $col['key'], $col['value']);
-			}
-		}
-
-		if(1 == count($rows)){
-			$arrWrapperClasses[] = sprintf("rows-%d", $rows[0]['value']);
-		}
-		else{
-			foreach($rows as $row){
-				if('all' == $row['key'])
-					$arrWrapperClasses[] = sprintf("rows-%d", $row['value']);
-				else
-					$arrWrapperClasses[] = sprintf("rows-%s-%d", $row['key'], $row['value']);
-			}
-		}
-
-		$strReturn = sprintf('<div class="%s">', implode(' ', $arrWrapperClasses));
+		$strReturn = sprintf('<div class="%s">', implode(' ', GridBuilder::getWrapperClasses($this->activeRecord)));
 
 		// Now, we will only fetch the items in the grid
 		while($objItems->next()){
@@ -147,7 +107,7 @@ class GridElementWizard extends \Widget
 			if("grid-stop" == $objItems->type)
 				break;
 
-			$strReturn .= sprintf('<div class="%s">%s</div>', implode(' ', $arrElementClasses), $this->getContentElement($objItems->current()));
+			$strReturn .= sprintf('<div class="%s">%s</div>', implode(' ', GridBuilder::getItemClasses($this->activeRecord)), $this->getContentElement($objItems->current()));
 		}
 		
 		// Add CSS & JS to the Wizard

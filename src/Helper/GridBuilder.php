@@ -8,7 +8,7 @@
  * @author Web ex Machina <https://www.webexmachina.fr>
  */
 
-namespace WEM\GridBundle\Classes;
+namespace WEM\GridBundle\Helper;
 
 /**
  * Function to centralize generic code to 
@@ -23,6 +23,7 @@ class GridBuilder extends \Controller
 	public static function getWrapperClasses($objElement){
 		$arrClasses = [];
 		$rows = unserialize($objElement->grid_rows);
+		$cols = unserialize($objElement->grid_cols);
 
 		switch($objElement->grid_preset){
 			case 'bs3':
@@ -40,15 +41,17 @@ class GridBuilder extends \Controller
 			case 'cssgrid':
 				$arrClasses[] = "d-grid";
 
-				foreach($cols as $col){
-					if('all' == $col['key'])
-						$arrClasses[] = sprintf("cols-%d", 12 / $col['value']);
+				foreach($cols as $k => $col){
+					// Quickfix : we need the first col to be generic, no matter what is the breakpoint
+					if(0 == $k)
+						$arrClasses[] = sprintf("cols-%d", $col['value']);
 					else
-						$arrClasses[] = sprintf("cols-%s-%d", $col['key'], 12 / $col['value']);
+						$arrClasses[] = sprintf("cols-%s-%d", $col['key'], $col['value']);
 				}
 
-				foreach($rows as $row){
-					if('all' == $row['key'])
+				foreach($rows as $k=>$row){
+					// Quickfix : we need the first col to be generic, no matter what is the breakpoint
+					if(0 == $k)
 						$arrClasses[] = sprintf("rows-%d", $row['value']);
 					else
 						$arrClasses[] = sprintf("rows-%s-%d", $row['key'], $row['value']);
@@ -69,7 +72,7 @@ class GridBuilder extends \Controller
 	 */
 	public static function getItemClasses($objElement){
 		$arrClasses = [];
-		$rows = unserialize($objElement->grid_rows);
+		$cols = unserialize($objElement->grid_rows);
 
 		switch($objElement->grid_preset){
 			case 'bs3':
