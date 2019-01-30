@@ -89,7 +89,7 @@ class GridElementWizard extends \Widget
 		$blnGridStart = false;
 		$blnGridStop = false;
 
-		$strReturn = sprintf('<div class="%s">', implode(' ', GridBuilder::getWrapperClasses($this->activeRecord)));
+		$strGrid = sprintf('<div class="grid_preview %s">', implode(' ', GridBuilder::getWrapperClasses($this->activeRecord)));
 
 		// Now, we will only fetch the items in the grid
 		while($objItems->next()){
@@ -107,15 +107,34 @@ class GridElementWizard extends \Widget
 			if("grid-stop" == $objItems->type)
 				break;
 
-			$strReturn .= sprintf('<div class="%s">%s</div>', implode(' ', GridBuilder::getItemClasses($this->activeRecord)), $this->getContentElement($objItems->current()));
+			$strGrid .= sprintf('<div class="helper %s">%s</div>', implode(' ', GridBuilder::getItemClasses($this->activeRecord)), $this->getContentElement($objItems->current()));
 		}
 		
 		// Add CSS & JS to the Wizard
 		$GLOBALS['TL_CSS']['wemgrid'] = 'bundles/wemgrid/css/backend.css';
+		$GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
 
-		$strReturn .= '</div>';
-		return $strReturn;
+		$strGrid .= '</div>';
 
-		
+
+		$strReturn = 
+'<div class="gridelement">
+	<div class="helpers d-grid cols-4">
+		<div class="item-grid">
+			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
+			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
+			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
+			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
+			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
+			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
+		</div>
+		<div class="item-grid">
+			<button class="tl_submit grid_toggleHelpers">Toggle helpers</button>
+		</div>
+	</div>
+	'.$strGrid.'
+</div>';
+
+		return $strReturn;		
 	}
 }
