@@ -118,8 +118,10 @@ class GridElementWizard extends \Widget
 
 		// If we want a preview modal, catch & break
 		if(\Input::get('grid_preview')){
-			$strGrid .= sprintf('<style>%s</style>', file_get_contents($GLOBALS['TL_CSS']['wemgrid']));
-			$objResponse = new \Haste\Http\Response\HtmlResponse($strGrid);
+			$objTemplate = new \BackendTemplate('be_grid_preview');
+			$objTemplate->grid = $strGrid;
+			$objTemplate->css = $GLOBALS['TL_CSS'];
+			$objResponse = new \Haste\Http\Response\HtmlResponse($objTemplate->parse());
 			$objResponse->send();
 		}
 
