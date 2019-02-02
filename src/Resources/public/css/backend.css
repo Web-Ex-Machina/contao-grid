@@ -5,3 +5,6 @@
 
 /** WIZARD **/
 .gridelement .helpers{margin:10px 0;}
+
+/** IFRAME PREVIEW **/
+.simple-modal-body iframe{background:url('../img/ajax-loader.gif') no-repeat center center transparent;}

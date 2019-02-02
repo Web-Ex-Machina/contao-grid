@@ -12,8 +12,8 @@ window.addEvent("domready", function() {
 			var w = '100%';
 			var title = "Grid Preview : ";
 			switch(e.target.getAttribute('data-breakpoint')){
-				case 'xxs': w = '520px'; bounds = "XXS (From 0px to 520px)"; break;
-				case 'xs': w = '620px'; bounds = "XS (From 521px to 620px)"; break;
+				case 'xxs': w = '400px'; bounds = "XXS (From 0px to 520px)"; break;
+				case 'xs': w = '600px'; bounds = "XS (From 521px to 620px)"; break;
 				case 'sm': w = '768px'; bounds = "SM (From 621px to 768px)"; break;
 				case 'md': w = '992px'; bounds = "MD (From 769px to 992px)"; break;
 				case 'lg': w = '1200px'; bounds = "LG (From 993px to 1200px)"; break;

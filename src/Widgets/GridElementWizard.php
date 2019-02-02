@@ -125,11 +125,11 @@ class GridElementWizard extends \Widget
 			$objResponse->send();
 		}
 
-
 		$strReturn = 
 '<div class="gridelement">
 	<div class="helpers d-grid cols-4">
 		<div class="item-grid">
+			<span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
 			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
 			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
 			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>

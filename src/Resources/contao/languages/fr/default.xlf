@@ -13,6 +13,11 @@
         <source>Grid | Stop</source>
         <target>Grille | Fin</target>
       </trans-unit>
+
+      <trans-unit id="WEM.GRID.BE.previewLabel">
+        <source>Preview</source>
+        <target>Aperçu</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
