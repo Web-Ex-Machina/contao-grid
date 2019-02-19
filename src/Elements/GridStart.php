@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Grid Bundle for Contao Open Source CMS
@@ -19,26 +19,27 @@ use WEM\GridBundle\Helper\GridBuilder;
  */
 class GridStart extends \ContentElement
 {
-	/**
-	 * Template
-	 * @var string
-	 */
-	protected $strTemplate = 'ce_grid_start';
+    /**
+     * Template
+     * @var string
+     */
+    protected $strTemplate = 'ce_grid_start';
 
-	/**
-	 * Generate the content element
-	 */
-	protected function compile(){
-		// Backend template
-		if (TL_MODE == 'BE'){
-			$this->strTemplate = 'be_wildcard';
-			$this->Template = new \BackendTemplate($this->strTemplate);
-			$this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
-		}
+    /**
+     * Generate the content element
+     */
+    protected function compile()
+    {
+        // Backend template
+        if (TL_MODE == 'BE') {
+            $this->strTemplate = 'be_wildcard';
+            $this->Template = new \BackendTemplate($this->strTemplate);
+            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
+        }
 
-		$GLOBALS['WEM']['GRID']['preset'] = $this->grid_preset;
-		$GLOBALS['WEM']['GRID']['classes'] = implode(' ', GridBuilder::getItemClasses($this));
+        $GLOBALS['WEM']['GRID']['preset'] = $this->grid_preset;
+        $GLOBALS['WEM']['GRID']['classes'] = implode(' ', GridBuilder::getItemClasses($this));
 
-		$this->Template->classes = GridBuilder::getWrapperClasses($this);
-	}
+        $this->Template->classes = GridBuilder::getWrapperClasses($this);
+    }
 }

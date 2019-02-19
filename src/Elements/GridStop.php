@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Grid Bundle for Contao Open Source CMS
@@ -15,23 +15,24 @@ namespace WEM\GridBundle\Elements;
  */
 class GridStop extends \ContentElement
 {
-	/**
-	 * Template
-	 * @var string
-	 */
-	protected $strTemplate = 'ce_grid_stop';
+    /**
+     * Template
+     * @var string
+     */
+    protected $strTemplate = 'ce_grid_stop';
 
-	/**
-	 * Generate the content element
-	 */
-	protected function compile(){
-		// Backend template
-		if (TL_MODE == 'BE'){
-			$this->strTemplate = 'be_wildcard';
-			$this->Template = new \BackendTemplate($this->strTemplate);
-			$this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
-		}
+    /**
+     * Generate the content element
+     */
+    protected function compile()
+    {
+        // Backend template
+        if (TL_MODE == 'BE') {
+            $this->strTemplate = 'be_wildcard';
+            $this->Template = new \BackendTemplate($this->strTemplate);
+            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
+        }
 
-		$GLOBALS['WEM']['GRID'] = null;
-	}
+        $GLOBALS['WEM']['GRID'] = null;
+    }
 }

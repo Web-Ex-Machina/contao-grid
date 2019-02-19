@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Grid Bundle for Contao Open Source CMS
@@ -15,20 +15,22 @@ namespace WEM\GridBundle\Classes;
  */
 class Hooks extends \Controller
 {
-	protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
-	
-	/**
-	 * getContentElement Hook : Check if the element is in a Grid and wrap them
-	 */
-	public function wrapGridElements(\ContentModel $objElement, $strBuffer){
-		// Skip elements we never want to wrap or if we are not in a grid
-		if(null === $GLOBALS['WEM']['GRID'] || in_array($objElement->type, static::$arrSkipContentTypes))
-			return $strBuffer;
+    protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
+    
+    /**
+     * getContentElement Hook : Check if the element is in a Grid and wrap them
+     */
+    public function wrapGridElements(\ContentModel $objElement, $strBuffer)
+    {
+        // Skip elements we never want to wrap or if we are not in a grid
+        if (null === $GLOBALS['WEM']['GRID'] || in_array($objElement->type, static::$arrSkipContentTypes)) {
+            return $strBuffer;
+        }
 
-		return sprintf(
-			'<div class="%s">%s</div>'
-			,$GLOBALS['WEM']['GRID']['classes']
-			,$strBuffer
-		);
-	}
+        return sprintf(
+            '<div class="%s">%s</div>',
+            $GLOBALS['WEM']['GRID']['classes'],
+            $strBuffer
+        );
+    }
 }
