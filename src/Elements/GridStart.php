@@ -40,6 +40,12 @@ class GridStart extends \ContentElement
         $GLOBALS['WEM']['GRID']['preset'] = $this->grid_preset;
         $GLOBALS['WEM']['GRID']['classes'] = implode(' ', GridBuilder::getItemClasses($this));
 
-        $this->Template->classes = GridBuilder::getWrapperClasses($this);
+        $classes = GridBuilder::getWrapperClasses($this);
+
+        if ("" !== $this->cssID[1]) {
+            $classes[] = $this->cssID[1];
+        }
+
+        $this->Template->classes = $classes;
     }
 }
