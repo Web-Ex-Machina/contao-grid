@@ -23,8 +23,23 @@ class GridBuilder extends \Controller
     public static function getWrapperClasses($objElement)
     {
         $arrClasses = [];
-        $rows = unserialize($objElement->grid_rows);
-        $cols = unserialize($objElement->grid_cols);
+        
+        if (!is_array($objElement->grid_rows)) {
+            $rows = unserialize($objElement->grid_rows);
+        } else {
+            $rows = $objElement->grid_rows;
+        }
+
+        if (!is_array($objElement->grid_cols)) {
+            $cols = unserialize($objElement->grid_cols);
+        } else {
+            $cols = $objElement->grid_cols;
+        }
+
+        // We don't need rows, but what's the point of a grid without cols ?
+        if (!is_array($cols)) {
+            return [];
+        }
 
         switch ($objElement->grid_preset) {
             case 'bs3':
