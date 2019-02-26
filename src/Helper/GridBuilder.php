@@ -120,6 +120,20 @@ class GridBuilder extends \Controller
                 throw new \Exception(sprintf("Preset %s unknown", $objElement->grid_preset));
         }
 
-        return $arrClasses;
+        // Setup special item rules
+        $arrItemsClasses = [];
+        if (null !== $objElement->grid_items) {
+            if (!is_array($objElement->grid_items)) {
+                $items = unserialize($objElement->grid_items);
+            } else {
+                $items = $objElement->grid_items;
+            }
+
+            if (0 < count($items)) {
+                $arrItemsClasses = $items;
+            }
+        }
+
+        return ["all" => $arrClasses, "items" => $arrItemsClasses];
     }
 }

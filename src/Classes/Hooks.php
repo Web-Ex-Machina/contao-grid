@@ -28,8 +28,9 @@ class Hooks extends \Controller
         }
 
         return sprintf(
-            '<div class="%s">%s</div>',
-            $GLOBALS['WEM']['GRID']['classes'],
+            '<div class="%s %s">%s</div>',
+            implode(' ', $GLOBALS['WEM']['GRID']['item_classes']['all']),
+            $GLOBALS['WEM']['GRID']['item_classes']['items'][$objElement->id] ?: '',
             $strBuffer
         );
     }

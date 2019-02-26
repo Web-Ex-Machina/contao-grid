@@ -19,7 +19,8 @@ class GridElementWizard extends \Widget
      * @var boolean
      */
     protected $blnSubmitInput = true;
-/**
+
+    /**
      * Template
      * @var string
      */
@@ -65,7 +66,8 @@ class GridElementWizard extends \Widget
     public function validate()
     {
         $mandatory = $this->mandatory;
-        $items = $this->getPost($this->strName);
+        $varValue = $this->getPost($this->strName);
+        parent::validate();
     }
 
     /**
@@ -93,7 +95,19 @@ class GridElementWizard extends \Widget
         $blnGridStart = false;
         $blnGridStop = false;
 
-        $strGrid = sprintf('<div class="grid_preview %s">', implode(' ', GridBuilder::getWrapperClasses($this->activeRecord)));
+        $GLOBALS['WEM']['GRID'] = [
+            "preset" => $this->grid_preset,
+            "wrapper_classes" => GridBuilder::getWrapperClasses($this->activeRecord),
+            "item_classes" => GridBuilder::getItemClasses($this->activeRecord)
+        ];
+        
+        if ("" !== $this->activeRecord->cssID[1]) {
+            $GLOBALS['WEM']['GRID']['wrapper_classes'][] = $this->cssID[1];
+        }
+
+        $GLOBALS['WEM']['GRID']['item_classes']['all'][] = 'helper';
+
+        $strGrid = sprintf('<div class="grid_preview %s">', implode(' ', $GLOBALS['WEM']['GRID']['wrapper_classes']));
 
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
@@ -113,7 +127,17 @@ class GridElementWizard extends \Widget
                 break;
             }
 
-            $strGrid .= sprintf('<div class="helper %s">%s</div>', implode(' ', GridBuilder::getItemClasses($this->activeRecord)), $this->getContentElement($objItems->current()));
+            $strElement = $this->getContentElement($objItems->current());
+
+            // Tricky but works all the time : replace the last 6 characters (</div>) with the input
+            $search = '</div>';
+            $pos = strrpos($strElement, $search);
+            if ($pos !== false) {
+                $replace = sprintf('<input name="%s[%s]" type="text" value="%s" />', $this->strId, $objItems->id, $this->varValue[$objItems->id]).$search;
+                $strElement = substr_replace($strElement, $replace, $pos, strlen($search));
+            }
+
+            $strGrid .= $strElement;
         }
         
         // Add CSS & JS to the Wizard
@@ -133,21 +157,21 @@ class GridElementWizard extends \Widget
 
         $strReturn =
         '<div class="gridelement">
-	<div class="helpers d-grid cols-4">
-		<div class="item-grid">
-			<span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
-			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
-			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
-			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
-			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
-			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
-			<button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
-		</div>
-		<div class="item-grid">
-			<button class="tl_submit grid_toggleHelpers">Toggle helpers</button>
-		</div>
-	</div>
-	'.$strGrid.'
+    <div class="helpers d-grid cols-4">
+        <div class="item-grid">
+            <span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
+        </div>
+        <div class="item-grid">
+            <button class="tl_submit grid_toggleHelpers">Toggle helpers</button>
+        </div>
+    </div>
+    '.$strGrid.'
 </div>';
 
         return $strReturn;

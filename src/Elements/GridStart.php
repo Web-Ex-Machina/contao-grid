@@ -37,15 +37,14 @@ class GridStart extends \ContentElement
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
         }
 
-        $GLOBALS['WEM']['GRID']['preset'] = $this->grid_preset;
-        $GLOBALS['WEM']['GRID']['classes'] = implode(' ', GridBuilder::getItemClasses($this));
-
-        $classes = GridBuilder::getWrapperClasses($this);
-
+        $GLOBALS['WEM']['GRID'] = [
+            "preset" => $this->grid_preset,
+            "wrapper_classes" => GridBuilder::getWrapperClasses($this),
+            "item_classes" => GridBuilder::getItemClasses($this)
+        ];
+        
         if ("" !== $this->cssID[1]) {
-            $classes[] = $this->cssID[1];
+            $GLOBALS['WEM']['GRID']['wrapper_classes'][] = $this->cssID[1];
         }
-
-        $this->Template->classes = $classes;
     }
 }
