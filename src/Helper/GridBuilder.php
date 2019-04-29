@@ -92,7 +92,11 @@ class GridBuilder extends \Controller
     public static function getItemClasses($objElement)
     {
         $arrClasses = [];
-        $cols = unserialize($objElement->grid_rows);
+        if (is_array($objElement->grid_cols)) {
+            $cols = $objElement->grid_cols;
+        } else {
+            $cols = unserialize($objElement->grid_cols);
+        }
 
         switch ($objElement->grid_preset) {
             case 'bs3':
