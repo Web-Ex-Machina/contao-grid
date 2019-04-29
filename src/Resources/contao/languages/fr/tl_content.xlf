@@ -14,10 +14,6 @@
         <source>Select the grid preset</source>
         <target>Sélectionner le format de grille</target>
       </trans-unit>
-      <trans-unit id="tl_content.grid_preset.bs3">
-        <source>Bootstrap 3</source>
-        <target>Bootstrap 3</target>
-      </trans-unit>
       <trans-unit id="tl_content.grid_preset.bs4">
         <source>Bootstrap 4</source>
         <target>Bootstrap 4</target>

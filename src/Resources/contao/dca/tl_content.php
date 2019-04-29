@@ -23,7 +23,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_preset'] = array
     'label'                   => &$GLOBALS['TL_LANG']['tl_content']['grid_preset'],
     'exclude'                 => true,
     'inputType'               => 'select',
-    'options'                 => array('bs3', 'bs4', 'cssgrid'),
+    'options'                 => array('bs4', 'cssgrid'),
     'reference'               => &$GLOBALS['TL_LANG']['tl_content']['grid_preset'],
     'eval'                    => array('tl_class'=>'', 'submitOnChange'=>true, 'includeBlankOption'=>true, 'chosen'=>true),
     'sql'                     => "varchar(32) NOT NULL default ''"
