@@ -43,7 +43,7 @@ class GridBuilder extends \Controller
 
         switch ($objElement->grid_preset) {
             case 'bs3':
-                $arrClasses[] = $objElement->grid_row_class;
+                throw new \Exception(sprintf("Preset %s removed", $objElement->grid_preset));
                 break;
 
             case 'bs4':
@@ -96,9 +96,7 @@ class GridBuilder extends \Controller
 
         switch ($objElement->grid_preset) {
             case 'bs3':
-                foreach ($cols as $col) {
-                    $arrClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
-                }
+                throw new \Exception(sprintf("Preset %s removed", $objElement->grid_preset));
                 break;
 
             case 'bs4':
