@@ -104,11 +104,10 @@ class GridBuilder extends \Controller
                 break;
 
             case 'bs4':
-                foreach ($cols as $k => $col) {
-                    // Quickfix : we need the first col to be generic, no matter what is the breakpoint
-                    if (0 == $k) {
-                        $arrClasses[] = sprintf("col-%d", 12 / $col['value']);
-                    } else {
+                if (1 == count($cols)) {
+                    $arrClasses[] = sprintf("col-%d", 12 / $cols[0]['value']);
+                } else {
+                    foreach ($cols as $k => $col) {
                         $arrClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
                     }
                 }

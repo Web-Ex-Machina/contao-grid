@@ -105,7 +105,7 @@ class GridElementWizard extends \Widget
             $GLOBALS['WEM']['GRID']['wrapper_classes'][] = $this->cssID[1];
         }
 
-        $GLOBALS['WEM']['GRID']['item_classes']['all'][] = 'helper';
+        $GLOBALS['WEM']['GRID']['item_classes']['all'][] = 'be_item_grid helper';
 
         $strGrid = sprintf('<div class="grid_preview %s">', implode(' ', $GLOBALS['WEM']['GRID']['wrapper_classes']));
 
@@ -142,6 +142,7 @@ class GridElementWizard extends \Widget
         
         // Add CSS & JS to the Wizard
         $GLOBALS['TL_CSS']['wemgrid'] = 'bundles/wemgrid/css/backend.css';
+        $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
 
         $strGrid .= '</div>';
