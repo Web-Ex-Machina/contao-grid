@@ -132,7 +132,7 @@ class GridElementWizard extends \Widget
             // Tricky but works all the time : replace the last 6 characters (</div>) with the input
             $search = '</div>';
             $pos = strrpos($strElement, $search);
-            if ($pos !== false) {
+            if ($pos !== false && !\Input::get('grid_preview')) {
                 $replace = sprintf('<input name="%s[%s]" type="text" value="%s" />', $this->strId, $objItems->id, $this->varValue[$objItems->id]).$search;
                 $strElement = substr_replace($strElement, $replace, $pos, strlen($search));
             }
