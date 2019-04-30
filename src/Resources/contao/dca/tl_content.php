@@ -8,6 +8,9 @@
  * @author Web ex Machina <https://www.webexmachina.fr>
  */
 
+// Update grid content elements callbacks
+$GLOBALS['TL_DCA']['tl_content']['config']['onsubmit_callback'][] = array('tl_content_wem_grid', 'createGridStop');
+
 // Update grid content elements palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][]  = 'grid_preset';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-start']      = '{type_legend},type;{grid_legend},grid_preset;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
@@ -63,7 +66,46 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_items'] = array
     'sql'                     => "blob NULL"
 );
 
-class tl_content_grid extends tl_content
+class tl_content_wem_grid extends tl_content
 {
+    /**
+     * Automaticly create a GridStop element when creating a GridStart element
+     * 
+     * @param  DataContainer $dc
+     * 
+     * @return 
+     */
+    public function createGridStop($dc){
+        if (null != $dc->activeRecord && "grid-start" == $dc->activeRecord->type){
+            // Try to fetch the really next grid stop element
+            $strSQL = sprintf(
+                "SELECT type FROM tl_content WHERE pid = %s AND ptable = '%s' AND sorting > %s ORDER BY sorting ASC"
+                ,$dc->activeRecord->pid
+                ,$dc->activeRecord->ptable
+                ,$dc->activeRecord->sorting
+            );
+            $objDb = $this->Database->prepare($strSQL)->execute();
 
+            // We'll check every other elements, if we don't find a "grid-stop" element, we have to create one
+            $blnCreate = true;
+            if ($objDb && 0 < $objDb->count()) {
+                while ($objDb->next()) {
+                    if ("grid-stop" != $objDb->type) {
+                        $blnCreate = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($blnCreate) {
+                $objElement = new \ContentModel();
+                $objElement->tstamp = time();
+                $objElement->pid = $dc->activeRecord->pid;
+                $objElement->ptable = $dc->activeRecord->ptable;
+                $objElement->type = "grid-stop";
+                $objElement->sorting = $dc->activeRecord->sorting + 64;
+                $objElement->save();
+            }
+        }
+    }
 }
