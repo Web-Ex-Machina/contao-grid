@@ -67,12 +67,16 @@ class GridBuilder extends \Controller
                     }
                 }
 
-                foreach ($rows as $k => $row) {
-                    // Quickfix : we need the first col to be generic, no matter what is the breakpoint
-                    if (0 == $k) {
-                        $arrClasses[] = sprintf("rows-%d", $row['value']);
-                    } else {
-                        $arrClasses[] = sprintf("rows-%s-%d", $row['key'], $row['value']);
+                if (!is_array($rows)) {
+                    $arrClasses = [];
+                } else {
+                    foreach ($rows as $k => $row) {
+                        // Quickfix : we need the first col to be generic, no matter what is the breakpoint
+                        if (0 == $k) {
+                            $arrClasses[] = sprintf("rows-%d", $row['value']);
+                        } else {
+                            $arrClasses[] = sprintf("rows-%s-%d", $row['key'], $row['value']);
+                        }
                     }
                 }
                 break;
@@ -102,6 +106,11 @@ class GridBuilder extends \Controller
                 break;
 
             case 'bs4':
+                if(!$cols){
+                    $arrClasses = [];
+                    break;
+                }
+                
                 foreach ($cols as $k => $col) {
                     // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                     if (0 == $k) {
