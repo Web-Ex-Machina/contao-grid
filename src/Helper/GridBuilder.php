@@ -43,7 +43,7 @@ class GridBuilder extends \Controller
 
         switch ($objElement->grid_preset) {
             case 'bs3':
-                $arrClasses[] = $objElement->grid_row_class;
+                throw new \Exception(sprintf("Preset %s removed", $objElement->grid_preset));
                 break;
 
             case 'bs4':
@@ -96,26 +96,27 @@ class GridBuilder extends \Controller
     public static function getItemClasses($objElement)
     {
         $arrClasses = [];
-        $cols = unserialize($objElement->grid_rows);
+        if (is_array($objElement->grid_cols)) {
+            $cols = $objElement->grid_cols;
+        } else {
+            $cols = unserialize($objElement->grid_cols);
+        }
 
         switch ($objElement->grid_preset) {
             case 'bs3':
-                foreach ($cols as $col) {
-                    $arrClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
-                }
+                throw new \Exception(sprintf("Preset %s removed", $objElement->grid_preset));
                 break;
 
             case 'bs4':
-                if(!$cols){
+                if (!$cols) {
                     $arrClasses = [];
                     break;
                 }
-                
-                foreach ($cols as $k => $col) {
-                    // Quickfix : we need the first col to be generic, no matter what is the breakpoint
-                    if (0 == $k) {
-                        $arrClasses[] = sprintf("col-%d", 12 / $col['value']);
-                    } else {
+
+                if (1 == count($cols)) {
+                    $arrClasses[] = sprintf("col-%d", 12 / $cols[0]['value']);
+                } else {
+                    foreach ($cols as $k => $col) {
                         $arrClasses[] = sprintf("col-%s-%d", $col['key'], 12 / $col['value']);
                     }
                 }
