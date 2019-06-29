@@ -146,4 +146,47 @@ class GridBuilder extends \Controller
 
         return ["all" => $arrClasses, "items" => $arrItemsClasses];
     }
+
+    /**
+     * Automaticly create a GridStop element when creating a GridStart element
+     *
+     * @param  DataContainer $dc
+     *
+     * @return
+     */
+    public function createGridStop($dc)
+    {
+        if (null != $dc->activeRecord && "grid-start" == $dc->activeRecord->type) {
+            // Try to fetch the really next grid stop element
+            $strSQL = sprintf(
+                "SELECT type FROM tl_content WHERE pid = %s AND ptable = '%s' AND sorting > %s ORDER BY sorting ASC",
+                $dc->activeRecord->pid,
+                $dc->activeRecord->ptable,
+                $dc->activeRecord->sorting
+            );
+            
+            $objDb = \Database::getInstance()->prepare($strSQL)->execute();
+
+            // We'll check every other elements, if we don't find a "grid-stop" element, we have to create one
+            $blnCreate = true;
+            if ($objDb && 0 < $objDb->count()) {
+                while ($objDb->next()) {
+                    if ("grid-stop" == $objDb->type) {
+                        $blnCreate = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($blnCreate) {
+                $objElement = new \ContentModel();
+                $objElement->tstamp = time();
+                $objElement->pid = $dc->activeRecord->pid;
+                $objElement->ptable = $dc->activeRecord->ptable;
+                $objElement->type = "grid-stop";
+                $objElement->sorting = $dc->activeRecord->sorting + 64;
+                $objElement->save();
+            }
+        }
+    }
 }
