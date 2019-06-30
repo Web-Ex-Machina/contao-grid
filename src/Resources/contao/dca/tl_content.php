@@ -23,12 +23,13 @@ $GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid']  = 'grid_
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_preset'] = array
 (
     'label'                   => &$GLOBALS['TL_LANG']['tl_content']['grid_preset'],
+    'default'                 => 'cssgrid',
     'exclude'                 => true,
     'inputType'               => 'select',
     'options'                 => array('bs4', 'cssgrid'),
     'reference'               => &$GLOBALS['TL_LANG']['tl_content']['grid_preset'],
     'eval'                    => array('tl_class'=>'', 'submitOnChange'=>true, 'includeBlankOption'=>true, 'chosen'=>true),
-    'sql'                     => "varchar(32) NOT NULL default ''"
+    'sql'                     => "varchar(32) NOT NULL default 'cssgrid'"
 );
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_row_class'] = array
 (
