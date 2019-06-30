@@ -6,6 +6,19 @@ window.addEvent("domready", function () {
         });
     });
 
+    document.querySelectorAll('.gridelement .be_item_grid').forEach(function (i) {
+        var c = i.getAttribute('class');
+        if("" != i.querySelector('input').value) {
+            c = c.replace(i.querySelector('input').value, "");
+        }
+        i.setAttribute('data-class', c.trim());
+    });
+
+    document.querySelector('.gridelement .be_item_grid .item-classes input').addEventListener("keyup", function (e) {
+        var itemgrid = this.parentNode.parentNode;
+        itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+this.value);
+    });
+
     document.querySelectorAll('.gridelement .helpers .grid_toggleBreakPoint').forEach(function (i) {
         i.addEventListener("click", function (e) {
             e.preventDefault();

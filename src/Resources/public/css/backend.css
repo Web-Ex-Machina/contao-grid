@@ -7,5 +7,8 @@
 .gridelement .helper{padding:15px;background:#eaeaec;}
 .gridelement img, .grid_preview img{max-width:100%;height: auto;}
 
+.gridelement .be_item_grid .item-classes{margin-top:8px;}
+.gridelement .be_item_grid .item-classes input{width:100%;padding:5px;}
+
 /** IFRAME PREVIEW **/
 .simple-modal-body iframe{background:url('../img/ajax-loader.gif') no-repeat center center transparent;}

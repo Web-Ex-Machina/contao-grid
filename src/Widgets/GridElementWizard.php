@@ -161,7 +161,13 @@ class GridElementWizard extends \Widget
             $search = '</div>';
             $pos = strrpos($strElement, $search);
             if ($pos !== false && !\Input::get('grid_preview')) {
-                $replace = sprintf('<input name="%s[%s]" type="text" value="%s" />', $this->strId, $objItems->id, $this->varValue[$objItems->id]).$search;
+                $replace = sprintf(
+                    '<div class="item-classes"><input name="%s[%s]" type="text" value="%s" placeholder="%s" /></div>',
+                    $this->strId,
+                    $objItems->id,
+                    $this->varValue[$objItems->id],
+                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inputItemPlaceholder']
+                ) . $search;
                 $strElement = substr_replace($strElement, $replace, $pos, strlen($search));
             }
 

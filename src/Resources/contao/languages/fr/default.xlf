@@ -22,6 +22,10 @@
         <source>Here is a guide to understand how the grid works : %s</source>
         <target>Vous trouverez ici un guide pour comprendre comment la grille fonctionne : %s</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inputItemPlaceholder">
+        <source>Add a class to this item's wrapper</source>
+        <target>Ajoutez une classe au conteneur de cet item</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
