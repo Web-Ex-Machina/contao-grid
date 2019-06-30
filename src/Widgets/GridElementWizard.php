@@ -96,7 +96,7 @@ class GridElementWizard extends \Widget
         $blnGridStop = false;
 
         $GLOBALS['WEM']['GRID'] = [
-            "preset" => $this->grid_preset,
+            "preset" => $this->activeRecord->grid_preset,
             "wrapper_classes" => GridBuilder::getWrapperClasses($this->activeRecord),
             "item_classes" => GridBuilder::getItemClasses($this->activeRecord)
         ];
@@ -108,6 +108,34 @@ class GridElementWizard extends \Widget
         $GLOBALS['WEM']['GRID']['item_classes']['all'][] = 'be_item_grid helper';
 
         $strGrid = sprintf('<div class="grid_preview %s">', implode(' ', $GLOBALS['WEM']['GRID']['wrapper_classes']));
+
+        switch ($this->activeRecord->grid_preset) {
+            case 'cssgrid':
+                $strHelper = sprintf(
+                    '<a href="%s" title="%s" target="_blank">%s</a>',
+                    'https://framway.webexmachina.fr/#framway__manuals-grid',
+                    'Framway Grid Manual',
+                    'Framway Grid Manual',
+                );
+                break;
+            
+            case 'bs4':
+                $strHelper = sprintf(
+                    '<a href="%s" title="%s" target="_blank">%s</a>',
+                    'https://getbootstrap.com/docs/4.0/layout/grid/',
+                    'BS4 Grid Manual',
+                    'BS4 Grid Manual',
+                );
+                break;
+
+            default:
+                $strHelper = '';
+                break;
+        }
+
+        if ('' != $strHelper) {
+            $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
+        }
 
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
@@ -172,6 +200,7 @@ class GridElementWizard extends \Widget
             <button class="tl_submit grid_toggleHelpers">Toggle helpers</button>
         </div>
     </div>
+    '.$strHelper.'
     '.$strGrid.'
 </div>';
 
