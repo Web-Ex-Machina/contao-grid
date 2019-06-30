@@ -1,1 +1,1 @@
-<div class="<?= implode(' ', $GLOBALS['WEM']['GRID']['wrapper_classes']) ?>">
+<div class="<?= $this->class ?>"<?= $this->cssID ?>>

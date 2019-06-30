@@ -43,8 +43,10 @@ class GridStart extends \ContentElement
             "item_classes" => GridBuilder::getItemClasses($this)
         ];
         
-        if ("" !== $this->cssID[1]) {
-            $GLOBALS['WEM']['GRID']['wrapper_classes'][] = $this->cssID[1];
+        if (is_array($this->objModel->classes)) {
+            $this->objModel->classes = array_merge($GLOBALS['WEM']['GRID']['wrapper_classes'], $this->objModel->classes);
+        } else {
+            $this->objModel->classes = $GLOBALS['WEM']['GRID']['wrapper_classes'];
         }
     }
 }
