@@ -33,6 +33,14 @@ class GridStop extends \ContentElement
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
         }
 
-        $GLOBALS['WEM']['GRID'] = null;
+        // Get the last open grid
+        $arrGrid = end($GLOBALS['WEM']['GRID']);
+        reset($GLOBALS['WEM']['GRID']);
+
+        // Send the grid_id to template
+        $this->Template->grid_id = $arrGrid['grid_id'];
+
+        // And pop the grid from the globals array
+        array_pop($GLOBALS['WEM']['GRID']);
     }
 }

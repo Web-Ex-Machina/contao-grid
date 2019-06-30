@@ -38,17 +38,23 @@ class GridStart extends \ContentElement
         }
 
         // Set up wrappers classes
-        $GLOBALS['WEM']['GRID'] = [
+        $arrGrid = [
+            "grid_id" => $this->id,
             "preset" => $this->grid_preset,
             "wrapper_classes" => GridBuilder::getWrapperClasses($this),
-            "item_classes" => GridBuilder::getItemClasses($this)
+            "item_classes" => GridBuilder::getItemClasses($this),
+            "elements" => []
         ];
+        $GLOBALS['WEM']['GRID'][$this->id] = $arrGrid;
         
-        // Add the classes to the Model so the main class can use it correctly
+        // Add the classes to the Model so the main class can use it correct
         if (is_array($this->objModel->classes)) {
-            $this->objModel->classes = array_merge($GLOBALS['WEM']['GRID']['wrapper_classes'], $this->objModel->classes);
+            $this->objModel->classes = array_merge($arrGrid['wrapper_classes'], $this->objModel->classes);
         } else {
-            $this->objModel->classes = $GLOBALS['WEM']['GRID']['wrapper_classes'];
+            $this->objModel->classes = $arrGrid['wrapper_classes'];
         }
+
+        // Send the grid_id to template
+        $this->Template->grid_id = $this->id;
     }
 }

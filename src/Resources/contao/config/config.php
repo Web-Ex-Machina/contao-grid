@@ -9,15 +9,23 @@
  */
 
 // Add the Grid Wrapper Content Element
-array_insert($GLOBALS['TL_CTE'], count($GLOBALS['TL_CTE'])+1, array(
-    'grid' => array(
-        'grid-start' => 'WEM\GridBundle\Elements\GridStart'
-        ,'grid-stop' => 'WEM\GridBundle\Elements\GridStop'
+array_insert(
+    $GLOBALS['TL_CTE'],
+    count($GLOBALS['TL_CTE'])+1,
+    array(
+        'grid' => array(
+            'grid-start' => 'WEM\GridBundle\Elements\GridStart'
+            ,'grid-stop' => 'WEM\GridBundle\Elements\GridStop'
+        )
     )
-));
+);
 
 // Add Hook
 $GLOBALS['TL_HOOKS']['getContentElement'][] = array('WEM\GridBundle\Classes\Hooks', 'wrapGridElements');
+
+if ("FE" == TL_MODE) {
+    $GLOBALS['TL_HOOKS']['modifyFrontendPage'][] = array('WEM\GridBundle\Classes\Hooks', 'clearEmptyGridWrappers');
+}
 
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = 'WEM\GridBundle\Widgets\GridElementWizard';
