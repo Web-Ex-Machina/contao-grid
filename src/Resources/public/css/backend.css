@@ -7,7 +7,8 @@
 .gridelement .helper{padding:15px;background:#eaeaec;}
 .gridelement img, .grid_preview img{max-width:100%;height: auto;}
 
-.gridelement .be_item_grid .item-classes{margin-top:8px;}
+.gridelement .be_item_grid .item-classes{margin-top:8px;display:none;}
+.gridelement .be_item_grid.helper .item-classes{display:block;}
 .gridelement .be_item_grid .item-classes input{width:100%;padding:5px;}
 
 /** IFRAME PREVIEW **/
