@@ -18,7 +18,12 @@ class Hooks extends \Controller
     protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
     
     /**
-     * getContentElement Hook : Check if the element is in a Grid and wrap them
+     * Hook getContentElement Hook : Check if the element is in a Grid and wrap them
+     *
+     * @param [ContentModel] $objElement [Content Element Model]
+     * @param [String]       $strBuffer  [Content Template parsed]
+     *
+     * @return [String] [Content Template, untouched or adjusted]
      */
     public function wrapGridElements(\ContentModel $objElement, $strBuffer)
     {
