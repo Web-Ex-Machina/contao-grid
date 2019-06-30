@@ -37,12 +37,14 @@ class GridStart extends \ContentElement
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
         }
 
+        // Set up wrappers classes
         $GLOBALS['WEM']['GRID'] = [
             "preset" => $this->grid_preset,
             "wrapper_classes" => GridBuilder::getWrapperClasses($this),
             "item_classes" => GridBuilder::getItemClasses($this)
         ];
         
+        // Add the classes to the Model so the main class can use it correctly
         if (is_array($this->objModel->classes)) {
             $this->objModel->classes = array_merge($GLOBALS['WEM']['GRID']['wrapper_classes'], $this->objModel->classes);
         } else {
