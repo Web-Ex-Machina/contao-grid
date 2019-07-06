@@ -23,9 +23,5 @@ array_insert(
 // Add Hook
 $GLOBALS['TL_HOOKS']['getContentElement'][] = array('WEM\GridBundle\Classes\Hooks', 'wrapGridElements');
 
-if ("FE" == TL_MODE) {
-    $GLOBALS['TL_HOOKS']['modifyFrontendPage'][] = array('WEM\GridBundle\Classes\Hooks', 'clearEmptyGridWrappers');
-}
-
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = 'WEM\GridBundle\Widgets\GridElementWizard';

@@ -1,1 +1,3 @@
+<?php if(!$this->doNotPrint): ?>
 <!--GridStart<?= $this->grid_id ?>--><div class="<?= $this->class ?>"<?= $this->cssID ?>>
+<?php endif; ?>

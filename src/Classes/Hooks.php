@@ -28,7 +28,7 @@ class Hooks extends \Controller
     public function wrapGridElements(\ContentModel $objElement, $strBuffer)
     {
         // Skip elements we never want to wrap or if we are not in a grid
-        if (null === $GLOBALS['WEM']['GRID'] || in_array($objElement->type, static::$arrSkipContentTypes)) {
+        if (null === $GLOBALS['WEM']['GRID']) {
             return $strBuffer;
         }
 
@@ -42,7 +42,16 @@ class Hooks extends \Controller
             return $strBuffer;
         }
 
-        $GLOBALS['WEM']['GRID'][$k]["elements"][] = $objElement->id;
+        // For each opened grid, we will add the elements into it
+        foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
+            if ($k != $objElement->id) {
+                $GLOBALS['WEM']['GRID'][$k]["elements"][] = $objElement->id;
+            }
+        }
+
+        if (in_array($objElement->type, static::$arrSkipContentTypes)) {
+            return $strBuffer;
+        }
 
         return sprintf(
             '<div class="%s %s">%s</div>',
@@ -50,29 +59,5 @@ class Hooks extends \Controller
             $arrGrid['item_classes']['items'][$objElement->id] ?: '',
             $strBuffer
         );
-    }
-
-    /**
-     * Hook modifyFrontendPage : Check if we have grid-start // grid-stop elements
-     * without contents and remove them if yes(they create blank spaces we don't
-     * want)
-     *
-     * @param [String] $strBuffer [Page HTML]
-     * @param [templateName] $strTemplate [Template used]
-     *
-     * @return [String] [Page HTML, untouched or adjusted]
-     */
-    public function clearEmptyGridWrappers($strBuffer, $strTemplate)
-    {
-        $regx = '/<div(.*)class="ce_grid-start(.*)>(.*\n.*)<\/div>/';
-        preg_match_all($regx, $strBuffer, $wrappers, PREG_SET_ORDER);
-
-        //dump($wrappers);
-
-        // Remove opening and closing grid comments
-        //$strBuffer = preg_replace('/<!--GridStart(\d{1,45})-->/', "", $strBuffer);
-        //$strBuffer = preg_replace('/<!--GridStop(\d{1,45})-->/', "", $strBuffer);
-
-        return $strBuffer;
     }
 }

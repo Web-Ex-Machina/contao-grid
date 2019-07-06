@@ -37,6 +37,13 @@ class GridStart extends \ContentElement
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
         }
 
+        // Check if the very next element is a grid-stop element
+        $objNextElement = \Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute([$this->pid, $this->ptable, $this->sorting]);
+
+        if (1 > $objNextElement->numRows || "grid-stop" == $objNextElement->type) {
+            $this->Template->doNotPrint = true;
+        }
+
         // Set up wrappers classes
         $arrGrid = [
             "grid_id" => $this->id,
