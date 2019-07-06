@@ -47,6 +47,7 @@ class GridStart extends \ContentElement
         // Set up wrappers classes
         $arrGrid = [
             "grid_id" => $this->id,
+            "subgrid" => (is_array($GLOBALS['WEM']['GRID']) && 1 <= count($GLOBALS['WEM']['GRID'])) ? true : false,
             "preset" => $this->grid_preset,
             "wrapper_classes" => GridBuilder::getWrapperClasses($this),
             "item_classes" => GridBuilder::getItemClasses($this),

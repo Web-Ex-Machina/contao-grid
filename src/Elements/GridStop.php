@@ -44,8 +44,5 @@ class GridStop extends \ContentElement
 
         // Send the grid_id to template
         $this->Template->grid_id = $arrGrid['grid_id'];
-
-        // And pop the grid from the globals array
-        array_pop($GLOBALS['WEM']['GRID']);
     }
 }
