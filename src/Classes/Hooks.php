@@ -40,6 +40,9 @@ class Hooks extends \Controller
         // For each opened grid, we will add the elements into it
         foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
             if ($k != $objElement->id) {
+                if (!array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
+                    $GLOBALS['WEM']['GRID'][$k]["elements"] = [];
+                }
                 $GLOBALS['WEM']['GRID'][$k]["elements"][] = $objElement->id;
             }
         }

@@ -95,19 +95,19 @@ class GridElementWizard extends \Widget
         $blnGridStart = false;
         $blnGridStop = false;
 
-        $GLOBALS['WEM']['GRID'] = [
+        $GLOBALS['WEM']['GRID'][$this->id] = [
             "preset" => $this->activeRecord->grid_preset,
             "wrapper_classes" => GridBuilder::getWrapperClasses($this->activeRecord),
             "item_classes" => GridBuilder::getItemClasses($this->activeRecord)
         ];
         
         if ("" !== $this->activeRecord->cssID[1]) {
-            $GLOBALS['WEM']['GRID']['wrapper_classes'][] = $this->cssID[1];
+            $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes'][] = $this->cssID[1];
         }
 
-        $GLOBALS['WEM']['GRID']['item_classes']['all'][] = 'be_item_grid helper';
+        $GLOBALS['WEM']['GRID'][$this->id]['item_classes']['all'][] = 'be_item_grid helper';
 
-        $strGrid = sprintf('<div class="grid_preview %s">', implode(' ', $GLOBALS['WEM']['GRID']['wrapper_classes']));
+        $strGrid = sprintf('<div class="grid_preview %s">', implode(' ', $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes']));
 
         switch ($this->activeRecord->grid_preset) {
             case 'cssgrid':
@@ -115,7 +115,7 @@ class GridElementWizard extends \Widget
                     '<a href="%s" title="%s" target="_blank">%s</a>',
                     'https://framway.webexmachina.fr/#framway__manuals-grid',
                     'Framway Grid Manual',
-                    'Framway Grid Manual',
+                    'Framway Grid Manual'
                 );
                 break;
             
@@ -124,7 +124,7 @@ class GridElementWizard extends \Widget
                     '<a href="%s" title="%s" target="_blank">%s</a>',
                     'https://getbootstrap.com/docs/4.0/layout/grid/',
                     'BS4 Grid Manual',
-                    'BS4 Grid Manual',
+                    'BS4 Grid Manual'
                 );
                 break;
 
