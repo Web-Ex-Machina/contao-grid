@@ -1,11 +1,15 @@
 <?php
 
-/*
- * This file is part of Contao.
+declare(strict_types=1);
+
+/**
+ * GRID for Contao Open Source CMS
+ * Copyright (c) 2015-2020 Web ex Machina
  *
- * Copyright (c) 2005-2017 Leo Feyer
- *
- * @license LGPL-3.0+
+ * @category ContaoBundle
+ * @package  Web-Ex-Machina/contao-grid
+ * @author   Web ex Machina <contact@webexmachina.fr>
+ * @link     https://github.com/Web-Ex-Machina/contao-grid/
  */
 
 namespace WEM\GridBundle\DependencyInjection;
@@ -25,7 +29,7 @@ class WEMGridExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function load(array $mergedConfig, ContainerBuilder $container)
+    public function load(array $mergedConfig, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader(
             $container,

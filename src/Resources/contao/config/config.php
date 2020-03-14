@@ -1,27 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Grid Bundle for Contao Open Source CMS
+ * GRID for Contao Open Source CMS
+ * Copyright (c) 2015-2020 Web ex Machina
  *
- * Copyright (c) 2019 Web ex Machina
- *
- * @author Web ex Machina <https://www.webexmachina.fr>
+ * @category ContaoBundle
+ * @package  Web-Ex-Machina/contao-grid
+ * @author   Web ex Machina <contact@webexmachina.fr>
+ * @link     https://github.com/Web-Ex-Machina/contao-grid/
  */
 
 // Add the Grid Wrapper Content Element
 array_insert(
     $GLOBALS['TL_CTE'],
-    count($GLOBALS['TL_CTE'])+1,
-    array(
-        'grid' => array(
-            'grid-start' => 'WEM\GridBundle\Elements\GridStart'
-            ,'grid-stop' => 'WEM\GridBundle\Elements\GridStop'
-        )
-    )
+    \count($GLOBALS['TL_CTE']) + 1,
+    [
+        'grid' => [
+            'grid-start' => 'WEM\GridBundle\Elements\GridStart', 'grid-stop' => 'WEM\GridBundle\Elements\GridStop',
+        ],
+    ]
 );
 
 // Add Hook
-$GLOBALS['TL_HOOKS']['getContentElement'][] = array('WEM\GridBundle\Classes\Hooks', 'wrapGridElements');
+$GLOBALS['TL_HOOKS']['getContentElement'][] = ['WEM\GridBundle\Classes\Hooks', 'wrapGridElements'];
 
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = 'WEM\GridBundle\Widgets\GridElementWizard';

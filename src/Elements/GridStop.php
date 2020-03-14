@@ -1,33 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Grid Bundle for Contao Open Source CMS
+ * GRID for Contao Open Source CMS
+ * Copyright (c) 2015-2020 Web ex Machina
  *
- * Copyright (c) 2019 Web ex Machina
- *
- * @author Web ex Machina <https://www.webexmachina.fr>
+ * @category ContaoBundle
+ * @package  Web-Ex-Machina/contao-grid
+ * @author   Web ex Machina <contact@webexmachina.fr>
+ * @link     https://github.com/Web-Ex-Machina/contao-grid/
  */
 
 namespace WEM\GridBundle\Elements;
 
 /**
- * Content Element "grid-stop"
+ * Content Element "grid-stop".
  */
 class GridStop extends \ContentElement
 {
     /**
-     * Template
+     * Template.
+     *
      * @var string
      */
     protected $strTemplate = 'ce_grid_stop';
 
     /**
-     * Generate the content element
+     * Generate the content element.
      */
-    protected function compile()
+    protected function compile(): void
     {
         // Backend template
-        if (TL_MODE == 'BE') {
+        if (TL_MODE === 'BE') {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new \BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
@@ -38,7 +43,7 @@ class GridStop extends \ContentElement
         reset($GLOBALS['WEM']['GRID']);
 
         // If no elements contained in the grid, we don't need to close the wrapper (because it won't be opened)
-        if (0 == count($arrGrid['elements'])) {
+        if (0 === \count($arrGrid['elements'])) {
             $this->Template->doNotPrint = true;
         }
 

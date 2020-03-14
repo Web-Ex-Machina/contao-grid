@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Grid Bundle for Contao Open Source CMS
+ * GRID for Contao Open Source CMS
+ * Copyright (c) 2015-2020 Web ex Machina
  *
- * Copyright (c) 2019 Web ex Machina
- *
- * @author Web ex Machina <https://www.webexmachina.fr>
+ * @category ContaoBundle
+ * @package  Web-Ex-Machina/contao-grid
+ * @author   Web ex Machina <contact@webexmachina.fr>
+ * @link     https://github.com/Web-Ex-Machina/contao-grid/
  */
 
 namespace WEM\GridBundle\Widgets;
@@ -15,19 +19,21 @@ use WEM\GridBundle\Helper\GridBuilder;
 class GridElementWizard extends \Widget
 {
     /**
-     * Submit user input
-     * @var boolean
+     * Submit user input.
+     *
+     * @var bool
      */
     protected $blnSubmitInput = true;
 
     /**
-     * Template
+     * Template.
+     *
      * @var string
      */
     protected $strTemplate = 'be_widget';
 
     /**
-     * Default constructor
+     * Default constructor.
      *
      * @param array $arrAttributes
      */
@@ -37,12 +43,11 @@ class GridElementWizard extends \Widget
     }
 
     /**
-     * Default Set
+     * Default Set.
      *
      * @param string $strKey
-     * @param mixed  $varValue
      */
-    public function __set($strKey, $varValue)
+    public function __set($strKey, $varValue): void
     {
         switch ($strKey) {
             case 'mandatory':
@@ -61,9 +66,9 @@ class GridElementWizard extends \Widget
     }
 
     /**
-     * Validate the input and set the value
+     * Validate the input and set the value.
      */
-    public function validate()
+    public function validate(): void
     {
         $mandatory = $this->mandatory;
         $varValue = $this->getPost($this->strName);
@@ -71,7 +76,7 @@ class GridElementWizard extends \Widget
     }
 
     /**
-     * Generate the widget and return it as string
+     * Generate the widget and return it as string.
      *
      * @return string
      */
@@ -84,11 +89,11 @@ class GridElementWizard extends \Widget
                 break;
 
             default:
-                throw new Exception("Unknown table for GridElementWizard : ".$this->strTable);
+                throw new Exception('Unknown table for GridElementWizard : '.$this->strTable);
         }
-    
+
         if (!$objItems || 0 === $objItems->count()) {
-            throw new Exception("No items found for this grid");
+            throw new Exception('No items found for this grid');
         }
 
         $arrItems = [];
@@ -96,12 +101,12 @@ class GridElementWizard extends \Widget
         $blnGridStop = false;
 
         $GLOBALS['WEM']['GRID'][$this->id] = [
-            "preset" => $this->activeRecord->grid_preset,
-            "wrapper_classes" => GridBuilder::getWrapperClasses($this->activeRecord),
-            "item_classes" => GridBuilder::getItemClasses($this->activeRecord)
+            'preset' => $this->activeRecord->grid_preset,
+            'wrapper_classes' => GridBuilder::getWrapperClasses($this->activeRecord),
+            'item_classes' => GridBuilder::getItemClasses($this->activeRecord),
         ];
-        
-        if ("" !== $this->activeRecord->cssID[1]) {
+
+        if ('' !== $this->activeRecord->cssID[1]) {
             $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes'][] = $this->cssID[1];
         }
 
@@ -118,7 +123,7 @@ class GridElementWizard extends \Widget
                     'Framway Grid Manual'
                 );
                 break;
-            
+
             case 'bs4':
                 $strHelper = sprintf(
                     '<a href="%s" title="%s" target="_blank">%s</a>',
@@ -133,14 +138,14 @@ class GridElementWizard extends \Widget
                 break;
         }
 
-        if ('' != $strHelper) {
+        if ('' !== $strHelper) {
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
         }
 
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
             // If we start a grid, start fetching items for the wizard
-            if ($objItems->id == $this->activeRecord->id) {
+            if ($objItems->id === $this->activeRecord->id) {
                 $blnGridStart = true;
                 continue;
             }
@@ -149,9 +154,9 @@ class GridElementWizard extends \Widget
             if (!$blnGridStart) {
                 continue;
             }
-            
+
             // And break the loop if we hit a grid-stop element
-            if ("grid-stop" == $objItems->type) {
+            if ('grid-stop' === $objItems->type) {
                 break;
             }
 
@@ -160,20 +165,20 @@ class GridElementWizard extends \Widget
             // Tricky but works all the time : replace the last 6 characters (</div>) with the input
             $search = '</div>';
             $pos = strrpos($strElement, $search);
-            if ($pos !== false && !\Input::get('grid_preview')) {
+            if (false !== $pos && !\Input::get('grid_preview')) {
                 $replace = sprintf(
                     '<div class="item-classes"><input name="%s[%s]" type="text" value="%s" placeholder="%s" /></div>',
                     $this->strId,
                     $objItems->id,
                     $this->varValue[$objItems->id],
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inputItemPlaceholder']
-                ) . $search;
-                $strElement = substr_replace($strElement, $replace, $pos, strlen($search));
+                ).$search;
+                $strElement = substr_replace($strElement, $replace, $pos, \strlen($search));
             }
 
             $strGrid .= $strElement;
         }
-        
+
         // Add CSS & JS to the Wizard
         $GLOBALS['TL_CSS']['wemgrid'] = 'bundles/wemgrid/css/backend.css';
         $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
