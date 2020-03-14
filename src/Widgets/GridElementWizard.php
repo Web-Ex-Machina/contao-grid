@@ -197,7 +197,7 @@ class GridElementWizard extends \Widget
 
         $strReturn =
         '<div class="gridelement">
-    <div class="helpers d-grid cols-4">
+    <div class="helpers d-grid cols-3">
         <div class="item-grid">
             <span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>

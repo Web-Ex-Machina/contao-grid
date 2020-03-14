@@ -21,7 +21,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-start'] = '{type_legend},type
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-stop'] = '{type_legend},type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_bs4'] = 'grid_row_class,grid_cols,grid_items';
-$GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid'] = 'grid_rows,grid_cols,grid_items';
+$GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid'] = 'grid_cols,grid_rows,grid_items';
 
 // Update tl_content fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_preset'] = [

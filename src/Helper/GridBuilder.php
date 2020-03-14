@@ -31,13 +31,13 @@ class GridBuilder extends \Controller
         $arrClasses = [];
 
         if (!\is_array($objElement->grid_rows)) {
-            $rows = unserialize($objElement->grid_rows);
+            $rows = deserialize($objElement->grid_rows);
         } else {
             $rows = $objElement->grid_rows;
         }
 
         if (!\is_array($objElement->grid_cols)) {
-            $cols = unserialize($objElement->grid_cols);
+            $cols = deserialize($objElement->grid_cols);
         } else {
             $cols = $objElement->grid_cols;
         }
@@ -107,7 +107,7 @@ class GridBuilder extends \Controller
         if (\is_array($objElement->grid_cols)) {
             $cols = $objElement->grid_cols;
         } else {
-            $cols = unserialize($objElement->grid_cols);
+            $cols = deserialize($objElement->grid_cols);
         }
 
         switch ($objElement->grid_preset) {
@@ -142,7 +142,7 @@ class GridBuilder extends \Controller
         $arrItemsClasses = [];
         if (null !== $objElement->grid_items) {
             if (!\is_array($objElement->grid_items)) {
-                $items = unserialize($objElement->grid_items);
+                $items = deserialize($objElement->grid_items);
             } else {
                 $items = $objElement->grid_items;
             }
