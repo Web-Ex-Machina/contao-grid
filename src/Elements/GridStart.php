@@ -37,7 +37,9 @@ class GridStart extends \ContentElement
         if (TL_MODE === 'BE') {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new \BackendTemplate($this->strTemplate);
-            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
+            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
+            $this->Template->wildcard = $GLOBALS['TL_LANG']['tl_content']['grid_preset'][$this->grid_preset];
+            $this->Template->wildcard .= ' | Wrapper: '.implode(' ', GridBuilder::getWrapperClasses($this));
         }
 
         // Check if the very next element is a grid-stop element

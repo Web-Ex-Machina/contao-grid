@@ -35,7 +35,7 @@ class GridStop extends \ContentElement
         if (TL_MODE === 'BE') {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new \BackendTemplate($this->strTemplate);
-            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type];
+            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
         }
 
         // Get the last open grid
