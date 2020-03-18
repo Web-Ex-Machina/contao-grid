@@ -14,9 +14,11 @@ window.addEvent("domready", function () {
         i.setAttribute('data-class', c.trim());
     });
 
-    document.querySelector('.gridelement .be_item_grid .item-classes input').addEventListener("keyup", function (e) {
-        var itemgrid = this.parentNode.parentNode;
-        itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+this.value);
+    document.querySelectorAll('.gridelement .be_item_grid .item-classes input').forEach(function (i) {
+        i.addEventListener("keyup", function (e) {
+            var itemgrid = this.parentNode.parentNode;
+            itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+this.value);
+        });
     });
 
     document.querySelectorAll('.gridelement .helpers .grid_toggleBreakPoint').forEach(function (i) {
