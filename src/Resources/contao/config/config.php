@@ -28,3 +28,4 @@ $GLOBALS['TL_HOOKS']['getContentElement'][] = ['WEM\GridBundle\Classes\Hooks', '
 
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = 'WEM\GridBundle\Widgets\GridElementWizard';
+$GLOBALS['BE_FFL']['gridBreakpointsValuesWizard'] = 'WEM\GridBundle\Widgets\GridBreakpointsValuesWizard';
