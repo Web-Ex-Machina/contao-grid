@@ -208,7 +208,7 @@ class GridElementWizard extends \Widget
             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
         </div>
         <div class="item-grid">
-            <button class="tl_submit grid_toggleHelpers">Toggle helpers</button>
+            <button class="tl_submit grid_toggleHelpers">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['toggleHelpers'].'</button>
         </div>
     </div>
     '.$strHelper.'
