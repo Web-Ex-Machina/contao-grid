@@ -13,3 +13,9 @@
 
 /** IFRAME PREVIEW **/
 .simple-modal-body iframe{background:url('../img/ajax-loader.gif') no-repeat center center transparent;}
+
+/** Breakpoints Values Wizard **/
+.grid_breakpoints_values_wizard .tl_table_wizard{width:100%;table-layout:fixed;}
+.grid_breakpoints_values_wizard .tl_table_wizard th{border-bottom:1px solid #888;padding:10px 0;text-align:center;}
+.grid_breakpoints_values_wizard .tl_table_wizard td{text-align:center;padding:5px;}
+.grid_breakpoints_values_wizard .tl_table_wizard td.type{font-weight:bold;}
