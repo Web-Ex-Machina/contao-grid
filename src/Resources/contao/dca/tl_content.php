@@ -21,7 +21,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-start'] = '{type_legend},type
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-stop'] = '{type_legend},type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_bs4'] = 'grid_row_class,grid_cols,grid_items';
-$GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid'] = 'grid_cols,grid_rows,grid_items';
+$GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid'] = 'grid_cols,grid_items';
 
 // Update tl_content fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_preset'] = [
@@ -44,18 +44,11 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_row_class'] = [
     'eval' => ['chosen' => true],
     'sql' => "varchar(32) NOT NULL default ''",
 ];
-$GLOBALS['TL_DCA']['tl_content']['fields']['grid_rows'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_rows'],
-    'exclude' => true,
-    'inputType' => 'keyValueWizard',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => 'blob NULL',
-];
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_cols'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_cols'],
     'exclude' => true,
     'inputType' => 'gridBreakpointsValuesWizard',
-    'eval' => ['tl_class' => 'w50'],
+    'eval' => ['tl_class' => ''],
     'sql' => 'blob NULL',
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_items'] = [
