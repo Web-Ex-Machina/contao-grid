@@ -26,6 +26,10 @@
         <source>Preview</source>
         <target>Aperçu</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.valuesLabel">
+        <source>Values</source>
+        <target>Valeurs</target>
+      </trans-unit>
       <trans-unit id="WEM.GRID.BE.toggleHelpers">
         <source>Display/Hide visual help</source>
         <target>Afficher/Cacher la grille d'aide</target>

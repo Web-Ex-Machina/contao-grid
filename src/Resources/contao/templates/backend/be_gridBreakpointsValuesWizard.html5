@@ -10,7 +10,7 @@
 	    </thead>
 	    <tbody>
 	    	<tr>
-	    		<td class="type">Valeurs</td>
+	    		<td class="type"><?= $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['valuesLabel'] ?></td>
 	    		<?php foreach($this->breakpoints as $k => $b): ?>
 	    		<td>
 		    		<input type="hidden" name="<?= $this->input ?>[<?= $k ?>][key]" id="<?= $this->input ?>_key_<?= $k ?>" class="tl_text" value="<?= $b['name'] ?>">
