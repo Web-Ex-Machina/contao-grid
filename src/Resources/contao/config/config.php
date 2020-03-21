@@ -23,6 +23,10 @@ array_insert(
     ]
 );
 
+// Add wrappers
+$GLOBALS['TL_WRAPPERS']['start'][] = 'grid-start';
+$GLOBALS['TL_WRAPPERS']['stop'][] = 'grid-stop';
+
 // Add Hook
 $GLOBALS['TL_HOOKS']['getContentElement'][] = ['WEM\GridBundle\Classes\Hooks', 'wrapGridElements'];
 
