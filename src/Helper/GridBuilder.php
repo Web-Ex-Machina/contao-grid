@@ -74,7 +74,7 @@ class GridBuilder extends \Controller
                 }
 
                 if (!\is_array($rows)) {
-                    $arrClasses = [];
+                    // $arrClasses = [];
                 } else {
                     foreach ($rows as $k => $row) {
                         // Quickfix : we need the first col to be generic, no matter what is the breakpoint
