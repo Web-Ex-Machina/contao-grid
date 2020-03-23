@@ -39,7 +39,36 @@ class GridStart extends \ContentElement
             $this->Template = new \BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
             $this->Template->wildcard = $GLOBALS['TL_LANG']['tl_content']['grid_preset'][$this->grid_preset];
-            $this->Template->wildcard .= ' | Wrapper: '.implode(' ', GridBuilder::getWrapperClasses($this));
+
+            $this->arrGridBreakpoints = [
+                ['name' => 'all', 'label' => 'Général', 'required'=>true],
+                ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'],
+                ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'],
+                ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'],
+                ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'],
+                ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'],
+                ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
+            ]; /** @todo - make it generic per grid */
+
+            $breakpoints = [];
+            $arrGridValues = GridBuilder::getWrapperClasses($this);
+            foreach($arrGridValues as $k=>$b) {
+                $b = explode("-", $b);
+                if("cols" !== $b[0]) {
+                    continue;
+                } elseif (2 == count($b)) {
+                    $breakpoint = $this->getBreakpointData("all");
+                    $val = $b[1];
+                } elseif(3 == count($b)) {
+                    $breakpoint = $this->getBreakpointData($b[1]);
+                    $val = $b[2];
+                }
+
+                if(0 != $val) {
+                    $breakpoints[] = $breakpoint["label"].": ".sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
+                }
+            }
+            $this->Template->wildcard .= ' | Config: '.implode(', ', $breakpoints);
         }
 
         // Check if the very next element is a grid-stop element
@@ -73,5 +102,13 @@ class GridStart extends \ContentElement
 
         // Send the grid_id to template
         $this->Template->grid_id = $this->id;
+    }
+
+    protected function getBreakpointData($name) {
+        foreach($this->arrGridBreakpoints as $b) {
+            if($name == $b['name']) {
+                return $b;
+            }
+        }
     }
 }
