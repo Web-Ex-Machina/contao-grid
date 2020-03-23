@@ -1,9 +1,15 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
-0.4 - 2020-xx-xx
+0.4 - 2020-03-23
 ---
-- 
+- Use a new system to setup a grid with its breakpoints
+- Use selects instead of inputs for item settings
+- Add visual helpers in the list and in the grid element
+- Remove the Rows settings for CSSGrid, still it doesn't really works as expected
+- Remove temporarly the BS4 grid system (coming back planned for 0.5)
+- Use translation system for labels
+- Global fixing / stability
 
 0.3 - 2019-02-27
 ---
