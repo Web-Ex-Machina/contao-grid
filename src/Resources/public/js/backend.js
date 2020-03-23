@@ -6,17 +6,20 @@ window.addEvent("domready", function () {
         });
     });
 
-    document.querySelectorAll('.gridelement .be_item_grid').forEach(function (i) {
-        var c = i.getAttribute('class');
-        if("" != i.querySelector('input').value) {
-            c = c.replace(i.querySelector('input').value, "");
+    document.querySelectorAll('.gridelement select').forEach(function (s) {
+        var itemgrid = s.parentNode.parentNode;
+        var c = itemgrid.getAttribute('class');
+        
+        if("" != s.value) {
+            c = c.replace(s.value, "");
         }
-        i.setAttribute('data-class', c.trim());
+        itemgrid.setAttribute('data-class', c.trim());
     });
 
-    document.querySelectorAll('.gridelement .be_item_grid .item-classes input').forEach(function (i) {
-        i.addEventListener("keyup", function (e) {
+    document.querySelectorAll('.gridelement .be_item_grid .item-classes select').forEach(function (i) {
+        i.addEventListener("change", function (e) {
             var itemgrid = this.parentNode.parentNode;
+            console.log(this.value);
             itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+this.value);
         });
     });

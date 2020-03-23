@@ -60,7 +60,7 @@ class GridStart extends \ContentElement
         ];
 
         // We might have a preset already registered for that grid, so check it before erase the global key
-        if(!array_key_exists($this->id, $GLOBALS['WEM']['GRID'])) {
+        if (\is_array($GLOBALS['WEM']['GRID']) && !\array_key_exists($this->id, $GLOBALS['WEM']['GRID'])) {
             $GLOBALS['WEM']['GRID'][$this->id] = $arrGrid;
         }
 

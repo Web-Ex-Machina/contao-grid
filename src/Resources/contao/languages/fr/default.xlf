@@ -30,6 +30,14 @@
         <source>Values</source>
         <target>Valeurs</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsSelectLabel">
+        <source>Nb of cols for this item:</source>
+        <target>Nb de colonnes pour cet élément :</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
+        <source>%s column(s)</source>
+        <target>%s colonne(s)</target>
+      </trans-unit>
       <trans-unit id="WEM.GRID.BE.toggleHelpers">
         <source>Display/Hide visual help</source>
         <target>Afficher/Cacher la grille d'aide</target>

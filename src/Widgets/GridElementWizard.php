@@ -178,18 +178,40 @@ class GridElementWizard extends \Widget
             $objItems->isForGridElementWizard = true;
             $strElement = $this->getContentElement($objItems->current());
 
-            // Tricky but works all the time : replace the last 6 characters (</div>) with the input
+            // Add the input to the grid item
             $search = '</div>';
             $pos = strrpos($strElement, $search);
-            $input = sprintf(
-                '<div class="item-classes"><input name="%s[%s]" type="text" value="%s" placeholder="%s" /></div>',
+
+            // Build a select options html with the number of possibilities
+            $options = '<option value="">-</option>';
+            if (!\is_array($this->activeRecord->grid_cols)) {
+                $cols = deserialize($this->activeRecord->grid_cols);
+            } else {
+                $cols = $this->activeRecord->grid_cols;
+            }
+            foreach ($cols as $c) {
+                if ('all' === $c['key']) {
+                    $v = $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id];
+                    for ($i = 1; $i <= 2; ++$i) {
+                        $options .= sprintf(
+                            '<option value="cols-span-%s"%s>%s</option>',
+                            $i,
+                            ($v === 'cols-span-'.$i) ? ' selected' : '',
+                            sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $i)
+                        );
+                    }
+                }
+            }
+            $select = sprintf(
+                '<div class="item-classes"><label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select></div>',
                 $this->strId,
                 ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id,
-                $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id],
-                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inputItemPlaceholder']
+                $options,
+                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel']
             );
+
             if (false !== $pos && !\Input::get('grid_preview')) {
-                $strElement = substr_replace($strElement, $input.$search, $pos, \strlen($search));
+                $strElement = substr_replace($strElement, $select.$search, $pos, \strlen($search));
             }
 
             $strGrid .= $strElement;
