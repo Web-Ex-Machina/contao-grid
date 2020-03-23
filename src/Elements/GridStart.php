@@ -34,7 +34,7 @@ class GridStart extends \ContentElement
     protected function compile(): void
     {
         // Backend template
-        if (TL_MODE === 'BE') {
+        if (TL_MODE === 'BE' && !$this->isForGridElementWizard) {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new \BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
@@ -58,7 +58,11 @@ class GridStart extends \ContentElement
             'item_classes' => GridBuilder::getItemClasses($this),
             'elements' => [],
         ];
-        $GLOBALS['WEM']['GRID'][$this->id] = $arrGrid;
+
+        // We might have a preset already registered for that grid, so check it before erase the global key
+        if(!array_key_exists($this->id, $GLOBALS['WEM']['GRID'])) {
+            $GLOBALS['WEM']['GRID'][$this->id] = $arrGrid;
+        }
 
         // Add the classes to the Model so the main class can use it correct
         if (\is_array($this->objModel->classes)) {

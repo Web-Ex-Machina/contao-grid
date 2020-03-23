@@ -4,7 +4,7 @@
 
 /** WIZARD **/
 .gridelement .helpers{margin:10px 0;}
-.gridelement .helper{padding:15px;background:#eaeaec;}
+.gridelement .helper{padding:15px;border:2px dashed #0f1c26;}
 .gridelement img, .grid_preview img{max-width:100%;height: auto;}
 
 .gridelement .be_item_grid .item-classes{margin-top:8px;display:none;}

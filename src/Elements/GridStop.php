@@ -32,7 +32,7 @@ class GridStop extends \ContentElement
     protected function compile(): void
     {
         // Backend template
-        if (TL_MODE === 'BE') {
+        if (TL_MODE === 'BE' && !$this->isForGridElementWizard) {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new \BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];

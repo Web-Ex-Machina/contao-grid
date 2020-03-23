@@ -99,6 +99,7 @@ class GridElementWizard extends \Widget
         $arrItems = [];
         $blnGridStart = false;
         $blnGridStop = false;
+        $intGridStop = 0;
 
         $GLOBALS['WEM']['GRID'][$this->id] = [
             'preset' => $this->activeRecord->grid_preset,
@@ -147,6 +148,7 @@ class GridElementWizard extends \Widget
             // If we start a grid, start fetching items for the wizard
             if ($objItems->id === $this->activeRecord->id) {
                 $blnGridStart = true;
+                ++$intGridStop;
                 continue;
             }
 
@@ -155,25 +157,39 @@ class GridElementWizard extends \Widget
                 continue;
             }
 
-            // And break the loop if we hit a grid-stop element
-            if ('grid-stop' === $objItems->type) {
-                break;
+            // If we hit another grid-start, increment the number of "grid stops" authorized
+            if ('grid-start' === $objItems->type) {
+                $GLOBALS['WEM']['GRID'][$objItems->id] = $GLOBALS['WEM']['GRID'][$this->id];
+                $GLOBALS['WEM']['GRID'][$objItems->id]['subgrid'] = true;
+
+                $strGridStartId = $objItems->id;
+                ++$intGridStop;
             }
 
+            // And break the loop if we hit a grid-stop element
+            if ('grid-stop' === $objItems->type) {
+                --$intGridStop;
+
+                if (0 === $intGridStop) {
+                    break;
+                }
+            }
+
+            $objItems->isForGridElementWizard = true;
             $strElement = $this->getContentElement($objItems->current());
 
             // Tricky but works all the time : replace the last 6 characters (</div>) with the input
             $search = '</div>';
             $pos = strrpos($strElement, $search);
+            $input = sprintf(
+                '<div class="item-classes"><input name="%s[%s]" type="text" value="%s" placeholder="%s" /></div>',
+                $this->strId,
+                ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id,
+                $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id],
+                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inputItemPlaceholder']
+            );
             if (false !== $pos && !\Input::get('grid_preview')) {
-                $replace = sprintf(
-                    '<div class="item-classes"><input name="%s[%s]" type="text" value="%s" placeholder="%s" /></div>',
-                    $this->strId,
-                    $objItems->id,
-                    $this->varValue[$objItems->id],
-                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inputItemPlaceholder']
-                ).$search;
-                $strElement = substr_replace($strElement, $replace, $pos, \strlen($search));
+                $strElement = substr_replace($strElement, $input.$search, $pos, \strlen($search));
             }
 
             $strGrid .= $strElement;
