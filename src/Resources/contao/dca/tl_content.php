@@ -29,7 +29,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_preset'] = [
     'default' => 'cssgrid',
     'exclude' => true,
     'inputType' => 'select',
-    'options' => ['bs4', 'cssgrid'],
+    'options' => ['cssgrid'],
     'reference' => &$GLOBALS['TL_LANG']['tl_content']['grid_preset'],
     'eval' => ['tl_class' => '', 'submitOnChange' => true, 'includeBlankOption' => true, 'chosen' => true],
     'sql' => "varchar(32) NOT NULL default 'cssgrid'",
