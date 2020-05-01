@@ -1,0 +1,23 @@
+<div class="grid_breakpoints_values_wizard" id="ctrl_'.$this->strId.'">
+    <table class="tl_table_wizard" id="ctrl_table_'.$this->strId.'">
+        <thead>
+        	<tr>
+	            <th>&nbsp;</th>
+	            <?php foreach($this->breakpoints as $b): ?>
+	            <th><?= $b['label'] ?><?= $b['required'] ? ' (*)' : '' ?></th>
+	            <?php endforeach; ?>
+	        </tr>
+	    </thead>
+	    <tbody>
+	    	<tr>
+	    		<td class="type"><?= $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['valuesLabel'] ?></td>
+	    		<?php foreach($this->breakpoints as $k => $b): ?>
+	    		<td>
+		    		<input type="hidden" name="<?= $this->input ?>[<?= $k ?>][key]" id="<?= $this->input ?>_key_<?= $k ?>" class="tl_text" value="<?= $b['name'] ?>">
+		    		<input type="text" name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_text" value="<?= $b['value'] ?>"<?= $b['required'] ? ' required' : '' ?>>
+		    	</td>
+	    		<?php endforeach; ?>
+	    	</tr>
+	    </tbody>
+    </table>
+</div>

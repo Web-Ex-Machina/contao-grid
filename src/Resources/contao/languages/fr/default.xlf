@@ -5,18 +5,42 @@
         <source>Grid elements</source>
         <target>Éléments de grille</target>
       </trans-unit>
-      <trans-unit id="CTE.grid-start">
+      <trans-unit id="CTE.grid-start.0">
         <source>Grid | Start</source>
         <target>Grille | Début</target>
       </trans-unit>
-      <trans-unit id="CTE.grid-stop">
+      <trans-unit id="CTE.grid-start.1">
+        <source>Start a Grid</source>
+        <target>Début d'une grille CSS</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-stop.0">
         <source>Grid | Stop</source>
         <target>Grille | Fin</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-stop.1">
+        <source>End a Grid</source>
+        <target>Fin d'une grille CSS</target>
       </trans-unit>
 
       <trans-unit id="WEM.GRID.BE.previewLabel">
         <source>Preview</source>
         <target>Aperçu</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.valuesLabel">
+        <source>Values</source>
+        <target>Valeurs</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsSelectLabel">
+        <source>Nb of cols for this item:</source>
+        <target>Nb de colonnes pour cet élément :</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
+        <source>%s column(s)</source>
+        <target>%s colonne(s)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.toggleHelpers">
+        <source>Display/Hide visual help</source>
+        <target>Afficher/Cacher la grille d'aide</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.manualLabel">
         <source>Here is a guide to understand how the grid works : %s</source>
