@@ -23,6 +23,9 @@ array_insert(
     ]
 );
 
+// Generate Global Wrapper
+$GLOBALS['WEM']['GRID'] = [];
+
 // Add wrappers
 $GLOBALS['TL_WRAPPERS']['start'][] = 'grid-start';
 $GLOBALS['TL_WRAPPERS']['stop'][] = 'grid-stop';
