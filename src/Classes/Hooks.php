@@ -59,6 +59,13 @@ class Hooks extends \Controller
         // If we used grids elements, we had to adjust the behaviour
         if ('grid-start' === $objElement->type && true === $arrGrid['subgrid']) {
             // For nested grid - starts, we want to add only the start of the item wrapper
+            // Retrieve the parent
+            foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
+                if (is_array($g['item_classes']['items']) && array_key_exists($objElement->id, $g['item_classes']['items'])) {
+                    $arrGrid = $g;
+                }
+            }
+            
             return sprintf(
                 '<div class="%s %s">%s',
                 implode(' ', $arrGrid['item_classes']['all']),
