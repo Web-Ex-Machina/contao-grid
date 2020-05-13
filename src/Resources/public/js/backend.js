@@ -6,21 +6,39 @@ window.addEvent("domready", function () {
         });
     });
 
-    document.querySelectorAll('.gridelement select').forEach(function (s) {
-        var itemgrid = s.parentNode.parentNode;
-        var c = itemgrid.getAttribute('class');
-        
-        if("" != s.value) {
-            c = c.replace(s.value, "");
+    document.querySelectorAll('.gridelement .be_item_grid').forEach(function (item) {
+        // Retrieve value of select and input
+        var classes = [];
+
+        if(item.querySelector('select')) {
+            classes.push(item.querySelector('select').value);
         }
-        itemgrid.setAttribute('data-class', c.trim());
+        if(item.querySelector('input')) {
+            classes.push(item.querySelector('input').value);
+        }
+        
+        var c = item.getAttribute('class');
+
+        for(var i in classes) {
+            c = c.replace(classes[i], "");
+        }
+
+        item.setAttribute('data-class', c.trim());
     });
 
-    document.querySelectorAll('.gridelement .be_item_grid .item-classes select').forEach(function (i) {
+    document.querySelectorAll('.gridelement select').forEach(function (i) {
         i.addEventListener("change", function (e) {
             var itemgrid = this.parentNode.parentNode;
-            console.log(this.value);
-            itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+this.value);
+            var strClass = this.value + ' ' + this.parentNode.querySelector('input').value;
+            itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass);
+        });
+    });
+
+    document.querySelectorAll('.gridelement input').forEach(function (i) {
+        i.addEventListener("keyup", function (e) {
+            var itemgrid = this.parentNode.parentNode;
+            var strClass = this.value + ' ' + this.parentNode.querySelector('select').value;
+            itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass);
         });
     });
 

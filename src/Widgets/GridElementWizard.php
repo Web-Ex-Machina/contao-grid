@@ -72,6 +72,20 @@ class GridElementWizard extends \Widget
     {
         $mandatory = $this->mandatory;
         $varValue = $this->getPost($this->strName);
+
+        foreach ($varValue as $k => &$v) {
+            // Skip _classes items
+            if(false !== strpos((string) $k, "_classes")) {
+                continue;
+            }
+
+            // Check if the _classes item for this key contains stuff
+            // If true, concat the values
+            if($varValue[$k.'_classes']) {
+                $v .= ' '.$varValue[$k.'_classes'];
+            }
+        }
+
         parent::validate();
     }
 
@@ -202,12 +216,18 @@ class GridElementWizard extends \Widget
                     }
                 }
             }
+
             $select = sprintf(
-                '<div class="item-classes"><label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select></div>',
+                '<div class="item-classes">
+                    <label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select>
+                    <label for="ctrl_%1$s_%2$s_classes">%5$s</label><input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text" value="%6$s" />
+                </div>',
                 $this->strId,
                 ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id,
                 $options,
-                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel']
+                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
+                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
+                $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId. '_classes' : $objItems->id . '_classes'],
             );
 
             if (false !== $pos && !\Input::get('grid_preview')) {
