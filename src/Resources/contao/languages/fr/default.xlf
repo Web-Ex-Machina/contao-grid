@@ -34,6 +34,10 @@
         <source>Nb of cols for this item:</source>
         <target>Nb de colonnes pour cet élément :</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.additionalClassesLabel">
+        <source>Additional classes:</source>
+        <target>Additional classes:</target>
+      </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
         <source>%s column(s)</source>
         <target>%s colonne(s)</target>

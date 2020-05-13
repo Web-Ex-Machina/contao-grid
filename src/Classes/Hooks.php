@@ -81,9 +81,10 @@ class Hooks extends \Controller
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return sprintf(
-                '<div class="%s %s">%s</div>',
+                '<div class="%s %s %s">%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $strBuffer
             );
         }
