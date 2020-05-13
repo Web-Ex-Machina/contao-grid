@@ -192,7 +192,7 @@ class GridElementWizard extends \Widget
             foreach ($cols as $c) {
                 if ('all' === $c['key']) {
                     $v = $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id];
-                    for ($i = 1; $i <= 2; ++$i) {
+                    for ($i = 1; $i <= $c['value']; ++$i) {
                         $options .= sprintf(
                             '<option value="cols-span-%s"%s>%s</option>',
                             $i,
