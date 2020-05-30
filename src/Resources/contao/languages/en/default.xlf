@@ -1,38 +1,38 @@
 <?xml version="1.0" ?><xliff version="1.1">
-  <file datatype="php" original="src/Resources/contao/languages/en/default.php" source-language="en" target-language="fr">
+  <file datatype="php" original="src/Resources/contao/languages/en/default.php" source-language="en" target-language="en">
     <body>
       <trans-unit id="CTE.grid">
         <source>Grid elements</source>
-        <target>Éléments de grille</target>
+        <target>Grid elements</target>
       </trans-unit>
       <trans-unit id="CTE.grid-start.0">
         <source>Grid | Start</source>
-        <target>Grille | Début</target>
+        <target>Grid | Start</target>
       </trans-unit>
       <trans-unit id="CTE.grid-start.1">
         <source>Start a Grid</source>
-        <target>Début d'une grille CSS</target>
+        <target>Start a Grid</target>
       </trans-unit>
       <trans-unit id="CTE.grid-stop.0">
         <source>Grid | Stop</source>
-        <target>Grille | Fin</target>
+        <target>Grid | Stop</target>
       </trans-unit>
       <trans-unit id="CTE.grid-stop.1">
         <source>End a Grid</source>
-        <target>Fin d'une grille CSS</target>
+        <target>End a Grid</target>
       </trans-unit>
 
       <trans-unit id="WEM.GRID.BE.previewLabel">
         <source>Preview</source>
-        <target>Aperçu</target>
+        <target>Preview</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.valuesLabel">
         <source>Values</source>
-        <target>Valeurs</target>
+        <target>Values</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbColsSelectLabel">
         <source>Nb of cols for this item:</source>
-        <target>Nb de colonnes pour cet élément :</target>
+        <target>Nb of cols for this item:</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.additionalClassesLabel">
         <source>Additional classes:</source>
@@ -40,19 +40,19 @@
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
         <source>%s column(s)</source>
-        <target>%s colonne(s)</target>
+        <target>%s column(s)</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.toggleHelpers">
         <source>Display/Hide visual help</source>
-        <target>Afficher/Cacher la grille d'aide</target>
+        <target>Display/Hide visual help</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.manualLabel">
         <source>Here is a guide to understand how the grid works : %s</source>
-        <target>Vous trouverez ici un guide pour comprendre comment la grille fonctionne : %s</target>
+        <target>Here is a guide to understand how the grid works : %s</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.inputItemPlaceholder">
         <source>Add a class to this item's wrapper</source>
-        <target>Ajoutez une classe au conteneur de cet item</target>
+        <target>Add a class to this item's wrapper</target>
       </trans-unit>
     </body>
   </file>

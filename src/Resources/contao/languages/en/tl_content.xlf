@@ -1,0 +1,70 @@
+<?xml version="1.0" ?><xliff version="1.1">
+  <file datatype="php" original="src/Resources/contao/languages/en/tl_content.php" source-language="en" target-language="fr">
+    <body>
+      <trans-unit id="tl_content.grid_legend">
+        <source>Grid settings</source>
+        <target>Grid settings</target>
+      </trans-unit>
+
+      <trans-unit id="tl_content.grid_preset.0">
+        <source>Preset</source>
+        <target>Preset</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_preset.1">
+        <source>Select the grid preset</source>
+        <target>Select the grid preset</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_preset.bs4">
+        <source>Bootstrap 4</source>
+        <target>Bootstrap 4</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_preset.cssgrid">
+        <source>CSS Grid</source>
+        <target>CSS Grid</target>
+      </trans-unit>
+
+      <trans-unit id="tl_content.grid_rows.0">
+        <source>Rows</source>
+        <target>Rows</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_rows.1">
+        <source>Enter the number of rows</source>
+        <target>Enter the number of rows</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.0">
+        <source>Row class</source>
+        <target>Row class</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.1">
+        <source>Select the row class</source>
+        <target>Select the row class</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.row">
+        <source>Row</source>
+        <target>Row</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.container">
+        <source>Container</source>
+        <target>Container</target>
+      </trans-unit>
+
+      <trans-unit id="tl_content.grid_cols.0">
+        <source>Columns</source>
+        <target>Columns</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_cols.1">
+        <source>Enter the number of columns</source>
+        <target>Enter the number of columns</target>
+      </trans-unit>
+
+      <trans-unit id="tl_content.grid_items.0">
+        <source>Items</source>
+        <target>Items</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_items.1">
+        <source>Add - if you want - settings to each item in the grid</source>
+        <target>Add - if you want - settings to each item in the grid</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
