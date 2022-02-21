@@ -67,9 +67,10 @@ class Hooks extends \Controller
             }
             
             return sprintf(
-                '<div class="%s %s">%s',
+                '<div class="%s %s %s">%s',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $strBuffer
             );
         }
