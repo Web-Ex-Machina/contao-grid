@@ -103,11 +103,11 @@ class GridElementWizard extends \Widget
                 break;
 
             default:
-                throw new Exception('Unknown table for GridElementWizard : '.$this->strTable);
+                throw new \Exception('Unknown table for GridElementWizard : '.$this->strTable);
         }
 
         if (!$objItems || 0 === $objItems->count()) {
-            throw new Exception('No items found for this grid');
+            return '';
         }
 
         $arrItems = [];
