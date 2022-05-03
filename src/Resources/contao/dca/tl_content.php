@@ -20,7 +20,6 @@ $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'grid_preset';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-start'] = '{type_legend},type;{grid_legend},grid_preset;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-stop'] = '{type_legend},type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
-$GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_bs4'] = 'grid_row_class,grid_cols,grid_items';
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid'] = 'grid_cols,grid_items';
 
 // Update tl_content fields
@@ -31,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_preset'] = [
     'inputType' => 'select',
     'options' => ['cssgrid'],
     'reference' => &$GLOBALS['TL_LANG']['tl_content']['grid_preset'],
-    'eval' => ['tl_class' => '', 'submitOnChange' => true, 'chosen' => true],
+    'eval' => ['tl_class' => 'clr', 'submitOnChange' => true, 'chosen' => true],
     'sql' => "varchar(32) NOT NULL default 'cssgrid'",
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_row_class'] = [
@@ -58,7 +57,3 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_items'] = [
     'eval' => ['tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
-
-class tl_content_wem_grid extends tl_content
-{
-}
