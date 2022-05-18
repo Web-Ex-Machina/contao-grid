@@ -197,4 +197,9 @@ class GridBuilder extends \Controller
             }
         }
     }
+
+    public function includeJSCSS(){
+        $GLOBALS['TL_CSS'][] = 'bundles/wemgrid/css/backend.css';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/wemgrid/js/backend-tl_content-list.js';
+    }
 }
