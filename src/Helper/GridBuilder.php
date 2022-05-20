@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Helper;
 
+use Exception;
+
 /**
  * Function to centralize generic code to.
  */
@@ -202,4 +204,78 @@ class GridBuilder extends \Controller
         $GLOBALS['TL_CSS'][] = 'bundles/wemgrid/css/backend.css';
         $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/wemgrid/js/backend-tl_content-list.js';
     }
+
+    public function oncutCallback(\Contao\DataContainer $dc): void
+    {
+        $objItem = \Contao\ContentModel::findOneById($dc->id);
+        $this->removeItemFromGridIfAny($objItem);
+        $this->addItemToGridIfAny($dc->id, $dc);
+    }
+
+
+    public function oncopyCallback(int $itemId, \Contao\DataContainer $dc): void
+    {
+        $objItem = \Contao\ContentModel::findOneById($itemId);
+        $this->removeItemFromGridIfAny($objItem);
+        $this->addItemToGridIfAny($objItem);
+    }
+
+    public function removeItemFromGridIfAny($objItem): void
+    {
+        // find the item pid
+        // find all the grid-start
+        // for each, check if it conains a reference to the item id
+        // if so, remove that reference
+        $colGridStarts = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?'],[$objItem->pid, $objItem->ptable,'grid-start']);
+        if($colGridStarts){
+            while($colGridStarts->next()){
+                $gridItems = null !== $colGridStarts->current->grid_items ? unserialize($colGridStarts->current->grid_items) : [];
+                if(!empty($colGridStarts->current->grid_items)){
+                throw new Exception($colGridStarts->current->grid_items);
+            }
+                
+                if(in_array($objItem->id,array_keys($gridItems))){
+                    unset($gridItems[$objItem->id]);
+                    unset($gridItems[$objItem->id.'_classes']);
+                    $colGridStarts->current->grid_items = serialize($gridItems);
+                    $colGridStarts->current->save();
+                    throw new Exception('ohooooooooooo');
+                }
+            }
+        }else{
+
+                    throw new Exception('NO GRID START HERE');
+        }
+    }
+
+    public function addItemToGridIfAny($objItem): void
+    {
+        // find the item pid
+        // find the item sorting
+        // find the closest grid-start with inferior sorting
+        // find the closest grid-stop with inferior sorting
+        // if grid-start.sorting > grid-stop.sorting, it means the grid is still opened (fake, nested grid babay)
+        // add the item to the grid-start.grid_items
+        // $objItem = $dc->activeRecord;
+
+        $closestGridStart = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?','sorting < ?'],[$objItem->pid, $objItem->ptable,'grid-start', $objItem->sorting],['limit'=>1,'order'=>'sorting DESC']);
+        if(!$closestGridStart){
+            return;
+        }
+        $closestGridStop = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?','sorting < ?'],[$objItem->pid, $objItem->ptable,'grid-stop', $objItem->sorting],['limit'=>1,'order'=>'sorting DESC']);
+
+        if(null !== $closestGridStop && (int) $closestGridStop->sorting > (int) $closestGridStart->sorting){
+            return;
+        }
+
+        $gridItems = null !== $closestGridStart->grid_items ? unserialize($closestGridStart->grid_items) : [];
+        if(!in_array($objItem->id,array_keys($gridItems))){
+            $gridItems[$objItem->id] = "";
+            $gridItems[$objItem->id.'_classes'] = "";
+            $closestGridStart->grid_items = serialize($gridItems);
+            $closestGridStart->save();
+        }
+    }
+
+
 }

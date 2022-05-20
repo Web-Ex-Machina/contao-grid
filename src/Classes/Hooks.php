@@ -33,9 +33,9 @@ class Hooks extends Controller
      */
     public function wrapGridElements(ContentModel $objElement, $strBuffer)
     {
-        if(TL_MODE === 'BE' && $objElement->type == "grid-start"){
-            return $this->prepareGridElementsInsideGridStartBEElement($objElement, $strBuffer);
-        }
+        // if(TL_MODE === 'BE' && $objElement->type == "grid-start"){
+        //     return $this->prepareGridElementsInsideGridStartBEElement($objElement, $strBuffer);
+        // }
         // Skip elements we never want to wrap or if we are not in a grid
         if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $GLOBALS['WEM']['GRID'] || empty($GLOBALS['WEM']['GRID'])) {
             return $strBuffer;

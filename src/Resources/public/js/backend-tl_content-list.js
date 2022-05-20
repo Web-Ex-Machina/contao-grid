@@ -1,7 +1,4 @@
 window.addEvent("domready", function () {
-	console.clear();
-
-	replaceGrid(document);
 
 	function replaceGrid(parentElement){
 		parentElement.querySelectorAll('.d-grid').forEach(function (grid) {
@@ -21,4 +18,6 @@ window.addEvent("domready", function () {
 		gridItem.innerHTML = li.innerHTML;
 		li.innerHTML = null;
 	}
+	
+	replaceGrid(document);
 });

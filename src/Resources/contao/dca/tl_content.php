@@ -15,6 +15,8 @@ declare(strict_types=1);
 // Update grid content elements callbacks
 $GLOBALS['TL_DCA']['tl_content']['config']['onsubmit_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'createGridStop'];
 $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'includeJSCSS'];
+$GLOBALS['TL_DCA']['tl_content']['config']['oncut_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'oncutCallback'];
+$GLOBALS['TL_DCA']['tl_content']['config']['oncopy_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'oncopyCallback'];
 
 // Update grid content elements palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'grid_preset';
