@@ -255,6 +255,8 @@ class GridBuilder extends \Controller
     protected function recalculateGridItems(\Contao\ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems): array
     {
         $gridItems = []; // reset grid items
+        $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
+
         foreach($objItems as $index => $objItem){
             if(in_array($objItem->id, $objItemsIdsToSkip)){
                 continue;
@@ -264,7 +266,7 @@ class GridBuilder extends \Controller
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems));
                 if(!in_array($objItem->id,array_keys($gridItems))){
                     $gridItems[$objItem->id] = "";
-                    $gridItems[$objItem->id.'_classes'] = "";
+                    $gridItems[$objItem->id.'_classes'] = array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : "";
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
                 }
@@ -275,7 +277,7 @@ class GridBuilder extends \Controller
             }else{
                 if(!in_array($objItem->id,array_keys($gridItems))){
                     $gridItems[$objItem->id] = "";
-                    $gridItems[$objItem->id.'_classes'] = "";
+                    $gridItems[$objItem->id.'_classes'] = array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : "";
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
                 }
