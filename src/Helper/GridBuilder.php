@@ -209,8 +209,7 @@ class GridBuilder extends \Controller
     {
         $objItem = \Contao\ContentModel::findOneById($dc->id);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        $this->removeItemFromPreviousGridStartIfAny($objItem);
-        $this->addItemToPreviousGridStartIfAny($objItem);
+        $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
 
@@ -218,65 +217,52 @@ class GridBuilder extends \Controller
     {
         $objItem = \Contao\ContentModel::findOneById($itemId);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        $this->removeItemFromPreviousGridStartIfAny($objItem);
-        $this->addItemToPreviousGridStartIfAny($objItem);
+        $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+    }
+    
+    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable){
+        $objItems = \Contao\ContentModel::findBy(['pid = ?','ptable = ?'],[$pid, $ptable],['order'=>'sorting ASC']);
+        $objItemsIdsToSkip = [];
+        foreach($objItems as $index => $objItem){
+            if(in_array($objItem->id, $objItemsIdsToSkip)){
+                continue;
+            }
+            if('grid-start' === $objItem->type){
+                $objItemsIdsToSkip[] = $objItem->id;
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems));
+            }
+        }
     }
 
-    public function removeItemFromPreviousGridStartIfAny($objItem): void
+    protected function recalculateGridItems(\Contao\ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems): array
     {
-        // find all the grid-start
-        // for each, check if it contains a reference to the item id
-        // if so, remove that reference
-        $colGridStarts = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?'],[$objItem->pid, $objItem->ptable,'grid-start']);
-        if($colGridStarts){
-            while($colGridStarts->next()){
-                $gridItems = null !== $colGridStarts->grid_items ? unserialize($colGridStarts->grid_items) : [];
-                
-                if(in_array($objItem->id,array_keys($gridItems))){
-                    unset($gridItems[$objItem->id]);
-                    unset($gridItems[$objItem->id.'_classes']);
-                    $colGridStarts->grid_items = serialize($gridItems);
-                    $colGridStarts->save();
+        $gridItems = []; // reset grid items
+        foreach($objItems as $index => $objItem){
+            if(in_array($objItem->id, $objItemsIdsToSkip)){
+                continue;
+            }
+            if('grid-start' === $objItem->type){
+                $objItemsIdsToSkip[] = $objItem->id;
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems));
+                if(!in_array($objItem->id,array_keys($gridItems))){
+                    $gridItems[$objItem->id] = "";
+                    $gridItems[$objItem->id.'_classes'] = "";
+                    $gridStart->grid_items = serialize($gridItems);
+                    $gridStart->save();
                 }
-            }
-        }
-    }
-
-    public function addItemToPreviousGridStartIfAny($objItem): void
-    {
-        // find the closest grid-start with inferior sorting
-        // find the closest grid-stop with inferior sorting
-        // if grid-start.sorting > grid-stop.sorting, it means the grid is still opened (what about nested grids smartass ?)
-        // add the item to the grid-start.grid_items
-        
-        $gridStartSortingReference = $objItem->sorting; 
-        $keepSearching = true;
-
-        while($keepSearching){
-            $closestGridStart = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?','sorting < ?'],[$objItem->pid, $objItem->ptable,'grid-start', $gridStartSortingReference],['limit'=>1,'order'=>'sorting DESC']);
-            if(!$closestGridStart){
-                return;
-            }
-            $closestGridStop = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?','sorting BETWEEN ? AND ?'],[$objItem->pid, $objItem->ptable,'grid-stop', $closestGridStart->sorting, $gridStartSortingReference],['limit'=>1,'order'=>'sorting DESC']);
-
-            // if(null !== $closestGridStop && (int) $closestGridStop->sorting > (int) $closestGridStart->sorting){
-            //     return;
-            // }
-            if(null === $closestGridStop){
-                $keepSearching = false;
+                $objItemsIdsToSkip[] = $objItem->id;
+            }elseif('grid-stop' === $objItem->type){
+                $objItemsIdsToSkip[] = $objItem->id;
+                return $objItemsIdsToSkip;
             }else{
-                $gridStartSortingReference = $closestGridStart->sorting; // we'll look for a grid-start placed before this one on the next loop
+                if(!in_array($objItem->id,array_keys($gridItems))){
+                    $gridItems[$objItem->id] = "";
+                    $gridItems[$objItem->id.'_classes'] = "";
+                    $gridStart->grid_items = serialize($gridItems);
+                    $gridStart->save();
+                }
+                $objItemsIdsToSkip[] = $objItem->id;
             }
         }
-
-        $gridItems = null !== $closestGridStart->grid_items ? unserialize($closestGridStart->grid_items) : [];
-        if(!in_array($objItem->id,array_keys($gridItems))){
-            $gridItems[$objItem->id] = "";
-            $gridItems[$objItem->id.'_classes'] = "";
-            $closestGridStart->grid_items = serialize($gridItems);
-            $closestGridStart->save();
-        }
     }
-
-
 }
