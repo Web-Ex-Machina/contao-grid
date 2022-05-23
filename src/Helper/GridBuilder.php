@@ -168,33 +168,36 @@ class GridBuilder extends \Controller
     {
         if (null !== $dc->activeRecord && 'grid-start' === $dc->activeRecord->type) {
             // Try to fetch the really next grid stop element
-            $strSQL = sprintf(
-                "SELECT type FROM tl_content WHERE pid = %s AND ptable = '%s' AND sorting > %s ORDER BY sorting ASC",
-                $dc->activeRecord->pid,
-                $dc->activeRecord->ptable,
-                $dc->activeRecord->sorting
-            );
+            // $strSQL = sprintf(
+            //     "SELECT type FROM tl_content WHERE pid = %s AND ptable = '%s' AND sorting > %s ORDER BY sorting ASC",
+            //     $dc->activeRecord->pid,
+            //     $dc->activeRecord->ptable,
+            //     $dc->activeRecord->sorting
+            // );
 
-            $objDb = \Database::getInstance()->prepare($strSQL)->execute();
+            // $objDb = \Database::getInstance()->prepare($strSQL)->execute();
 
             // We'll check every other elements, if we don't find a "grid-stop" element, we have to create one
-            $blnCreate = true;
-            if ($objDb && 0 < $objDb->count()) {
-                while ($objDb->next()) {
-                    if ('grid-stop' === $objDb->type) {
-                        $blnCreate = false;
-                        break;
-                    }
-                }
-            }
+            // $blnCreate = true;
+            // if ($objDb && 0 < $objDb->count()) {
+            //     while ($objDb->next()) {
+            //         if ('grid-stop' === $objDb->type) {
+            //             $blnCreate = false;
+            //             break;
+            //         }
+            //     }
+            // }
+            $gridStarts = \Contao\ContentModel::countBy(['pid = ?','ptable = ?','type = ?'],[$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-start']);
+            $gridStops = \Contao\ContentModel::countBy(['pid = ?','ptable = ?','type = ?'],[$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-stop']);
 
-            if ($blnCreate) {
-                $objElement = new \ContentModel();
+            if($gridStarts > $gridStops){
+                $objElement = new \Contao\ContentModel();
                 $objElement->tstamp = time();
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
                 $objElement->type = 'grid-stop';
-                $objElement->sorting = $dc->activeRecord->sorting + 64;
+                // $objElement->sorting = $dc->activeRecord->sorting + 64;
+                $objElement->sorting = $dc->activeRecord->sorting + 1;
                 $objElement->save();
             }
         }
@@ -212,14 +215,29 @@ class GridBuilder extends \Controller
         $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
-
     public function oncopyCallback(int $itemId, \Contao\DataContainer $dc): void
     {
         $objItem = \Contao\ContentModel::findOneById($itemId);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
-    
+
+    public function ondeleteCallback(\Contao\DataContainer $dc, int $undoItemId): void
+    {
+        $objItem = \Contao\ContentModel::findOneById($dc->id);
+        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
+        $this->deleteClosestGridStopFromGridStart($objItem);
+        $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+    }
+
+    public function deleteClosestGridStopFromGridStart(\Contao\ContentModel $gridStart)
+    {
+        $gridStop = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?','sorting > ?'],[$gridStart->pid, $gridStart->ptable, 'grid-stop', $gridStart->sorting],['limit'=>1,'order'=>'sorting ASC']);
+        if($gridStop){
+            $gridStop->delete();
+        }
+    }
+
     public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable){
         $objItems = \Contao\ContentModel::findBy(['pid = ?','ptable = ?'],[$pid, $ptable],['order'=>'sorting ASC']);
         $objItemsIdsToSkip = [];
@@ -264,5 +282,6 @@ class GridBuilder extends \Controller
                 $objItemsIdsToSkip[] = $objItem->id;
             }
         }
+        return $objItemsIdsToSkip;
     }
 }
