@@ -242,7 +242,7 @@ class GridElementWizard extends \Widget
         $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
 
-        $strGrid .= '</div>';
+        $strGrid .= '<div class="item-grid be_item_grid"><div class="item-new">BOUTON PLUSS</div></div></div>';
 
         // If we want a preview modal, catch & break
         if (\Input::get('grid_preview')) {

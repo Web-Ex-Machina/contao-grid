@@ -226,7 +226,9 @@ class GridBuilder extends \Controller
     {
         $objItem = \Contao\ContentModel::findOneById($dc->id);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        $this->deleteClosestGridStopFromGridStart($objItem);
+        if('grid-start' == $objItem->type){
+            $this->deleteClosestGridStopFromGridStart($objItem);
+        }
         $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
