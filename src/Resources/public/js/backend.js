@@ -64,4 +64,11 @@ window.addEvent("domready", function () {
             });
         });
     });
+
+    document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
+        container.addEventListener("click", function (e) {
+            e.preventDefault();
+            alert('To do : open modal to create a new content element.');
+        });
+    });
 });
