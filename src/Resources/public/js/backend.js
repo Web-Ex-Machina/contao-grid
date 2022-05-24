@@ -68,7 +68,59 @@ window.addEvent("domready", function () {
     document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
         container.addEventListener("click", function (e) {
             e.preventDefault();
-            alert('To do : open modal to create a new content element.');
+            Backend.openModalIframe({
+                // width:w
+                title:'Nouvel élément'
+                ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid=$1')+'&popup=1&nb=1'
+            });
         });
     });
+
+    document.querySelectorAll('.grid_preview > .be_item_grid').forEach(function (container){
+        container.setAttribute('draggable',true);
+        container.setAttribute('dropable',true);
+        container.addEventListener('dragstart',gridItemOnDragStart);
+        container.addEventListener('dragover',gridItemOnDragOver);
+        container.addEventListener('drop',gridItemOnDrop);
+    });
+
+    function gridItemOnDragStart(event){
+        // console.log('ondragstart',event.target);
+        // event.preventDefault();
+        event
+            .dataTransfer
+            .setData('text/plain', event.target.getAttribute('data-id'));
+    }
+
+    function gridItemOnDragOver(event){
+        // console.log('ondragover',event.target);
+
+        event.preventDefault();
+    }
+
+    function gridItemOnDrop(event){
+        // console.log('ondrop',event.target);
+        event.preventDefault();
+        const dropzone = event.target;
+        const id = event
+            .dataTransfer
+            .getData('text');
+        const draggableElement = document.querySelector('[data-id="'+id+'"]');
+        const pid = dropzone.getAttribute('data-id');
+        const grid = document.querySelector('.grid_preview');
+
+        if(!dropzone.getAttribute('dropable')
+        || id == pid
+        ){
+            return;
+        }
+
+        req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
+        href = window.location.href.replace(/\?.*$/, '');
+        // console.log(req);
+        new Request.Contao({'url':href + req, 'followRedirects':false}).get();
+        // once done, exchange both element places in display
+        grid.removeChild(draggableElement);
+        grid.insertBefore(draggableElement,dropzone.nextSibling);
+    }
 });

@@ -72,10 +72,11 @@ class Hooks extends Controller
             }
             
             return sprintf(
-                '<div class="%s %s %s">%s%s',
+                '<div class="%s %s %s" data-id="%s">%s%s',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
+                $objElement->id,
                 TL_MODE === 'BE' ? $this->getBackendActionsForGridContentElement($objElement) : '',
                 $strBuffer
             );
@@ -88,19 +89,21 @@ class Hooks extends Controller
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true) && true === $arrGrid['subgrid']) {
             return sprintf(
-                '<div class="%s %s %s">%s</div>',
+                '<div class="%s %s %s" data-id="%s">%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
+                $objElement->id,
                 $strBuffer
             );
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return sprintf(
-                '<div class="%s %s %s">%s%s</div>',
+                '<div class="%s %s %s" data-id="%s">%s%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
+                $objElement->id,
                 TL_MODE === 'BE' ? $this->getBackendActionsForContentElement($objElement) : '',
                 $strBuffer
             );
