@@ -116,42 +116,81 @@ window.addEvent("domready", function () {
             return;
         }
 
+        // var myQueue = new Request.Queue({autoAdvance :true,concurrent : 1});
+        var requests = [];
+
         if('grid-start' == dropzone.getAttribute('data-type')){
             // if we drag over a grid, place the element after the corresponding grid-stop
-            var gridStops = dropzone.querySelectorAll('[data-type="grid-stop"]');
-            pid = gridStops[gridStops.length-1].getAttribute('data-id');
-            contaoPutElementAfterAnother(id, pid);
-            // once done, exchange both element places in display
-            grid.removeChild(draggableElement);
-            grid.insertBefore(draggableElement,dropzone.nextSibling);
+            // var gridStops = dropzone.querySelectorAll('[data-type="grid-stop"]');
+            // pid = gridStops[gridStops.length-1].getAttribute('data-id');
+            // contaoPutElementAfterAnother(id, pid);
+            // window.setTimeout(function(){
+            //     contaoPutElementAfterAnother(pid, id);
+            // },500);
+            var r = getContaoRequestPutElementAfterAnother(id, pid);
+            requests.push(r);
+
+            var r = getContaoRequestPutElementAfterAnother(pid, id);
+            requests.push(r);
         }else if('grid-start' == draggableElement.getAttribute('data-type')){
             // if we move a grid-start, we have to move all child elements before the dropzone
             // move the grid start
-            contaoPutElementAfterAnother(id, pid);
+            var r = getContaoRequestPutElementAfterAnother(id, pid);
+            requests.push(r);
             // move the grid elements
             pid = id; // the grid start becomes the PID
             var gridElements = draggableElement.querySelectorAll('[data-type]');
             gridElements.forEach(function(gridElement){
                 id = gridElement.getAttribute('data-id');
-                contaoPutElementAfterAnother(id, pid);
+                var r = getContaoRequestPutElementAfterAnother(id, pid);
+                requests.push(r);
                 pid = id; // grid elements stay behind each others
             });
-            // once done, exchange both element places in display
-            grid.removeChild(draggableElement);
-            grid.insertBefore(draggableElement,dropzone.nextSibling);
+
+            var r = getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid);
+            requests.push(r);
+
         }else{
-            contaoPutElementAfterAnother(id, pid);
-            // once done, exchange both element places in display
-            grid.removeChild(draggableElement);
-            grid.insertBefore(draggableElement,dropzone.nextSibling);
+            var r = getContaoRequestPutElementAfterAnother(id, pid);
+            requests.push(r);
+            var r = getContaoRequestPutElementAfterAnother(pid, id);
+            requests.push(r);
         }
+        runFakeQueue(requests);
+
+        // once done, exchange both element places in display
+        grid.removeChild(draggableElement);
+        grid.insertBefore(draggableElement,dropzone);
     }
 
-    function contaoPutElementAfterAnother(id, pid){
-        // console.log(id + ' behind '+pid);
+    function getContaoRequestPutElementAfterAnother(id, pid, params = {}){
         var req,href;
         req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
         href = window.location.href.replace(/\?.*$/, '');
-        return new Request.Contao({'url':href + req, 'followRedirects':false}).get();
+        params = Object.assign(params, {'url':href + req, 'followRedirects':false});
+        return params;
     }
+
+    function runFakeQueue(requests){
+        AjaxRequest.displayBox(Contao.lang.loading + ' …');
+        runFakeQueueItem(requests,0);
+    }
+
+    function runFakeQueueItem(requests, index){
+        fetch(requests[index].url,{
+            method:'get',
+            redirect:'manual'
+        })
+        .then(data => {
+            if("undefined" != typeof requests[index+1]){
+                runFakeQueueItem(requests,index+1);
+            }else{
+                AjaxRequest.hideBox();
+            }
+        })
+        .catch(error => {
+            AjaxRequest.hideBox();
+        });
+    }
+
 });
