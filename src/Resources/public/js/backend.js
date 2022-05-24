@@ -101,13 +101,14 @@ window.addEvent("domready", function () {
     function gridItemOnDrop(event){
         // console.log('ondrop',event.target);
         event.preventDefault();
-        const dropzone = event.target;
-        const id = event
+        
+        var dropzone = event.target;
+        var id = event
             .dataTransfer
             .getData('text');
-        const draggableElement = document.querySelector('[data-id="'+id+'"]');
-        const pid = dropzone.getAttribute('data-id');
-        const grid = document.querySelector('.grid_preview');
+        var draggableElement = document.querySelector('[data-id="'+id+'"]');
+        var pid = dropzone.getAttribute('data-id');
+        var grid = document.querySelector('.grid_preview');
 
         if(!dropzone.getAttribute('dropable')
         || id == pid
@@ -115,12 +116,42 @@ window.addEvent("domready", function () {
             return;
         }
 
+        if('grid-start' == dropzone.getAttribute('data-type')){
+            // if we drag over a grid, place the element after the corresponding grid-stop
+            var gridStops = dropzone.querySelectorAll('[data-type="grid-stop"]');
+            pid = gridStops[gridStops.length-1].getAttribute('data-id');
+            contaoPutElementAfterAnother(id, pid);
+            // once done, exchange both element places in display
+            grid.removeChild(draggableElement);
+            grid.insertBefore(draggableElement,dropzone.nextSibling);
+        }else if('grid-start' == draggableElement.getAttribute('data-type')){
+            // if we move a grid-start, we have to move all child elements before the dropzone
+            // move the grid start
+            contaoPutElementAfterAnother(id, pid);
+            // move the grid elements
+            pid = id; // the grid start becomes the PID
+            var gridElements = draggableElement.querySelectorAll('[data-type]');
+            gridElements.forEach(function(gridElement){
+                id = gridElement.getAttribute('data-id');
+                contaoPutElementAfterAnother(id, pid);
+                pid = id; // grid elements stay behind each others
+            });
+            // once done, exchange both element places in display
+            grid.removeChild(draggableElement);
+            grid.insertBefore(draggableElement,dropzone.nextSibling);
+        }else{
+            contaoPutElementAfterAnother(id, pid);
+            // once done, exchange both element places in display
+            grid.removeChild(draggableElement);
+            grid.insertBefore(draggableElement,dropzone.nextSibling);
+        }
+    }
+
+    function contaoPutElementAfterAnother(id, pid){
+        // console.log(id + ' behind '+pid);
+        var req,href;
         req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
         href = window.location.href.replace(/\?.*$/, '');
-        // console.log(req);
-        new Request.Contao({'url':href + req, 'followRedirects':false}).get();
-        // once done, exchange both element places in display
-        grid.removeChild(draggableElement);
-        grid.insertBefore(draggableElement,dropzone.nextSibling);
+        return new Request.Contao({'url':href + req, 'followRedirects':false}).get();
     }
 });

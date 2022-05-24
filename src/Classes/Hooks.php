@@ -72,38 +72,43 @@ class Hooks extends Controller
             }
             
             return sprintf(
-                '<div class="%s %s %s" data-id="%s">%s%s',
+                '<div class="%s %s %s" data-id="%s" data-type="%s">%s%s',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
+                $objElement->type,
                 TL_MODE === 'BE' ? $this->getBackendActionsForGridContentElement($objElement) : '',
                 $strBuffer
             );
         }
         if ('grid-stop' === $objElement->type && true === $arrGrid['subgrid']) {
             return sprintf(
-                '%s</div>',
+                '<div data-id="%s" data-type="%s">%s</div></div>',
+                $objElement->id,
+                $objElement->type,
                 $strBuffer
             );
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true) && true === $arrGrid['subgrid']) {
             return sprintf(
-                '<div class="%s %s %s" data-id="%s">%s</div>',
+                '<div class="%s %s %s" data-id="%s" data-type="%s">%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
+                $objElement->type,
                 $strBuffer
             );
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return sprintf(
-                '<div class="%s %s %s" data-id="%s">%s%s</div>',
+                '<div class="%s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
+                $objElement->type,
                 TL_MODE === 'BE' ? $this->getBackendActionsForContentElement($objElement) : '',
                 $strBuffer
             );
@@ -128,7 +133,7 @@ class Hooks extends Controller
 
         $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleDelete), $confirmDelete ,\Contao\Image::getHtml('delete.svg', $titleDelete));
 
-        return sprintf('<div class="item-actions">%s</div>',$buttons);
+        return sprintf('<div class="item-actions">%s (ID %s) - %s</div>',$objElement->type, $objElement->id,$buttons);
     }
 
     public function getBackendActionsForGridContentElement(\Contao\ContentModel $objElement): string
@@ -147,7 +152,7 @@ class Hooks extends Controller
 
         $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleDelete), $confirmDelete ,\Contao\Image::getHtml('delete.svg', $titleDelete));
 
-        return sprintf('<div class="item-actions">%s</div>',$buttons);
+        return sprintf('<div class="item-actions">%s (ID %s) - %s</div>',$objElement->type, $objElement->id,$buttons);
     }
 
     public function prepareGridElementsInsideGridStartBEElement(ContentModel $objElement, $strBuffer): string
