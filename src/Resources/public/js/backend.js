@@ -93,14 +93,57 @@ window.addEvent("domready", function () {
             container.addEventListener('dragleave',gridItemOnDragLeave);
             container.addEventListener('drop',gridItemOnDrop);
         }
+        // save the original number of columns
+        for(i = 1; i <=12;i++){
+            if(-1 < container.className.indexOf('cols-span-'+i)){
+                container.setAttribute('data-cols-span',i);
+            }
+        }
+    });
+
+    document.querySelector('[name="grid_cols[0][value]"]').addEventListener('keyup',function(event){
+        var nbColumns = parseInt(event.target.value);
+        if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
+            return;
+        }
+        // Update the main grid size
+        var grid = document.querySelector('.grid_preview');
+        grid.className = grid.className.replace(/cols-([0-9]{1,2})/,'cols-'+nbColumns);
+        // Update the fake elements size
+        document.querySelectorAll('.grid_preview .be_item_grid_fake').forEach(function(item){
+            item.className = item.className.replace(/cols-span-([0-9]{1,2})/,'cols-span-'+nbColumns);
+        });
+        // Update the items' available size options
+        document.querySelectorAll('.grid_preview > .be_item_grid').forEach(function(item){
+            var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+']"]');
+            if(null === select){
+                return;
+            }
+            // remove all options
+            var length = select.options.length;
+            for(i = 0; i <= length; i++){
+                select.remove(0);
+            }
+            // recreate options
+            select.add(new Option('-','',false,null == item.getAttribute('data-cols-span') ? true : false));
+            for(var i = 1; i <= nbColumns; i++){
+                select.add(new Option(i+' colonne(s)','cols-span-'+i,false,parseInt(item.getAttribute('data-cols-span')) == i ? true : false));
+            }
+
+            for(i = 1; i <= 12; i++){
+                if(-1 < item.className.indexOf('cols-span-'+i) && i > nbColumns){
+                    item.classList.toggle('cols-span-'+i);
+                }
+            }
+
+            select.dispatchEvent(new Event('change'));
+        });
     });
 
     function gridItemOnDragStart(event){
-        // event.preventDefault();
         event
             .dataTransfer
             .setData('text/plain', event.target.getAttribute('data-id'));
-        // event.target.className = event.target.className.concat('drag-start');
         event.target.classList.toggle('drag-start');
     }
 
@@ -155,10 +198,6 @@ window.addEvent("domready", function () {
         }else if('fake-first-element' == dropzone.getAttribute('data-type')){
             var dropzone = getGridFirstRealElement();
             pid = dropzone.getAttribute('data-id');
-        // }else if('grid-start' == dropzone.getAttribute('data-type')){
-            // if we drag over a grid, place the element after the corresponding grid-stop
-            // var gridStops = dropzone.querySelectorAll('[data-type="grid-stop"]');
-            // pid = gridStops[gridStops.length-1].getAttribute('data-id');
         } 
 
         if('grid-start' == draggableElement.getAttribute('data-type')){
@@ -198,7 +237,6 @@ window.addEvent("domready", function () {
     }
 
     function getGridFirstRealElement(){
-        
         var grid = document.querySelector('.grid_preview');
 
         elements = grid.querySelectorAll('[data-type]');
