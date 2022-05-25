@@ -78,14 +78,22 @@ window.addEvent("domready", function () {
             });
         });
     });
-
+    console.clear();
     document.querySelectorAll('.grid_preview > .be_item_grid').forEach(function (container){ // only first level elements, not nested ones
         if("false" !== container.getAttribute('draggable')){
-            container.setAttribute('draggable',true);
-            container.addEventListener('dragstart',gridItemOnDragStart);
-            container.addEventListener('dragend',gridItemOnDragEnd);
-            container.addEventListener('dragover',gridItemOnDragOver);
+            // container.setAttribute('draggable',true);
+            // container.addEventListener('dragstart',gridItemOnDragStart);
+            // container.addEventListener('dragend',gridItemOnDragEnd);
+            // container.addEventListener('dragover',gridItemOnDragOver);
+
+            var dragBtn = container.querySelector('.drag-handle');
+            if(null !== dragBtn){
+                dragBtn.addEventListener('dragstart',gridItemOnDragStart);
+                dragBtn.addEventListener('dragend',gridItemOnDragEnd);
+                dragBtn.addEventListener('dragover',gridItemOnDragOver);
+            }
         }
+
         if("false" !== container.getAttribute('dropable')){
             container.setAttribute('dropable',true);
             container.addEventListener('dragover',gridItemOnDragOver);
@@ -141,18 +149,49 @@ window.addEvent("domready", function () {
     });
 
     function gridItemOnDragStart(event){
+        var target = event.target.parentNode.parentNode;
         event
             .dataTransfer
-            .setData('text/plain', event.target.getAttribute('data-id'));
-        event.target.classList.toggle('drag-start');
+            .setData('text/plain', target.getAttribute('data-id'));
+        target.classList.toggle('drag-start');
+        // coordinates stuff
+        var rect = target.getBoundingClientRect();
+        var real = window.getComputedStyle(target);
+        target.setAttribute('data-mouse-offset-x',event.clientX - rect.left); //x position within the element.
+        target.setAttribute('data-mouse-offset-y',event.clientY - rect.top);  //y position within the element.
+        target.setAttribute('data-offset-x',parseFloat(real.left));
+        target.setAttribute('data-offset-y',parseFloat(real.top));
+        document.body.addEventListener('mousemove',gridItemDragging);
+        document.body.addEventListener('mouseup',function(){
+            // document.body.removeEventListener('mousemove',gridItemDragging,false);
+            document.body.removeEventListener('mousemove',gridItemDragging);
+        });
     }
 
     function gridItemOnDragEnd(event){
-        event.target.classList.toggle('drag-start','');
+        var target = event.target.parentNode.parentNode;
+        target.classList.toggle('drag-start','');
+        target.setAttribute('data-mouse-offset-x',false);
+        target.setAttribute('data-mouse-offset-y',false);
+        target.setAttribute('data-offset-x',false);
+        target.setAttribute('data-offset-y',false);
     }
 
     function gridItemOnDragOver(event){
         event.preventDefault();
+        // var target = event.target.parentNode.parentNode;
+        // target.style.left = parseInt(target.getAttribute('data-offset-x')) + event.clientX - parseInt(target.getAttribute('data-mouse-offset-x')) + 'px';
+        // target.style.top = parseInt(target.getAttribute('data-offset-y')) + event.clientY - parseInt(target.getAttribute('data-mouse-offset-y')) + 'px';
+    }
+
+    function gridItemDragging(event){
+        console.log('move');
+        event.preventDefault();
+        if(event.dataTransfer){
+            var target = document.querySelector('[data-id="'+event.dataTransfer.getData('text')+'"]');
+            target.style.left = parseInt(target.getAttribute('data-offset-x')) + event.clientX - parseInt(target.getAttribute('data-mouse-offset-x')) + 'px';
+            target.style.top = parseInt(target.getAttribute('data-offset-y')) + event.clientY - parseInt(target.getAttribute('data-mouse-offset-y')) + 'px';
+        }
     }
 
     function gridItemOnDragEnter(event){

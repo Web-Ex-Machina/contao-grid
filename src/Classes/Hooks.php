@@ -121,6 +121,7 @@ class Hooks extends Controller
     {
         $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'],$objElement->id);
         $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'],$objElement->id);
+        $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'],$objElement->id);
         $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'],$objElement->id) : null;
 
         $buttons = sprintf('
@@ -132,6 +133,14 @@ class Hooks extends Controller
             </a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleEdit),\Contao\StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)),\Contao\Image::getHtml('edit.svg', $titleEdit));
 
         $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleDelete), $confirmDelete ,\Contao\Image::getHtml('delete.svg', $titleDelete));
+
+        $buttons.= sprintf('
+            <a 
+            href="#" 
+            title="%s" 
+            class="drag-handle">
+            %s
+            </a>',\Contao\StringUtil::specialchars($titleDrag),\Contao\Image::getHtml('drag.svg', $titleDrag));
 
         return sprintf('<div class="item-actions">%s (ID %s) - %s</div>',$objElement->type, $objElement->id,$buttons);
     }
