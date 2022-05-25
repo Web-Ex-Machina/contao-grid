@@ -54,6 +54,14 @@
         <source>Add a class to this item's wrapper</source>
         <target>Ajoutez une classe au conteneur de cet item</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridStart">
+        <source>Drag and drop the element here to place it at the grid's start</source>
+        <target>Glissez l'élement de contenu ici pour le placer au début de la grille</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridEnd">
+        <source>Drag and drop the element here to place it at the grid's end</source>
+        <target>Glissez l'élement de contenu ici pour le placer à la fin de la grille</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

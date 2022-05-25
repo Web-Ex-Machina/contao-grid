@@ -3,6 +3,7 @@ window.addEvent("domready", function () {
         e.preventDefault();
         document.querySelectorAll('.gridelement .grid_preview .be_item_grid').forEach(function (i) {
             i.classList.toggle('helper');
+            i.classList.toggle('fake-helper');
         });
     });
 
