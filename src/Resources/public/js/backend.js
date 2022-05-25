@@ -76,30 +76,54 @@ window.addEvent("domready", function () {
         });
     });
 
-    document.querySelectorAll('.grid_preview > .be_item_grid').forEach(function (container){
-        container.setAttribute('draggable',true);
-        container.setAttribute('dropable',true);
-        container.addEventListener('dragstart',gridItemOnDragStart);
-        container.addEventListener('dragover',gridItemOnDragOver);
-        container.addEventListener('drop',gridItemOnDrop);
+    document.querySelectorAll('.grid_preview > .be_item_grid').forEach(function (container){ // only first level elements, not nested ones
+        if("false" !== container.getAttribute('draggable')){
+            container.setAttribute('draggable',true);
+            container.addEventListener('dragstart',gridItemOnDragStart);
+            container.addEventListener('dragend',gridItemOnDragEnd);
+            container.addEventListener('dragover',gridItemOnDragOver);
+        }
+        if("false" !== container.getAttribute('dropable')){
+            container.setAttribute('dropable',true);
+            container.addEventListener('dragover',gridItemOnDragOver);
+            container.addEventListener('dragenter',gridItemOnDragEnter);
+            container.addEventListener('dragleave',gridItemOnDragLeave);
+            container.addEventListener('drop',gridItemOnDrop);
+        }
     });
 
     function gridItemOnDragStart(event){
-        // console.log('ondragstart',event.target);
         // event.preventDefault();
         event
             .dataTransfer
             .setData('text/plain', event.target.getAttribute('data-id'));
+        // event.target.className = event.target.className.concat('drag-start');
+        event.target.classList.toggle('drag-start');
+    }
+
+    function gridItemOnDragEnd(event){
+        event.target.classList.toggle('drag-start','');
     }
 
     function gridItemOnDragOver(event){
-        // console.log('ondragover',event.target);
-
         event.preventDefault();
     }
 
+    function gridItemOnDragEnter(event){
+        if(!event.target.getAttribute('dropable')){
+            return;
+        }
+        event.target.classList.toggle('drag-enter');
+    }
+
+    function gridItemOnDragLeave(event){
+        if(!event.target.getAttribute('dropable')){
+            return;
+        }
+        event.target.classList.toggle('drag-enter','');
+    }
+
     function gridItemOnDrop(event){
-        // console.log('ondrop',event.target);
         event.preventDefault();
         
         var dropzone = event.target;
@@ -110,51 +134,57 @@ window.addEvent("domready", function () {
         var pid = dropzone.getAttribute('data-id');
         var grid = document.querySelector('.grid_preview');
 
+        event.target.classList.toggle('drag-enter','');
+        draggableElement.classList.toggle('drag-enter','');
+
         if(!dropzone.getAttribute('dropable')
         || id == pid
         ){
             return;
         }
 
-        // var myQueue = new Request.Queue({autoAdvance :true,concurrent : 1});
         var requests = [];
+        var doDoublePositionning = true;
 
-        if('grid-start' == dropzone.getAttribute('data-type')){
+        if('fake-last-element' == dropzone.getAttribute('data-type')){
+            var realdropzone = dropzone.previousSibling;
+            if('grid-start' == realdropzone.getAttribute('data-type')){
+                // if we drag over a grid, place the element after the corresponding grid-stop
+                var gridStops = realdropzone.querySelectorAll('[data-type="grid-stop"]');
+                pid = gridStops[gridStops.length-1].getAttribute('data-id');
+            }else{
+                pid = realdropzone.getAttribute('data-id');
+            }
+            doDoublePositionning = false;
+        }else if('fake-first-element' == dropzone.getAttribute('data-type')){
+            var dropzone = dropzone.nextSibling;
+            pid = dropzone.getAttribute('data-id');
+        // }else if('grid-start' == dropzone.getAttribute('data-type')){
             // if we drag over a grid, place the element after the corresponding grid-stop
             // var gridStops = dropzone.querySelectorAll('[data-type="grid-stop"]');
             // pid = gridStops[gridStops.length-1].getAttribute('data-id');
-            // contaoPutElementAfterAnother(id, pid);
-            // window.setTimeout(function(){
-            //     contaoPutElementAfterAnother(pid, id);
-            // },500);
-            var r = getContaoRequestPutElementAfterAnother(id, pid);
-            requests.push(r);
+        } 
 
-            var r = getContaoRequestPutElementAfterAnother(pid, id);
-            requests.push(r);
-        }else if('grid-start' == draggableElement.getAttribute('data-type')){
-            // if we move a grid-start, we have to move all child elements before the dropzone
+        if('grid-start' == draggableElement.getAttribute('data-type')){
+            // if we move a grid-start, we have to move all children elements before the dropzone
             // move the grid start
-            var r = getContaoRequestPutElementAfterAnother(id, pid);
-            requests.push(r);
+            requests.push(getContaoRequestPutElementAfterAnother(id, pid));
             // move the grid elements
             pid = id; // the grid start becomes the PID
             var gridElements = draggableElement.querySelectorAll('[data-type]');
             gridElements.forEach(function(gridElement){
                 id = gridElement.getAttribute('data-id');
-                var r = getContaoRequestPutElementAfterAnother(id, pid);
-                requests.push(r);
+                requests.push(getContaoRequestPutElementAfterAnother(id, pid));
                 pid = id; // grid elements stay behind each others
             });
-
-            var r = getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid);
-            requests.push(r);
-
+            if(doDoublePositionning){
+                requests.push(getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid));
+            }
         }else{
-            var r = getContaoRequestPutElementAfterAnother(id, pid);
-            requests.push(r);
-            var r = getContaoRequestPutElementAfterAnother(pid, id);
-            requests.push(r);
+            requests.push(getContaoRequestPutElementAfterAnother(id, pid));
+            if(doDoublePositionning){
+                requests.push(getContaoRequestPutElementAfterAnother(pid, id));
+            }
         }
         runFakeQueue(requests);
 
@@ -172,6 +202,9 @@ window.addEvent("domready", function () {
     }
 
     function runFakeQueue(requests){
+        if(requests.length <= 0){
+            return;
+        }
         AjaxRequest.displayBox(Contao.lang.loading + ' …');
         runFakeQueueItem(requests,0);
     }

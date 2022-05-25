@@ -157,6 +157,8 @@ class GridElementWizard extends \Widget
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
         }
 
+        $strGrid .= sprintf('<div class="item-grid be_item_grid helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">POSITIONNER AU DEBUT</div>',str_replace('cols-','cols-span-',implode(' ', $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes'])));
+
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
             // If we start a grid, start fetching items for the wizard
@@ -242,7 +244,9 @@ class GridElementWizard extends \Widget
         $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
 
-        $strGrid .= '<div class="item-grid be_item_grid"><div class="item-new"></div></div></div>';
+        $strGrid .= '<div class="item-grid be_item_grid helper be_item_grid_fake" dropable="true" draggable="false" data-type="fake-last-element">POSITIONNER A LA FIN</div>';
+        $strGrid .= '<div class="item-grid be_item_grid" dropable="false" draggable="false"><div class="item-new"></div></div>';
+        $strGrid .= '</div>';
 
         // If we want a preview modal, catch & break
         if (\Input::get('grid_preview')) {
