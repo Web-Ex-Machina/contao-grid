@@ -66,12 +66,14 @@ window.addEvent("domready", function () {
     });
 
     document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
+        var lastElement = getGridLastRealElement();
         container.addEventListener("click", function (e) {
             e.preventDefault();
             Backend.openModalIframe({
                 // width:w
                 title:'Nouvel élément'
-                ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid=$1')+'&popup=1&nb=1'
+                // ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid=$1')+'&popup=1&nb=1'
+                ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nb=1'
             });
         });
     });
@@ -147,17 +149,10 @@ window.addEvent("domready", function () {
         var doDoublePositionning = true;
 
         if('fake-last-element' == dropzone.getAttribute('data-type')){
-            var realdropzone = dropzone.previousSibling;
-            if('grid-start' == realdropzone.getAttribute('data-type')){
-                // if we drag over a grid, place the element after the corresponding grid-stop
-                var gridStops = realdropzone.querySelectorAll('[data-type="grid-stop"]');
-                pid = gridStops[gridStops.length-1].getAttribute('data-id');
-            }else{
-                pid = realdropzone.getAttribute('data-id');
-            }
+            pid = getGridLastRealElement().getAttribute('data-id');
             doDoublePositionning = false;
         }else if('fake-first-element' == dropzone.getAttribute('data-type')){
-            var dropzone = dropzone.nextSibling;
+            var dropzone = getGridFirstRealElement();
             pid = dropzone.getAttribute('data-id');
         // }else if('grid-start' == dropzone.getAttribute('data-type')){
             // if we drag over a grid, place the element after the corresponding grid-stop
@@ -199,6 +194,42 @@ window.addEvent("domready", function () {
         href = window.location.href.replace(/\?.*$/, '');
         params = Object.assign(params, {'url':href + req, 'followRedirects':false});
         return params;
+    }
+
+    function getGridFirstRealElement(){
+        
+        var grid = document.querySelector('.grid_preview');
+
+        elements = grid.querySelectorAll('[data-type]');
+
+        var elementIndex = 0;
+        var element = elements[elementIndex];
+        while(-1 < element.getAttribute('data-type').indexOf('fake-')){
+            elementIndex++;
+            element = elements[elementIndex];
+        }
+
+        return element;
+    }
+
+    function getGridLastRealElement(){
+        var grid = document.querySelector('.grid_preview');
+
+        elements = grid.querySelectorAll('[data-type]');
+
+        var elementIndex = elements.length-1;
+        var element = elements[elementIndex];
+        while(-1 < element.getAttribute('data-type').indexOf('fake-')){
+            elementIndex--;
+            element = elements[elementIndex];
+        }
+        if('grid-start' == element.getAttribute('data-type')){
+            // if we drag over a grid, place the element after the corresponding grid-stop
+            var gridStops = element.querySelectorAll('[data-type="grid-stop"]');
+            element = gridStops[gridStops.length-1];
+        }
+
+        return element;
     }
 
     function runFakeQueue(requests){

@@ -198,41 +198,43 @@ class GridElementWizard extends \Widget
             $search = '</div>';
             $pos = strrpos($strElement, $search);
 
-            // Build a select options html with the number of possibilities
-            $options = '<option value="">-</option>';
-            if (!\is_array($this->activeRecord->grid_cols)) {
-                $cols = deserialize($this->activeRecord->grid_cols);
-            } else {
-                $cols = $this->activeRecord->grid_cols;
-            }
-            foreach ($cols as $c) {
-                if ('all' === $c['key']) {
-                    $v = $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id];
-                    for ($i = 1; $i <= $c['value']; ++$i) {
-                        $options .= sprintf(
-                            '<option value="cols-span-%s"%s>%s</option>',
-                            $i,
-                            ($v === 'cols-span-'.$i) ? ' selected' : '',
-                            sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $i)
-                        );
+            // if (false !== $pos && !\Input::get('grid_preview') && 'grid-start' !== $objItems->current()->type) {
+            if (false !== $pos && !\Input::get('grid_preview')) {
+
+                // Build a select options html with the number of possibilities
+                $options = '<option value="">-</option>';
+                if (!\is_array($this->activeRecord->grid_cols)) {
+                    $cols = deserialize($this->activeRecord->grid_cols);
+                } else {
+                    $cols = $this->activeRecord->grid_cols;
+                }
+                foreach ($cols as $c) {
+                    if ('all' === $c['key']) {
+                        $v = $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id];
+                        for ($i = 1; $i <= $c['value']; ++$i) {
+                            $options .= sprintf(
+                                '<option value="cols-span-%s"%s>%s</option>',
+                                $i,
+                                ($v === 'cols-span-'.$i) ? ' selected' : '',
+                                sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $i)
+                            );
+                        }
                     }
                 }
-            }
 
-            $select = sprintf(
-                '<div class="item-classes">
-                    <label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select>
-                    <label for="ctrl_%1$s_%2$s_classes">%5$s</label><input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text" value="%6$s" />
-                </div>',
-                $this->strId,
-                ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id,
-                $options,
-                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
-                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
-                $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId. '_classes' : $objItems->id . '_classes'],
-            );
+                $select = sprintf(
+                    '<div class="item-classes">
+                        <label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select>
+                        <label for="ctrl_%1$s_%2$s_classes">%5$s</label><input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text" value="%6$s" />
+                    </div>',
+                    $this->strId,
+                    ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id,
+                    $options,
+                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
+                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
+                    $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId. '_classes' : $objItems->id . '_classes'],
+                );
 
-            if (false !== $pos && !\Input::get('grid_preview')) {
                 $strElement = substr_replace($strElement, $select.$search, $pos, \strlen($search));
             }
 
@@ -245,7 +247,7 @@ class GridElementWizard extends \Widget
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
 
         $strGrid .= '<div class="item-grid be_item_grid helper be_item_grid_fake" dropable="true" draggable="false" data-type="fake-last-element">POSITIONNER A LA FIN</div>';
-        $strGrid .= '<div class="item-grid be_item_grid" dropable="false" draggable="false"><div class="item-new"></div></div>';
+        $strGrid .= '<div class="item-grid be_item_grid helper be_item_grid_fake" dropable="false" draggable="false"><div class="item-new"></div></div>';
         $strGrid .= '</div>';
 
         // If we want a preview modal, catch & break
