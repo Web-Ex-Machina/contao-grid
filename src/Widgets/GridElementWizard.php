@@ -156,8 +156,9 @@ class GridElementWizard extends \Widget
         if ('' !== $strHelper) {
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
         }
-
-        $strGrid .= sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>',str_replace('cols-','cols-span-',implode(' ', $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes'])),$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
+        if(!\Input::get('grid_preview')){
+            $strGrid .= GridBuilder::fakeFirstGridElementMarkup($this->id);
+        }
 
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
@@ -175,8 +176,15 @@ class GridElementWizard extends \Widget
 
             // If we hit another grid-start, increment the number of "grid stops" authorized
             if ('grid-start' === $objItems->type) {
-                $GLOBALS['WEM']['GRID'][$objItems->id] = $GLOBALS['WEM']['GRID'][$this->id];
+                // $GLOBALS['WEM']['GRID'][$objItems->id] = $GLOBALS['WEM']['GRID'][$this->id];
+                $GLOBALS['WEM']['GRID'][$objItems->id] = [
+                    'preset' => $this->activeRecord->grid_preset,
+                    'wrapper_classes' => GridBuilder::getWrapperClasses($objItems),
+                    'item_classes' => GridBuilder::getItemClasses($objItems),
+                ];
+                $GLOBALS['WEM']['GRID'][$objItems->id]['item_classes']['all'][] = 'be_item_grid helper';
                 $GLOBALS['WEM']['GRID'][$objItems->id]['subgrid'] = true;
+                $GLOBALS['WEM']['GRID'][$objItems->id]['level'] = $intGridStop;
 
                 $strGridStartId = $objItems->id;
                 ++$intGridStop;
@@ -198,8 +206,8 @@ class GridElementWizard extends \Widget
             $search = '</div>';
             $pos = strrpos($strElement, $search);
 
-            // if (false !== $pos && !\Input::get('grid_preview') && 'grid-start' !== $objItems->current()->type) {
-            if (false !== $pos && !\Input::get('grid_preview')) {
+            if (false !== $pos && !\Input::get('grid_preview') && 1 >= $intGridStop) {
+            // if (false !== $pos && !\Input::get('grid_preview')) {
 
                 // Build a select options html with the number of possibilities
                 $options = '<option value="">-</option>';
@@ -246,8 +254,11 @@ class GridElementWizard extends \Widget
         $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
 
-        $strGrid .= sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake" dropable="true" draggable="false" data-type="fake-last-element">%s</div>',$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
-        $strGrid .= '<div class="item-grid be_item_grid fake-helper be_item_grid_fake" dropable="false" draggable="false"><div class="item-new"></div></div>';
+        if(!\Input::get('grid_preview')){
+
+            $strGrid .= GridBuilder::fakeLastGridElementMarkup();
+            $strGrid .= GridBuilder::fakeNewGridElementMarkup();
+        }
         $strGrid .= '</div>';
 
         // If we want a preview modal, catch & break

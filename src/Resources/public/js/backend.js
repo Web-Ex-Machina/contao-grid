@@ -5,12 +5,13 @@ WEM.Grid  = WEM.Grid || {};
         selectors:{
             grid:'.grid_preview',
             firstLevelElements:'.grid_preview > .be_item_grid',
+            allLevelElements:'.grid_preview .be_item_grid',
         },
         init:function(){
             self.applyListeners();
         }
         ,applyListeners:function(){
-            document.querySelectorAll(self.selectors.firstLevelElements).forEach(function (container){ // only first level elements, not nested ones
+            document.querySelectorAll(self.selectors.allLevelElements).forEach(function (container){ // only first level elements, not nested ones
                 if("false" !== container.getAttribute('draggable')){
                     var dragBtn = container.querySelector('.drag-handle');
                     if(null !== dragBtn){
@@ -75,7 +76,9 @@ WEM.Grid  = WEM.Grid || {};
                 .getData('text');
             var draggableElement = document.querySelector('[data-id="'+id+'"]');
             var pid = dropzone.getAttribute('data-id');
-            var grid = document.querySelector('.grid_preview');
+            // var grid = document.querySelector('.grid_preview');
+            var gridSource = self.getGridFromElement(draggableElement);
+            var gridDest = self.getGridFromElement(dropzone);
 
             event.target.classList.toggle('drag-enter','');
             draggableElement.classList.toggle('drag-enter','');
@@ -91,10 +94,10 @@ WEM.Grid  = WEM.Grid || {};
             var position = 'before';
 
             if('fake-last-element' == dropzone.getAttribute('data-type')){
-                pid = self.getGridLastRealElement().getAttribute('data-id');
-                doDoublePositionning = false;
+                pid = self.getGridLastRealElement(dropzone).getAttribute('data-id');
+                doDoublePositionning = !(self.isGridFirstLevel(gridSource) && self.isGridFirstLevel(gridDest));
             }else if('fake-first-element' == dropzone.getAttribute('data-type')){
-                var dropzone = self.getGridFirstRealElement();
+                var dropzone = self.getGridFirstRealElement(dropzone);
                 pid = dropzone.getAttribute('data-id');
             }else if(dropzone.previousSibling == draggableElement){
                 doDoublePositionning=false;
@@ -129,22 +132,24 @@ WEM.Grid  = WEM.Grid || {};
                     requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
                 }
             }
+
             self.runFakeQueue(requests);
 
             // once done, exchange both element places in display
-            grid.removeChild(draggableElement);
+            gridSource.removeChild(draggableElement);
             if('before' === position){
-                grid.insertBefore(draggableElement,dropzone);
+                gridDest.insertBefore(draggableElement,dropzone);
             }else{
-                grid.insertBefore(draggableElement,dropzone.nextSibling);
+                gridDest.insertBefore(draggableElement,dropzone.nextSibling);
 
             }
 
         }
-        ,getGridFirstRealElement:function(){
-            var grid = document.querySelector(self.selectors.grid);
+        ,getGridFirstRealElement:function(fromElement){
+            // var grid = document.querySelector(self.selectors.grid);
+            var grid = self.getGridFromElement(fromElement);
 
-            elements = grid.querySelectorAll('[data-type]');
+            var elements = grid.querySelectorAll('[data-type]');
 
             var elementIndex = 0;
             var element = elements[elementIndex];
@@ -155,10 +160,11 @@ WEM.Grid  = WEM.Grid || {};
 
             return element;
         }
-        ,getGridLastRealElement:function(){
-            var grid = document.querySelector(self.selectors.grid);
+        ,getGridLastRealElement:function(fromElement){
+            // var grid = document.querySelector(self.selectors.grid);
+            var grid = self.getGridFromElement(fromElement);
 
-            elements = grid.querySelectorAll('[data-type]');
+            var elements = grid.querySelectorAll('[data-type]');
 
             var elementIndex = elements.length-1;
             var element = elements[elementIndex];
@@ -173,8 +179,23 @@ WEM.Grid  = WEM.Grid || {};
             }
 
             return element;
-        },
-        getContaoRequestPutElementAfterAnother:function(id, pid, params = {}){
+        }
+        ,getGridFromElement:function(element){
+            if(-1 < element.className.indexOf('d-grid')
+            && ( -1 < element.className.indexOf(self.selectors.grid.substring(1))
+                || -1 < element.className.indexOf('ce_grid-start')
+            )
+            ){
+                return element;
+            }else{
+                element = self.getGridFromElement(element.parentNode); 
+            }
+            return element;
+        }
+        ,isGridFirstLevel:function(element){
+            return -1 < element.className.indexOf(self.selectors.grid.substring(1));
+        }
+        ,getContaoRequestPutElementAfterAnother:function(id, pid, params = {}){
             var req,href;
             req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
             href = window.location.href.replace(/\?.*$/, '');
@@ -188,7 +209,6 @@ WEM.Grid  = WEM.Grid || {};
             AjaxRequest.displayBox(Contao.lang.loading + ' …');
             self.runFakeQueueItem(requests,0);
         }
-
         ,runFakeQueueItem:function(requests, index){
             fetch(requests[index].url,{
                 method:'get',
@@ -279,13 +299,11 @@ window.addEvent("domready", function () {
     });
 
     document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
-        var lastElement = WEM.Grid.Drag.getGridLastRealElement();
+        var lastElement = WEM.Grid.Drag.getGridLastRealElement(container);
         container.addEventListener("click", function (e) {
             e.preventDefault();
             Backend.openModalIframe({
-                // width:w
                 title:'Nouvel élément'
-                // ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid=$1')+'&popup=1&nb=1'
                 ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nb=1'
             });
         });
@@ -300,7 +318,7 @@ window.addEvent("domready", function () {
         var grid = document.querySelector('.grid_preview');
         grid.className = grid.className.replace(/cols-([0-9]{1,2})/,'cols-'+nbColumns);
         // Update the fake elements size
-        document.querySelectorAll('.grid_preview .be_item_grid_fake').forEach(function(item){
+        document.querySelectorAll('.grid_preview > .be_item_grid_fake').forEach(function(item){
             item.className = item.className.replace(/cols-span-([0-9]{1,2})/,'cols-span-'+nbColumns);
         });
         // Update the items' available size options

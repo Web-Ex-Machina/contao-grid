@@ -16,6 +16,9 @@ namespace WEM\GridBundle\Classes;
 use Contao\Controller;
 use Contao\ContentModel;
 use Contao\Input;
+use Contao\StringUtil;
+use Contao\Image;
+use WEM\GridBundle\Helper\GridBuilder;
 /**
  * Grid Hooks.
  */
@@ -44,6 +47,7 @@ class Hooks extends Controller
         // Get the last open grid
         $arrGrid = end($GLOBALS['WEM']['GRID']);
         $k = key($GLOBALS['WEM']['GRID']);
+        $currentGridId = $k;
         reset($GLOBALS['WEM']['GRID']);
 
         // For each opened grid, we will add the elements into it
@@ -53,6 +57,7 @@ class Hooks extends Controller
                     $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
                 }
                 $GLOBALS['WEM']['GRID'][$k]['elements'][] = $objElement->id;
+                $currentGridId = $k;
             }
         }
 
@@ -70,21 +75,23 @@ class Hooks extends Controller
                     $arrGrid = $g;
                 }
             }
-            
             return sprintf(
-                '<div class="%s %s %s" data-id="%s" data-type="%s">%s%s',
+                '<div class="%s %s %s be_subgrid" data-id="%s" data-type="%s">%s%s%s',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
-                TL_MODE === 'BE' ? $this->getBackendActionsForGridContentElement($objElement) : '',
-                $strBuffer
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridContentElement($objElement,true) : '',
+                $strBuffer,
+                // GridBuilder::fakeFirstGridElementMarkup($objElement->id)
+                GridBuilder::fakeFirstGridElementMarkup($currentGridId)
             );
         }
         if ('grid-stop' === $objElement->type && true === $arrGrid['subgrid']) {
             return sprintf(
-                '<div data-id="%s" data-type="%s">%s</div></div>',
+                '%s<div data-id="%s" data-type="%s">%s</div></div>',
+                GridBuilder::fakeLastGridElementMarkup(),
                 $objElement->id,
                 $objElement->type,
                 $strBuffer
@@ -92,12 +99,13 @@ class Hooks extends Controller
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true) && true === $arrGrid['subgrid']) {
             return sprintf(
-                '<div class="%s %s %s" data-id="%s" data-type="%s">%s</div>',
+                '<div class="%s %s %s be_subgrid_item" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement,true) : '',
                 $strBuffer
             );
         }
@@ -109,7 +117,7 @@ class Hooks extends Controller
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
-                TL_MODE === 'BE' ? $this->getBackendActionsForContentElement($objElement) : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement,true) : '',
                 $strBuffer
             );
         }
@@ -117,37 +125,39 @@ class Hooks extends Controller
         return $strBuffer;
     }
 
-    public function getBackendActionsForContentElement(\Contao\ContentModel $objElement): string
+    public function getBackendActionsForContentElement(ContentModel $objElement, bool $withActions): string
     {
-        $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'],$objElement->id);
-        $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'],$objElement->id);
-        $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'],$objElement->id);
-        $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'],$objElement->id) : null;
+        if($withActions){
+            $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'],$objElement->id);
+            $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'],$objElement->id);
+            $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'],$objElement->id);
+            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'],$objElement->id) : null;
 
-        $buttons = sprintf('
-            <a 
-            href="contao?do=article&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s" 
-            title="%s" 
-            onclick="Backend.openModalIframe({\'title\':\'%s\',\'url\':this.href});return false">
-            %s
-            </a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleEdit),\Contao\StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)),\Contao\Image::getHtml('edit.svg', $titleEdit));
+            $buttons = sprintf('
+                <a 
+                href="contao?do=article&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s" 
+                title="%s" 
+                onclick="Backend.openModalIframe({\'title\':\'%s\',\'url\':this.href});return false">
+                %s
+                </a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleEdit),StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)),Image::getHtml('edit.svg', $titleEdit));
 
-        $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleDelete), $confirmDelete ,\Contao\Image::getHtml('delete.svg', $titleDelete));
+            $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleDelete), $confirmDelete ,Image::getHtml('delete.svg', $titleDelete));
 
-        $buttons.= sprintf('
-            <a 
-            href="#" 
-            onClick="return false;"
-            title="%s" 
-            class="drag-handle">
-            %s
-            </a>',\Contao\StringUtil::specialchars($titleDrag),\Contao\Image::getHtml('drag.svg', $titleDrag));
-
-        return sprintf('<div class="item-actions">%s (ID %s) - %s</div>',$objElement->type, $objElement->id,$buttons);
+            $buttons.= sprintf('
+                <a 
+                href="#" 
+                onClick="return false;"
+                title="%s" 
+                class="drag-handle">
+                %s
+                </a>',StringUtil::specialchars($titleDrag),Image::getHtml('drag.svg', $titleDrag));
+        }
+        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>',$objElement->type, $objElement->id,$withActions ? ' - ' : '',$withActions ? $buttons : '');
     }
 
-    public function getBackendActionsForGridContentElement(\Contao\ContentModel $objElement): string
+    public function getBackendActionsForGridContentElement(\Contao\ContentModel $objElement, bool $withActions): string
     {
+        if($withActions){
         $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'],$objElement->id);
         $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'],$objElement->id);
         $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'],$objElement->id);
@@ -159,9 +169,9 @@ class Hooks extends Controller
             title="%s" 
             target="_blank">
             %s
-            </a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleEdit),\Contao\Image::getHtml('edit.svg', $titleEdit));
+            </a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleEdit),Image::getHtml('edit.svg', $titleEdit));
 
-        $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,\Contao\StringUtil::specialchars($titleDelete), $confirmDelete ,\Contao\Image::getHtml('delete.svg', $titleDelete));
+        $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleDelete), $confirmDelete ,Image::getHtml('delete.svg', $titleDelete));
 
         $buttons.= sprintf('
             <a 
@@ -170,8 +180,9 @@ class Hooks extends Controller
             title="%s" 
             class="drag-handle">
             %s
-            </a>',\Contao\StringUtil::specialchars($titleDrag),\Contao\Image::getHtml('drag.svg', $titleDrag));
-        return sprintf('<div class="item-actions">%s (ID %s) - %s</div>',$objElement->type, $objElement->id,$buttons);
+            </a>',StringUtil::specialchars($titleDrag),Image::getHtml('drag.svg', $titleDrag));
+        }
+        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>',$objElement->type, $objElement->id,$withActions ? ' - ' : '',$withActions ? $buttons : '');
     }
 
     public function prepareGridElementsInsideGridStartBEElement(ContentModel $objElement, $strBuffer): string
@@ -192,50 +203,50 @@ class Hooks extends Controller
         return $strGrid;
     }
 
-    protected function prepareGridStart(ContentModel $objElement,array $gridCols): string
-    {
-        $strGrid = '<div class="d-grid';
-        foreach($gridCols as $gridCol){
-            if("all" === $gridCol['key']){
-                $strGrid.=sprintf(' cols-%s',$gridCol['value']);
-            }else{
-                $strGrid.=sprintf(' cols-%s-%s',$gridCol['key'],$gridCol['value']);
-            }
-        }
+    // protected function prepareGridStart(ContentModel $objElement,array $gridCols): string
+    // {
+    //     $strGrid = '<div class="d-grid';
+    //     foreach($gridCols as $gridCol){
+    //         if("all" === $gridCol['key']){
+    //             $strGrid.=sprintf(' cols-%s',$gridCol['value']);
+    //         }else{
+    //             $strGrid.=sprintf(' cols-%s-%s',$gridCol['key'],$gridCol['value']);
+    //         }
+    //     }
 
-        $strGrid.= '" data-grid-item="'.$objElement->id.'">';
+    //     $strGrid.= '" data-grid-item="'.$objElement->id.'">';
 
-        return $strGrid;
-    }
+    //     return $strGrid;
+    // }
 
-    protected function prepareGridStop(): string
-    {
-        return '</div>';
-    }
+    // protected function prepareGridStop(): string
+    // {
+    //     return '</div>';
+    // }
 
-    protected function prepareGridItems(array $gridItems): string
-    {
-        $strGrid = '';
-        $strGridNested = '';
-        $strGridNestedClasses = '';
-        $gridItemsKeys = array_keys($gridItems) ?? [];
-        for($i = 0; $i < count($gridItemsKeys)-1; $i = $i +2){
-            $itemId = $gridItemsKeys[$i];
+    // protected function prepareGridItems(array $gridItems): string
+    // {
+    //     $strGrid = '';
+    //     $strGridNested = '';
+    //     $strGridNestedClasses = '';
+    //     $gridItemsKeys = array_keys($gridItems) ?? [];
+    //     for($i = 0; $i < count($gridItemsKeys)-1; $i = $i +2){
+    //         $itemId = $gridItemsKeys[$i];
 
-            $objItem = \Contao\ContentModel::findById($itemId);
-            if($objItem->type === "grid-start"){
-                $strGridNestedClasses = $gridItems[$gridItemsKeys[$i+1]];
-                $strGridNested = sprintf('<div data-item="%s"></div>', $itemId);
-            }elseif($objItem->type === "grid-stop"){
-                $itemClasses = $gridItems[$gridItemsKeys[$i+1]];
-                $strGrid.=sprintf('<div class="%s">%s<div data-item="%s"></div></div>', $strGridNestedClasses, $strGridNested,$itemId);
-            }else{
-                $itemClasses = $gridItems[$gridItemsKeys[$i+1]];
-                $strGrid.=sprintf('<div data-item="%s" class="%s"></div>', $itemId, $itemClasses);
-            }
+    //         $objItem = \Contao\ContentModel::findById($itemId);
+    //         if($objItem->type === "grid-start"){
+    //             $strGridNestedClasses = $gridItems[$gridItemsKeys[$i+1]];
+    //             $strGridNested = sprintf('<div data-item="%s"></div>', $itemId);
+    //         }elseif($objItem->type === "grid-stop"){
+    //             $itemClasses = $gridItems[$gridItemsKeys[$i+1]];
+    //             $strGrid.=sprintf('<div class="%s">%s<div data-item="%s"></div></div>', $strGridNestedClasses, $strGridNested,$itemId);
+    //         }else{
+    //             $itemClasses = $gridItems[$gridItemsKeys[$i+1]];
+    //             $strGrid.=sprintf('<div data-item="%s" class="%s"></div>', $itemId, $itemClasses);
+    //         }
 
-        }
+    //     }
 
-        return $strGrid;
-    }
+    //     return $strGrid;
+    // }
 }
