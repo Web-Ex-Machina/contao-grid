@@ -75,17 +75,18 @@ class Hooks extends Controller
                     $arrGrid = $g;
                 }
             }
+            // dump($arrGrid['cols']);
             return sprintf(
-                '<div class="%s %s %s be_subgrid" data-id="%s" data-type="%s">%s%s%s',
+                '<div class="%s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
                 implode(' ', $arrGrid['item_classes']['all']),
                 $arrGrid['item_classes']['items'][$objElement->id] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
+                !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
                 TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridContentElement($objElement,true) : '',
                 $strBuffer,
-                // GridBuilder::fakeFirstGridElementMarkup($objElement->id)
-                GridBuilder::fakeFirstGridElementMarkup($currentGridId)
+                GridBuilder::fakeFirstGridElementMarkup((string) $currentGridId)
             );
         }
         if ('grid-stop' === $objElement->type && true === $arrGrid['subgrid']) {

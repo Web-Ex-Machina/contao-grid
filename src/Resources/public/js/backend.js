@@ -56,18 +56,19 @@ WEM.Grid  = WEM.Grid || {};
             event.preventDefault();
         }
         ,dragEnter:function(event){
-            if(!event.target.getAttribute('dropable')){
+            if(event.target && !event.target.getAttribute('dropable')){
                 return;
             }
-            event.target.classList.toggle('drag-enter');
+            event.target.classList.toggle('drag-enter', true);
         }
         ,dragLeave:function(event){
-            if(!event.target.getAttribute('dropable')){
+            if(event.target && !event.target.getAttribute('dropable')){
                 return;
             }
-            event.target.classList.toggle('drag-enter','');
+            event.target.classList.toggle('drag-enter',false);
         }
         ,drop:function(event){
+            console.clear();
             event.preventDefault();
         
             var dropzone = event.target;
@@ -76,12 +77,12 @@ WEM.Grid  = WEM.Grid || {};
                 .getData('text');
             var draggableElement = document.querySelector('[data-id="'+id+'"]');
             var pid = dropzone.getAttribute('data-id');
-            // var grid = document.querySelector('.grid_preview');
+
             var gridSource = self.getGridFromElement(draggableElement);
             var gridDest = self.getGridFromElement(dropzone);
 
-            event.target.classList.toggle('drag-enter','');
-            draggableElement.classList.toggle('drag-enter','');
+            event.target.classList.toggle('drag-enter',false);
+            draggableElement.classList.toggle('drag-enter',false);
 
             if(!dropzone.getAttribute('dropable')
             || id == pid
@@ -97,11 +98,20 @@ WEM.Grid  = WEM.Grid || {};
                 pid = self.getGridLastRealElement(dropzone).getAttribute('data-id');
                 doDoublePositionning = !(self.isGridFirstLevel(gridSource) && self.isGridFirstLevel(gridDest));
             }else if('fake-first-element' == dropzone.getAttribute('data-type')){
-                var dropzone = self.getGridFirstRealElement(dropzone);
+                dropzone = self.getGridFirstRealElement(dropzone);
+                gridDest = self.getGridFromElement(dropzone);
                 pid = dropzone.getAttribute('data-id');
+                // pid = self.getGridFirstRealElement(dropzone).getAttribute('data-id');
+                // doDoublePositionning = !(self.isGridFirstLevel(gridSource) && self.isGridFirstLevel(gridDest));
             }else if(dropzone.previousSibling == draggableElement){
-                doDoublePositionning=false;
-                position = 'after';
+                if(self.isGridFirstLevel(gridSource) && self.isGridFirstLevel(gridDest)){
+                    doDoublePositionning=false;
+                    position = 'after';
+                }
+            }
+
+            if(id == pid){
+                return;
             }
 
             if('grid-start' == dropzone.getAttribute('data-type') 
@@ -110,18 +120,25 @@ WEM.Grid  = WEM.Grid || {};
                 var gridStopElements = dropzone.querySelectorAll('[data-type="grid-stop"]');
                 pid = gridStopElements[gridStopElements.length-1].getAttribute('data-id');
             }
-            
+
             if('grid-start' == draggableElement.getAttribute('data-type')){
                 // if we move a grid-start, we have to move all children elements before the dropzone
                 // move the grid start
                 requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
+                requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
                 // move the grid elements
                 pid = id; // the grid start becomes the PID
                 var gridElements = draggableElement.querySelectorAll('[data-type]');
                 gridElements.forEach(function(gridElement){
-                    id = gridElement.getAttribute('data-id');
-                    requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
-                    pid = id; // grid elements stay behind each others
+                    console.log(gridElement.getAttribute('data-type'));
+                    if(-1 == gridElement.getAttribute('data-type').indexOf('fake-')){
+                        console.log("On ajoute");
+                        id = gridElement.getAttribute('data-id');
+                        requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
+                        pid = id; // grid elements stay behind each others
+                    }else{
+                        console.log("On ajoute pas");
+                    }
                 });
                 if(doDoublePositionning){
                     requests.push(self.getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid));
@@ -132,17 +149,29 @@ WEM.Grid  = WEM.Grid || {};
                     requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
                 }
             }
+            
+            for(var i in requests){
+                console.log(requests[i].id,requests[i].pid);
+            }
 
             self.runFakeQueue(requests);
 
             // once done, exchange both element places in display
+            console.log("draggableElement",draggableElement);
+            console.log("gridSource",gridSource);
+            console.log("gridDest",gridDest);
+            console.log("dropzone",dropzone);
+            console.log("position",position);
             gridSource.removeChild(draggableElement);
             if('before' === position){
                 gridDest.insertBefore(draggableElement,dropzone);
             }else{
+                console.log(dropzone.nextSibling);
                 gridDest.insertBefore(draggableElement,dropzone.nextSibling);
 
             }
+
+            self.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), document.querySelector('[name="grid_cols[0][value]"]').value);
 
         }
         ,getGridFirstRealElement:function(fromElement){
@@ -199,10 +228,11 @@ WEM.Grid  = WEM.Grid || {};
             var req,href;
             req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
             href = window.location.href.replace(/\?.*$/, '');
-            params = Object.assign(params, {'url':href + req, 'followRedirects':false});
+            params = Object.assign(params, {'url':href + req, 'followRedirects':false,'id':id,'pid':pid});
             return params;
         }
         ,runFakeQueue:function(requests){
+            console.log('RUN QUEUEU');
             if(requests.length <= 0){
                 return;
             }
@@ -223,6 +253,43 @@ WEM.Grid  = WEM.Grid || {};
             })
             .catch(error => {
                 AjaxRequest.hideBox();
+            });
+        }
+        ,updateGridElementsAvailableColumns:function(grid, nbColumns){
+            nbColumns = parseInt(nbColumns);
+            if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
+                return;
+            }
+            // Update the items' available size options
+            grid.querySelectorAll(':scope > .be_item_grid').forEach(function(item){
+                if("grid-start" === item.getAttribute('data-type')){
+                    self.updateGridElementsAvailableColumns(item, item.getAttribute('data-nb-cols'));
+                }
+
+                    var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+']"]');
+
+                    if(null === select){
+                        return;
+                    }
+                    // remove all options
+                    var length = select.options.length;
+                    for(i = 0; i <= length; i++){
+                        select.remove(0);
+                    }
+                    // recreate options
+                    select.add(new Option('-','',false,null == item.getAttribute('data-cols-span') ? true : false));
+                    for(var i = 1; i <= nbColumns; i++){
+                        select.add(new Option(i+' colonne(s)','cols-span-'+i,false,parseInt(item.getAttribute('data-cols-span')) == i ? true : false));
+                    }
+
+                    for(i = 1; i <= 12; i++){
+                        if(-1 < item.className.indexOf('cols-span-'+i) && i > nbColumns){
+                            item.classList.toggle('cols-span-'+i,true);
+                        }
+                    }
+
+                    select.dispatchEvent(new Event('change'));
+                // }
             });
         }
     }
@@ -321,30 +388,8 @@ window.addEvent("domready", function () {
         document.querySelectorAll('.grid_preview > .be_item_grid_fake').forEach(function(item){
             item.className = item.className.replace(/cols-span-([0-9]{1,2})/,'cols-span-'+nbColumns);
         });
-        // Update the items' available size options
-        document.querySelectorAll('.grid_preview > .be_item_grid').forEach(function(item){
-            var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+']"]');
-            if(null === select){
-                return;
-            }
-            // remove all options
-            var length = select.options.length;
-            for(i = 0; i <= length; i++){
-                select.remove(0);
-            }
-            // recreate options
-            select.add(new Option('-','',false,null == item.getAttribute('data-cols-span') ? true : false));
-            for(var i = 1; i <= nbColumns; i++){
-                select.add(new Option(i+' colonne(s)','cols-span-'+i,false,parseInt(item.getAttribute('data-cols-span')) == i ? true : false));
-            }
 
-            for(i = 1; i <= 12; i++){
-                if(-1 < item.className.indexOf('cols-span-'+i) && i > nbColumns){
-                    item.classList.toggle('cols-span-'+i);
-                }
-            }
-
-            select.dispatchEvent(new Event('change'));
-        });
+        WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), nbColumns);
+        
     });
 });

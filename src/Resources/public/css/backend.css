@@ -22,8 +22,8 @@
 .gridelement .be_item_grid.fake-helper.drag-enter{background-color: lightgreen;border-color: green;}
 .gridelement .be_item_grid.helper.drag-enter{background-color: lightgreen;border-color: green;}
 
-.gridelement .be_subgrid_item.helper{padding-bottom:15px;}
-.gridelement .be_subgrid .be_subgrid{padding-bottom:15px;}
+/*.gridelement .be_subgrid_item.helper{padding-bottom:15px;}*/
+/*.gridelement .be_subgrid .be_subgrid{padding-bottom:15px;}*/
 .gridelement .be_subgrid .item-classes{display:none;}
 
 .gridelement .be_item_grid.be_item_grid_fake{display: none;}

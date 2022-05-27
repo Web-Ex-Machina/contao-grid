@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Widgets;
 
 use WEM\GridBundle\Helper\GridBuilder;
+use Contao\ContentModel;
 
 class GridElementWizard extends \Widget
 {
@@ -114,11 +115,15 @@ class GridElementWizard extends \Widget
         $blnGridStart = false;
         $blnGridStop = false;
         $intGridStop = 0;
+        $currentGridId[] = $this->id;
 
-        $GLOBALS['WEM']['GRID'][$this->id] = [
+        $GLOBALS['WEM']['GRID'][(string) $this->id] = [
             'preset' => $this->activeRecord->grid_preset,
+            'cols' => !\is_array($this->activeRecord->grid_cols) ? deserialize($this->activeRecord->grid_cols) : $this->activeRecord->grid_cols,
             'wrapper_classes' => GridBuilder::getWrapperClasses($this->activeRecord),
             'item_classes' => GridBuilder::getItemClasses($this->activeRecord),
+            'level' => 0,
+            'id' => (string) $this->id,
         ];
 
         if ('' !== $this->activeRecord->cssID[1]) {
@@ -157,7 +162,7 @@ class GridElementWizard extends \Widget
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
         }
         if(!\Input::get('grid_preview')){
-            $strGrid .= GridBuilder::fakeFirstGridElementMarkup($this->id);
+            $strGrid .= GridBuilder::fakeFirstGridElementMarkup((string) $this->id);
         }
 
         // Now, we will only fetch the items in the grid
@@ -177,10 +182,12 @@ class GridElementWizard extends \Widget
             // If we hit another grid-start, increment the number of "grid stops" authorized
             if ('grid-start' === $objItems->type) {
                 // $GLOBALS['WEM']['GRID'][$objItems->id] = $GLOBALS['WEM']['GRID'][$this->id];
-                $GLOBALS['WEM']['GRID'][$objItems->id] = [
-                    'preset' => $this->activeRecord->grid_preset,
+                $GLOBALS['WEM']['GRID'][(string) $objItems->id] = [
+                    'preset' => $objItems->grid_preset,
+                    'cols' => !\is_array($objItems->grid_cols) ? deserialize($objItems->grid_cols) : $objItems->grid_cols,
                     'wrapper_classes' => GridBuilder::getWrapperClasses($objItems),
                     'item_classes' => GridBuilder::getItemClasses($objItems),
+                    'id' => (string) $objItems->id,
                 ];
                 $GLOBALS['WEM']['GRID'][$objItems->id]['item_classes']['all'][] = 'be_item_grid helper';
                 $GLOBALS['WEM']['GRID'][$objItems->id]['subgrid'] = true;
@@ -193,59 +200,23 @@ class GridElementWizard extends \Widget
             // And break the loop if we hit a grid-stop element
             if ('grid-stop' === $objItems->type) {
                 --$intGridStop;
-
+                array_pop($currentGridId);
                 if (0 === $intGridStop) {
                     break;
                 }
             }
 
             $objItems->isForGridElementWizard = true;
-            $strElement = $this->getContentElement($objItems->current());
 
-            // Add the input to the grid item
-            $search = '</div>';
-            $pos = strrpos($strElement, $search);
-
-            if (false !== $pos && !\Input::get('grid_preview') && 1 >= $intGridStop) {
-            // if (false !== $pos && !\Input::get('grid_preview')) {
-
-                // Build a select options html with the number of possibilities
-                $options = '<option value="">-</option>';
-                if (!\is_array($this->activeRecord->grid_cols)) {
-                    $cols = deserialize($this->activeRecord->grid_cols);
-                } else {
-                    $cols = $this->activeRecord->grid_cols;
-                }
-                foreach ($cols as $c) {
-                    if ('all' === $c['key']) {
-                        $v = $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id];
-                        for ($i = 1; $i <= $c['value']; ++$i) {
-                            $options .= sprintf(
-                                '<option value="cols-span-%s"%s>%s</option>',
-                                $i,
-                                ($v === 'cols-span-'.$i) ? ' selected' : '',
-                                sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $i)
-                            );
-                        }
-                    }
-                }
-
-                $select = sprintf(
-                    '<div class="item-classes">
-                        <label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select>
-                        <label for="ctrl_%1$s_%2$s_classes">%5$s</label><input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text" value="%6$s" />
-                    </div>',
-                    $this->strId,
-                    ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id,
-                    $options,
-                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
-                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
-                    $this->varValue[('grid-stop' === $objItems->type) ? $strGridStartId. '_classes' : $objItems->id . '_classes'],
-                );
-
-                $strElement = substr_replace($strElement, $select.$search, $pos, \strlen($search));
+            if('grid-start' === $objItems->type){
+                $strElement = $this->getContentElement($objItems->current());
+            }else{
+                $strElement = $this->BEGridItemSettings(end($currentGridId),('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id, $this->getContentElement($objItems->current()));
             }
-
+            
+            if('grid-start' === $objItems->type){
+                $currentGridId[] = $objItems->id;
+            }
             $strGrid .= $strElement;
         }
 
@@ -291,5 +262,50 @@ class GridElementWizard extends \Widget
 </div>';
 
         return $strReturn;
+    }
+
+    protected function BEGridItemSettings(string $gridId, string $objItemId, string $strElement): string
+    {
+        // Add the input to the grid item
+        $search = '</div>';
+        $pos = strrpos($strElement, $search);
+
+        // if (false !== $pos && !\Input::get('grid_preview') && 1 >= $intGridStop) {
+        if (false !== $pos && !\Input::get('grid_preview')) {
+
+            // Build a select options html with the number of possibilities
+            $options = '<option value="">-</option>';
+            $cols = $GLOBALS['WEM']['GRID'][$gridId]['cols'];
+            foreach ($cols as $c) {
+                if ('all' === $c['key']) {
+                    $v = $this->varValue[$objItemId];
+                    for ($i = 1; $i <= $c['value']; ++$i) {
+                        $options .= sprintf(
+                            '<option value="cols-span-%s"%s>%s</option>',
+                            $i,
+                            ($v === 'cols-span-'.$i) ? ' selected' : '',
+                            sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $i)
+                        );
+                    }
+                }
+            }
+
+            $select = sprintf(
+                '<div class="item-classes">
+                    <label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select>
+                    <label for="ctrl_%1$s_%2$s_classes">%5$s</label><input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text" value="%6$s" />
+                </div>',
+                $this->strId,
+                $objItemId,
+                $options,
+                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
+                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
+                $this->varValue[$objItemId . '_classes'],
+            );
+
+            $strElement = substr_replace($strElement, $select.$search, $pos, \strlen($search));
+        }
+
+        return $strElement;
     }
 }
