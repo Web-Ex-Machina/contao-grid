@@ -1,4 +1,216 @@
+var WEM = WEM || {};
+WEM.Grid  = WEM.Grid || {};
+(function() {
+    WEM.Grid.Drag = WEM.Grid.Drag || {
+        selectors:{
+            grid:'.grid_preview',
+            firstLevelElements:'.grid_preview > .be_item_grid',
+        },
+        init:function(){
+            self.applyListeners();
+        }
+        ,applyListeners:function(){
+            document.querySelectorAll(self.selectors.firstLevelElements).forEach(function (container){ // only first level elements, not nested ones
+                if("false" !== container.getAttribute('draggable')){
+                    var dragBtn = container.querySelector('.drag-handle');
+                    if(null !== dragBtn){
+                        dragBtn.addEventListener('dragstart',self.dragStart);
+                        dragBtn.addEventListener('dragend',self.dragEnd);
+                        dragBtn.addEventListener('dragover',self.dragOver);
+                    }
+                }
+
+                if("false" !== container.getAttribute('dropable')){
+                    container.setAttribute('dropable',true);
+                    container.addEventListener('dragover',self.dragOver);
+                    container.addEventListener('dragenter',self.dragEnter);
+                    container.addEventListener('dragleave',self.dragLeave);
+                    container.addEventListener('drop',self.drop);
+                }
+                // save the original number of columns
+                for(i = 1; i <=12;i++){
+                    if(-1 < container.className.indexOf('cols-span-'+i)){
+                        container.setAttribute('data-cols-span',i);
+                    }
+                }
+            });
+        }
+        ,dragStart:function(event){
+            if(-1 < event.target.className.indexOf('drag-handle')){
+                var target = event.target.parentNode.parentNode;
+            }else if('IMG' == event.target.nodeName){
+                var target = event.target.parentNode.parentNode.parentNode;
+            }
+            event
+                .dataTransfer
+                .setData('text/plain', target.getAttribute('data-id'));
+            event
+                .dataTransfer
+                .setDragImage(document.querySelector('[data-id="'+target.getAttribute('data-id')+'"]'),event.layerX,event.layerY);
+        }
+        ,dragEnd:function(event){
+            event.preventDefault();
+        }
+        ,dragOver:function(event){
+            event.preventDefault();
+        }
+        ,dragEnter:function(event){
+            if(!event.target.getAttribute('dropable')){
+                return;
+            }
+            event.target.classList.toggle('drag-enter');
+        }
+        ,dragLeave:function(event){
+            if(!event.target.getAttribute('dropable')){
+                return;
+            }
+            event.target.classList.toggle('drag-enter','');
+        }
+        ,drop:function(event){
+            event.preventDefault();
+        
+            var dropzone = event.target;
+            var id = event
+                .dataTransfer
+                .getData('text');
+            var draggableElement = document.querySelector('[data-id="'+id+'"]');
+            var pid = dropzone.getAttribute('data-id');
+            var grid = document.querySelector('.grid_preview');
+
+            event.target.classList.toggle('drag-enter','');
+            draggableElement.classList.toggle('drag-enter','');
+
+            if(!dropzone.getAttribute('dropable')
+            || id == pid
+            ){
+                return;
+            }
+
+            var requests = [];
+            var doDoublePositionning = true;
+            var position = 'before';
+
+            if('fake-last-element' == dropzone.getAttribute('data-type')){
+                pid = self.getGridLastRealElement().getAttribute('data-id');
+                doDoublePositionning = false;
+            }else if('fake-first-element' == dropzone.getAttribute('data-type')){
+                var dropzone = self.getGridFirstRealElement();
+                pid = dropzone.getAttribute('data-id');
+            }else if(dropzone.previousSibling == draggableElement){
+                doDoublePositionning=false;
+                position = 'after';
+            }
+
+            if('grid-start' == dropzone.getAttribute('data-type') 
+            && 'after' == position
+            ){
+                var gridStopElements = dropzone.querySelectorAll('[data-type="grid-stop"]');
+                pid = gridStopElements[gridStopElements.length-1].getAttribute('data-id');
+            }
+            
+            if('grid-start' == draggableElement.getAttribute('data-type')){
+                // if we move a grid-start, we have to move all children elements before the dropzone
+                // move the grid start
+                requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
+                // move the grid elements
+                pid = id; // the grid start becomes the PID
+                var gridElements = draggableElement.querySelectorAll('[data-type]');
+                gridElements.forEach(function(gridElement){
+                    id = gridElement.getAttribute('data-id');
+                    requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
+                    pid = id; // grid elements stay behind each others
+                });
+                if(doDoublePositionning){
+                    requests.push(self.getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid));
+                }
+            }else{
+                requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
+                if(doDoublePositionning){
+                    requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
+                }
+            }
+            self.runFakeQueue(requests);
+
+            // once done, exchange both element places in display
+            grid.removeChild(draggableElement);
+            if('before' === position){
+                grid.insertBefore(draggableElement,dropzone);
+            }else{
+                grid.insertBefore(draggableElement,dropzone.nextSibling);
+
+            }
+
+        }
+        ,getGridFirstRealElement:function(){
+            var grid = document.querySelector(self.selectors.grid);
+
+            elements = grid.querySelectorAll('[data-type]');
+
+            var elementIndex = 0;
+            var element = elements[elementIndex];
+            while(-1 < element.getAttribute('data-type').indexOf('fake-')){
+                elementIndex++;
+                element = elements[elementIndex];
+            }
+
+            return element;
+        }
+        ,getGridLastRealElement:function(){
+            var grid = document.querySelector(self.selectors.grid);
+
+            elements = grid.querySelectorAll('[data-type]');
+
+            var elementIndex = elements.length-1;
+            var element = elements[elementIndex];
+            while(-1 < element.getAttribute('data-type').indexOf('fake-')){
+                elementIndex--;
+                element = elements[elementIndex];
+            }
+            if('grid-start' == element.getAttribute('data-type')){
+                // if we drag over a grid, place the element after the corresponding grid-stop
+                var gridStops = element.querySelectorAll('[data-type="grid-stop"]');
+                element = gridStops[gridStops.length-1];
+            }
+
+            return element;
+        },
+        getContaoRequestPutElementAfterAnother:function(id, pid, params = {}){
+            var req,href;
+            req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
+            href = window.location.href.replace(/\?.*$/, '');
+            params = Object.assign(params, {'url':href + req, 'followRedirects':false});
+            return params;
+        }
+        ,runFakeQueue:function(requests){
+            if(requests.length <= 0){
+                return;
+            }
+            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+            self.runFakeQueueItem(requests,0);
+        }
+
+        ,runFakeQueueItem:function(requests, index){
+            fetch(requests[index].url,{
+                method:'get',
+                redirect:'manual'
+            })
+            .then(data => {
+                if("undefined" != typeof requests[index+1]){
+                    self.runFakeQueueItem(requests,index+1);
+                }else{
+                    AjaxRequest.hideBox();
+                }
+            })
+            .catch(error => {
+                AjaxRequest.hideBox();
+            });
+        }
+    }
+    var self = WEM.Grid.Drag;
+})();
+
 window.addEvent("domready", function () {
+    WEM.Grid.Drag.init();
     document.querySelector('.gridelement .helpers .grid_toggleHelpers').addEventListener("click", function (e) {
         e.preventDefault();
         document.querySelectorAll('.gridelement .grid_preview .be_item_grid').forEach(function (i) {
@@ -67,7 +279,7 @@ window.addEvent("domready", function () {
     });
 
     document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
-        var lastElement = getGridLastRealElement();
+        var lastElement = WEM.Grid.Drag.getGridLastRealElement();
         container.addEventListener("click", function (e) {
             e.preventDefault();
             Backend.openModalIframe({
@@ -77,36 +289,6 @@ window.addEvent("domready", function () {
                 ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nb=1'
             });
         });
-    });
-    console.clear();
-    document.querySelectorAll('.grid_preview > .be_item_grid').forEach(function (container){ // only first level elements, not nested ones
-        if("false" !== container.getAttribute('draggable')){
-            // container.setAttribute('draggable',true);
-            // container.addEventListener('dragstart',gridItemOnDragStart);
-            // container.addEventListener('dragend',gridItemOnDragEnd);
-            // container.addEventListener('dragover',gridItemOnDragOver);
-
-            var dragBtn = container.querySelector('.drag-handle');
-            if(null !== dragBtn){
-                dragBtn.addEventListener('dragstart',gridItemOnDragStart);
-                dragBtn.addEventListener('dragend',gridItemOnDragEnd);
-                dragBtn.addEventListener('dragover',gridItemOnDragOver);
-            }
-        }
-
-        if("false" !== container.getAttribute('dropable')){
-            container.setAttribute('dropable',true);
-            container.addEventListener('dragover',gridItemOnDragOver);
-            container.addEventListener('dragenter',gridItemOnDragEnter);
-            container.addEventListener('dragleave',gridItemOnDragLeave);
-            container.addEventListener('drop',gridItemOnDrop);
-        }
-        // save the original number of columns
-        for(i = 1; i <=12;i++){
-            if(-1 < container.className.indexOf('cols-span-'+i)){
-                container.setAttribute('data-cols-span',i);
-            }
-        }
     });
 
     document.querySelector('[name="grid_cols[0][value]"]').addEventListener('keyup',function(event){
@@ -147,192 +329,4 @@ window.addEvent("domready", function () {
             select.dispatchEvent(new Event('change'));
         });
     });
-
-    function gridItemOnDragStart(event){
-        var target = event.target.parentNode.parentNode;
-        event
-            .dataTransfer
-            .setData('text/plain', target.getAttribute('data-id'));
-        target.classList.toggle('drag-start');
-        // coordinates stuff
-        var rect = target.getBoundingClientRect();
-        var real = window.getComputedStyle(target);
-        target.setAttribute('data-mouse-offset-x',event.clientX - rect.left); //x position within the element.
-        target.setAttribute('data-mouse-offset-y',event.clientY - rect.top);  //y position within the element.
-        target.setAttribute('data-offset-x',parseFloat(real.left));
-        target.setAttribute('data-offset-y',parseFloat(real.top));
-        document.body.addEventListener('mousemove',gridItemDragging);
-        document.body.addEventListener('mouseup',function(){
-            // document.body.removeEventListener('mousemove',gridItemDragging,false);
-            document.body.removeEventListener('mousemove',gridItemDragging);
-        });
-    }
-
-    function gridItemOnDragEnd(event){
-        var target = event.target.parentNode.parentNode;
-        target.classList.toggle('drag-start','');
-        target.setAttribute('data-mouse-offset-x',false);
-        target.setAttribute('data-mouse-offset-y',false);
-        target.setAttribute('data-offset-x',false);
-        target.setAttribute('data-offset-y',false);
-    }
-
-    function gridItemOnDragOver(event){
-        event.preventDefault();
-        // var target = event.target.parentNode.parentNode;
-        // target.style.left = parseInt(target.getAttribute('data-offset-x')) + event.clientX - parseInt(target.getAttribute('data-mouse-offset-x')) + 'px';
-        // target.style.top = parseInt(target.getAttribute('data-offset-y')) + event.clientY - parseInt(target.getAttribute('data-mouse-offset-y')) + 'px';
-    }
-
-    function gridItemDragging(event){
-        console.log('move');
-        event.preventDefault();
-        if(event.dataTransfer){
-            var target = document.querySelector('[data-id="'+event.dataTransfer.getData('text')+'"]');
-            target.style.left = parseInt(target.getAttribute('data-offset-x')) + event.clientX - parseInt(target.getAttribute('data-mouse-offset-x')) + 'px';
-            target.style.top = parseInt(target.getAttribute('data-offset-y')) + event.clientY - parseInt(target.getAttribute('data-mouse-offset-y')) + 'px';
-        }
-    }
-
-    function gridItemOnDragEnter(event){
-        if(!event.target.getAttribute('dropable')){
-            return;
-        }
-        event.target.classList.toggle('drag-enter');
-    }
-
-    function gridItemOnDragLeave(event){
-        if(!event.target.getAttribute('dropable')){
-            return;
-        }
-        event.target.classList.toggle('drag-enter','');
-    }
-
-    function gridItemOnDrop(event){
-        event.preventDefault();
-        
-        var dropzone = event.target;
-        var id = event
-            .dataTransfer
-            .getData('text');
-        var draggableElement = document.querySelector('[data-id="'+id+'"]');
-        var pid = dropzone.getAttribute('data-id');
-        var grid = document.querySelector('.grid_preview');
-
-        event.target.classList.toggle('drag-enter','');
-        draggableElement.classList.toggle('drag-enter','');
-
-        if(!dropzone.getAttribute('dropable')
-        || id == pid
-        ){
-            return;
-        }
-
-        var requests = [];
-        var doDoublePositionning = true;
-
-        if('fake-last-element' == dropzone.getAttribute('data-type')){
-            pid = getGridLastRealElement().getAttribute('data-id');
-            doDoublePositionning = false;
-        }else if('fake-first-element' == dropzone.getAttribute('data-type')){
-            var dropzone = getGridFirstRealElement();
-            pid = dropzone.getAttribute('data-id');
-        } 
-
-        if('grid-start' == draggableElement.getAttribute('data-type')){
-            // if we move a grid-start, we have to move all children elements before the dropzone
-            // move the grid start
-            requests.push(getContaoRequestPutElementAfterAnother(id, pid));
-            // move the grid elements
-            pid = id; // the grid start becomes the PID
-            var gridElements = draggableElement.querySelectorAll('[data-type]');
-            gridElements.forEach(function(gridElement){
-                id = gridElement.getAttribute('data-id');
-                requests.push(getContaoRequestPutElementAfterAnother(id, pid));
-                pid = id; // grid elements stay behind each others
-            });
-            if(doDoublePositionning){
-                requests.push(getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid));
-            }
-        }else{
-            requests.push(getContaoRequestPutElementAfterAnother(id, pid));
-            if(doDoublePositionning){
-                requests.push(getContaoRequestPutElementAfterAnother(pid, id));
-            }
-        }
-        runFakeQueue(requests);
-
-        // once done, exchange both element places in display
-        grid.removeChild(draggableElement);
-        grid.insertBefore(draggableElement,dropzone);
-    }
-
-    function getContaoRequestPutElementAfterAnother(id, pid, params = {}){
-        var req,href;
-        req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
-        href = window.location.href.replace(/\?.*$/, '');
-        params = Object.assign(params, {'url':href + req, 'followRedirects':false});
-        return params;
-    }
-
-    function getGridFirstRealElement(){
-        var grid = document.querySelector('.grid_preview');
-
-        elements = grid.querySelectorAll('[data-type]');
-
-        var elementIndex = 0;
-        var element = elements[elementIndex];
-        while(-1 < element.getAttribute('data-type').indexOf('fake-')){
-            elementIndex++;
-            element = elements[elementIndex];
-        }
-
-        return element;
-    }
-
-    function getGridLastRealElement(){
-        var grid = document.querySelector('.grid_preview');
-
-        elements = grid.querySelectorAll('[data-type]');
-
-        var elementIndex = elements.length-1;
-        var element = elements[elementIndex];
-        while(-1 < element.getAttribute('data-type').indexOf('fake-')){
-            elementIndex--;
-            element = elements[elementIndex];
-        }
-        if('grid-start' == element.getAttribute('data-type')){
-            // if we drag over a grid, place the element after the corresponding grid-stop
-            var gridStops = element.querySelectorAll('[data-type="grid-stop"]');
-            element = gridStops[gridStops.length-1];
-        }
-
-        return element;
-    }
-
-    function runFakeQueue(requests){
-        if(requests.length <= 0){
-            return;
-        }
-        AjaxRequest.displayBox(Contao.lang.loading + ' …');
-        runFakeQueueItem(requests,0);
-    }
-
-    function runFakeQueueItem(requests, index){
-        fetch(requests[index].url,{
-            method:'get',
-            redirect:'manual'
-        })
-        .then(data => {
-            if("undefined" != typeof requests[index+1]){
-                runFakeQueueItem(requests,index+1);
-            }else{
-                AjaxRequest.hideBox();
-            }
-        })
-        .catch(error => {
-            AjaxRequest.hideBox();
-        });
-    }
-
 });
