@@ -254,30 +254,29 @@ WEM.Grid  = WEM.Grid || {};
                     self.updateGridElementsAvailableColumns(item, item.getAttribute('data-nb-cols'));
                 }
 
-                    var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+']"]');
+                var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+']"]');
 
-                    if(null === select){
-                        return;
-                    }
-                    // remove all options
-                    var length = select.options.length;
-                    for(i = 0; i <= length; i++){
-                        select.remove(0);
-                    }
-                    // recreate options
-                    select.add(new Option('-','',false,null == item.getAttribute('data-cols-span') ? true : false));
-                    for(var i = 1; i <= nbColumns; i++){
-                        select.add(new Option(WEM.Grid.Translations.columns[i-1],'cols-span-'+i,false,parseInt(item.getAttribute('data-cols-span')) == i ? true : false));
-                    }
+                if(null === select){
+                    return;
+                }
+                // remove all options
+                var length = select.options.length;
+                for(i = 0; i <= length; i++){
+                    select.remove(0);
+                }
+                // recreate options
+                select.add(new Option('-','',false,null == item.getAttribute('data-cols-span') ? true : false));
+                for(var i = 1; i <= nbColumns; i++){
+                    select.add(new Option(WEM.Grid.Translations.columns[i-1],'cols-span-'+i,false,parseInt(item.getAttribute('data-cols-span')) == i ? true : false));
+                }
 
-                    for(i = 1; i <= 12; i++){
-                        if(-1 < item.className.indexOf('cols-span-'+i) && i > nbColumns){
-                            item.classList.toggle('cols-span-'+i,true);
-                        }
+                for(i = 1; i <= 12; i++){
+                    if(-1 < item.className.indexOf('cols-span-'+i) && i > nbColumns){
+                        item.classList.toggle('cols-span-'+i,true);
                     }
+                }
 
-                    select.dispatchEvent(new Event('change'));
-                // }
+                select.dispatchEvent(new Event('change'));
             });
         }
     }

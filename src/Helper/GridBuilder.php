@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Helper;
 
 use Exception;
+use Contao\ContentModel;
+use Contao\DataContainer;
 
 /**
  * Function to centralize generic code to.
@@ -215,11 +217,11 @@ class GridBuilder extends \Controller
             //         }
             //     }
             // }
-            $gridStarts = \Contao\ContentModel::countBy(['pid = ?','ptable = ?','type = ?'],[$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-start']);
-            $gridStops = \Contao\ContentModel::countBy(['pid = ?','ptable = ?','type = ?'],[$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-stop']);
+            $gridStarts = ContentModel::countBy(['pid = ?','ptable = ?','type = ?'],[$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-start']);
+            $gridStops = ContentModel::countBy(['pid = ?','ptable = ?','type = ?'],[$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-stop']);
 
             if($gridStarts > $gridStops){
-                $objElement = new \Contao\ContentModel();
+                $objElement = new ContentModel();
                 $objElement->tstamp = time();
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
@@ -233,26 +235,25 @@ class GridBuilder extends \Controller
 
     public function includeJSCSS(){
         $GLOBALS['TL_CSS'][] = 'bundles/wemgrid/css/backend.css';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/wemgrid/js/backend-tl_content-list.js';
     }
 
-    public function oncutCallback(\Contao\DataContainer $dc): void
+    public function oncutCallback(DataContainer $dc): void
     {
-        $objItem = \Contao\ContentModel::findOneById($dc->id);
+        $objItem = ContentModel::findOneById($dc->id);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
-    public function oncopyCallback(int $itemId, \Contao\DataContainer $dc): void
+    public function oncopyCallback(int $itemId, DataContainer $dc): void
     {
-        $objItem = \Contao\ContentModel::findOneById($itemId);
+        $objItem = ContentModel::findOneById($itemId);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
-    public function ondeleteCallback(\Contao\DataContainer $dc, int $undoItemId): void
+    public function ondeleteCallback(DataContainer $dc, int $undoItemId): void
     {
-        $objItem = \Contao\ContentModel::findOneById($dc->id);
+        $objItem = ContentModel::findOneById($dc->id);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         if('grid-start' == $objItem->type){
             $this->deleteClosestGridStopFromGridStart($objItem);
@@ -260,16 +261,16 @@ class GridBuilder extends \Controller
         $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
-    public function deleteClosestGridStopFromGridStart(\Contao\ContentModel $gridStart)
+    public function deleteClosestGridStopFromGridStart(ContentModel $gridStart)
     {
-        $gridStop = \Contao\ContentModel::findBy(['pid = ?','ptable = ?','type = ?','sorting > ?'],[$gridStart->pid, $gridStart->ptable, 'grid-stop', $gridStart->sorting],['limit'=>1,'order'=>'sorting ASC']);
+        $gridStop = ContentModel::findBy(['pid = ?','ptable = ?','type = ?','sorting > ?'],[$gridStart->pid, $gridStart->ptable, 'grid-stop', $gridStart->sorting],['limit'=>1,'order'=>'sorting ASC']);
         if($gridStop){
             $gridStop->delete();
         }
     }
 
     public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable){
-        $objItems = \Contao\ContentModel::findBy(['pid = ?','ptable = ?'],[$pid, $ptable],['order'=>'sorting ASC']);
+        $objItems = ContentModel::findBy(['pid = ?','ptable = ?'],[$pid, $ptable],['order'=>'sorting ASC']);
         $objItemsIdsToSkip = [];
         foreach($objItems as $index => $objItem){
             if(in_array($objItem->id, $objItemsIdsToSkip)){
@@ -282,7 +283,7 @@ class GridBuilder extends \Controller
         }
     }
 
-    protected function recalculateGridItems(\Contao\ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems): array
+    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems): array
     {
         $gridItems = []; // reset grid items
         $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];

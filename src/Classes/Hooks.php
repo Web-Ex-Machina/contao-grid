@@ -36,9 +36,6 @@ class Hooks extends Controller
      */
     public function wrapGridElements(ContentModel $objElement, $strBuffer)
     {
-        // if(TL_MODE === 'BE' && $objElement->type == "grid-start"){
-        //     return $this->prepareGridElementsInsideGridStartBEElement($objElement, $strBuffer);
-        // }
         // Skip elements we never want to wrap or if we are not in a grid
         if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $GLOBALS['WEM']['GRID'] || empty($GLOBALS['WEM']['GRID'])) {
             return $strBuffer;
@@ -184,69 +181,4 @@ class Hooks extends Controller
         }
         return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>',$objElement->type, $objElement->id,$withActions ? ' - ' : '',$withActions ? $buttons : '');
     }
-
-    // public function prepareGridElementsInsideGridStartBEElement(ContentModel $objElement, $strBuffer): string
-    // {
-    //     // return $strBuffer;
-    //     return $strBuffer . $this->prepareGrid($objElement);
-    // }
-
-    // protected function prepareGrid(ContentModel $objElement): string
-    // {
-    //     $gridCols = unserialize($objElement->grid_cols ?? '') ?? [];
-    //     $gridItems = unserialize($objElement->grid_items ?? '') ?? [];
-
-    //     $strGrid = $this->prepareGridStart($objElement, $gridCols);
-    //     $strGrid.= $this->prepareGridItems($gridItems);
-    //     $strGrid.= $this->prepareGridStop();
-
-    //     return $strGrid;
-    // }
-
-    // protected function prepareGridStart(ContentModel $objElement,array $gridCols): string
-    // {
-    //     $strGrid = '<div class="d-grid';
-    //     foreach($gridCols as $gridCol){
-    //         if("all" === $gridCol['key']){
-    //             $strGrid.=sprintf(' cols-%s',$gridCol['value']);
-    //         }else{
-    //             $strGrid.=sprintf(' cols-%s-%s',$gridCol['key'],$gridCol['value']);
-    //         }
-    //     }
-
-    //     $strGrid.= '" data-grid-item="'.$objElement->id.'">';
-
-    //     return $strGrid;
-    // }
-
-    // protected function prepareGridStop(): string
-    // {
-    //     return '</div>';
-    // }
-
-    // protected function prepareGridItems(array $gridItems): string
-    // {
-    //     $strGrid = '';
-    //     $strGridNested = '';
-    //     $strGridNestedClasses = '';
-    //     $gridItemsKeys = array_keys($gridItems) ?? [];
-    //     for($i = 0; $i < count($gridItemsKeys)-1; $i = $i +2){
-    //         $itemId = $gridItemsKeys[$i];
-
-    //         $objItem = \Contao\ContentModel::findById($itemId);
-    //         if($objItem->type === "grid-start"){
-    //             $strGridNestedClasses = $gridItems[$gridItemsKeys[$i+1]];
-    //             $strGridNested = sprintf('<div data-item="%s"></div>', $itemId);
-    //         }elseif($objItem->type === "grid-stop"){
-    //             $itemClasses = $gridItems[$gridItemsKeys[$i+1]];
-    //             $strGrid.=sprintf('<div class="%s">%s<div data-item="%s"></div></div>', $strGridNestedClasses, $strGridNested,$itemId);
-    //         }else{
-    //             $itemClasses = $gridItems[$gridItemsKeys[$i+1]];
-    //             $strGrid.=sprintf('<div data-item="%s" class="%s"></div>', $itemId, $itemClasses);
-    //         }
-
-    //     }
-
-    //     return $strGrid;
-    // }
 }
