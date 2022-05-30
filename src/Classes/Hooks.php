@@ -185,23 +185,23 @@ class Hooks extends Controller
         return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>',$objElement->type, $objElement->id,$withActions ? ' - ' : '',$withActions ? $buttons : '');
     }
 
-    public function prepareGridElementsInsideGridStartBEElement(ContentModel $objElement, $strBuffer): string
-    {
-        // return $strBuffer;
-        return $strBuffer . $this->prepareGrid($objElement);
-    }
+    // public function prepareGridElementsInsideGridStartBEElement(ContentModel $objElement, $strBuffer): string
+    // {
+    //     // return $strBuffer;
+    //     return $strBuffer . $this->prepareGrid($objElement);
+    // }
 
-    protected function prepareGrid(ContentModel $objElement): string
-    {
-        $gridCols = unserialize($objElement->grid_cols ?? '') ?? [];
-        $gridItems = unserialize($objElement->grid_items ?? '') ?? [];
+    // protected function prepareGrid(ContentModel $objElement): string
+    // {
+    //     $gridCols = unserialize($objElement->grid_cols ?? '') ?? [];
+    //     $gridItems = unserialize($objElement->grid_items ?? '') ?? [];
 
-        $strGrid = $this->prepareGridStart($objElement, $gridCols);
-        $strGrid.= $this->prepareGridItems($gridItems);
-        $strGrid.= $this->prepareGridStop();
+    //     $strGrid = $this->prepareGridStart($objElement, $gridCols);
+    //     $strGrid.= $this->prepareGridItems($gridItems);
+    //     $strGrid.= $this->prepareGridStop();
 
-        return $strGrid;
-    }
+    //     return $strGrid;
+    // }
 
     // protected function prepareGridStart(ContentModel $objElement,array $gridCols): string
     // {

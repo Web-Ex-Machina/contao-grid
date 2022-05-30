@@ -267,7 +267,7 @@ WEM.Grid  = WEM.Grid || {};
                     // recreate options
                     select.add(new Option('-','',false,null == item.getAttribute('data-cols-span') ? true : false));
                     for(var i = 1; i <= nbColumns; i++){
-                        select.add(new Option(i+' colonne(s)','cols-span-'+i,false,parseInt(item.getAttribute('data-cols-span')) == i ? true : false));
+                        select.add(new Option(WEM.Grid.Translations.columns[i-1],'cols-span-'+i,false,parseInt(item.getAttribute('data-cols-span')) == i ? true : false));
                     }
 
                     for(i = 1; i <= 12; i++){
@@ -358,7 +358,7 @@ window.addEvent("domready", function () {
         container.addEventListener("click", function (e) {
             e.preventDefault();
             openModalIframe({
-                title:'Nouvel élément'
+                title:WEM.Grid.Translations.new
                 ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nb=1'
                 ,onHide:function(){
                     window.location.reload();
