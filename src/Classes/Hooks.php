@@ -75,7 +75,6 @@ class Hooks extends Controller
                     $arrGrid = $g;
                 }
             }
-            // dump($arrGrid['cols']);
             return sprintf(
                 '<div class="%s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
                 implode(' ', $arrGrid['item_classes']['all']),

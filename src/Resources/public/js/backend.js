@@ -125,7 +125,10 @@ WEM.Grid  = WEM.Grid || {};
                 // if we move a grid-start, we have to move all children elements before the dropzone
                 // move the grid start
                 requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
-                requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
+                if(self.isGridFirstLevel(gridSource) && !self.isGridFirstLevel(gridDest)){
+                    requests.push(self.getContaoRequestPutElementAfterAnother(pid, id)); // comment to make subgrid -> grid work on last fake element
+                }
+                
                 // move the grid elements
                 pid = id; // the grid start becomes the PID
                 var gridElements = draggableElement.querySelectorAll('[data-type]');
