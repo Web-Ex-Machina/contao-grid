@@ -96,7 +96,7 @@ WEM.Grid  = WEM.Grid || {};
 
             if('fake-last-element' == dropzone.getAttribute('data-type')){
                 pid = self.getGridLastRealElement(dropzone).getAttribute('data-id');
-                doDoublePositionning = !(self.isGridFirstLevel(gridSource) && self.isGridFirstLevel(gridDest));
+                doDoublePositionning = !self.isGridFirstLevel(gridDest);
             }else if('fake-first-element' == dropzone.getAttribute('data-type')){
                 dropzone = self.getGridFirstRealElement(dropzone);
                 gridDest = self.getGridFromElement(dropzone);
@@ -130,14 +130,10 @@ WEM.Grid  = WEM.Grid || {};
                 pid = id; // the grid start becomes the PID
                 var gridElements = draggableElement.querySelectorAll('[data-type]');
                 gridElements.forEach(function(gridElement){
-                    console.log(gridElement.getAttribute('data-type'));
                     if(-1 == gridElement.getAttribute('data-type').indexOf('fake-')){
-                        console.log("On ajoute");
                         id = gridElement.getAttribute('data-id');
                         requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
                         pid = id; // grid elements stay behind each others
-                    }else{
-                        console.log("On ajoute pas");
                     }
                 });
                 if(doDoublePositionning){
@@ -149,24 +145,14 @@ WEM.Grid  = WEM.Grid || {};
                     requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
                 }
             }
-            
-            for(var i in requests){
-                console.log(requests[i].id,requests[i].pid);
-            }
 
             self.runFakeQueue(requests);
 
             // once done, exchange both element places in display
-            console.log("draggableElement",draggableElement);
-            console.log("gridSource",gridSource);
-            console.log("gridDest",gridDest);
-            console.log("dropzone",dropzone);
-            console.log("position",position);
             gridSource.removeChild(draggableElement);
             if('before' === position){
                 gridDest.insertBefore(draggableElement,dropzone);
             }else{
-                console.log(dropzone.nextSibling);
                 gridDest.insertBefore(draggableElement,dropzone.nextSibling);
 
             }
@@ -232,7 +218,6 @@ WEM.Grid  = WEM.Grid || {};
             return params;
         }
         ,runFakeQueue:function(requests){
-            console.log('RUN QUEUEU');
             if(requests.length <= 0){
                 return;
             }
@@ -369,9 +354,12 @@ window.addEvent("domready", function () {
         var lastElement = WEM.Grid.Drag.getGridLastRealElement(container);
         container.addEventListener("click", function (e) {
             e.preventDefault();
-            Backend.openModalIframe({
+            openModalIframe({
                 title:'Nouvel élément'
                 ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nb=1'
+                ,onHide:function(){
+                    window.location.reload();
+                }
             });
         });
     });
@@ -392,4 +380,31 @@ window.addEvent("domready", function () {
         WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), nbColumns);
         
     });
+
+    /**
+     * Override of Backend.openModalIframe to allow onShow & onHide callbacks
+     * Open an iframe in a modal window
+     *
+     * @param {object} options An optional options object
+     */
+    function openModalIframe(options) {
+        var opt = options || {},
+            maxWidth = (window.getSize().x - 20).toInt(),
+            maxHeight = (window.getSize().y - 137).toInt();
+        if (!opt.width || opt.width > maxWidth) opt.width = Math.min(maxWidth, 900);
+        if (!opt.height || opt.height > maxHeight) opt.height = maxHeight;
+        var M = new SimpleModal({
+            'width': opt.width,
+            'hideFooter': true,
+            'draggable': false,
+            'overlayOpacity': .7,
+            'onShow': function() { document.body.setStyle('overflow', 'hidden');if("undefined" != typeof opt.onShow){opt.onShow();} },
+            'onHide': function() { document.body.setStyle('overflow', 'auto');if("undefined" != typeof opt.onHide){opt.onHide();} }
+        });
+        M.show({
+            'title': opt.title,
+            'contents': '<iframe src="' + opt.url + '" width="100%" height="' + opt.height + '" frameborder="0"></iframe>',
+            'model': 'modal'
+        });
+    }
 });
