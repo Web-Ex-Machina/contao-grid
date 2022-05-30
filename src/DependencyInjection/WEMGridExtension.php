@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2020 Web ex Machina
+ * Copyright (c) 2015-2022 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -37,5 +37,6 @@ class WEMGridExtension extends Extension
         );
 
         $loader->load('services.yml');
+        $loader->load('listeners.yml');
     }
 }

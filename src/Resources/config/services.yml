@@ -1,0 +1,6 @@
+services:
+  wem.classes.grid_elements_wrapper:
+    class: WEM\GridBundle\Classes\GridElementsWrapper
+    arguments:
+      $translator: '@contao.translation.translator'
+    public: true

@@ -1,0 +1,6 @@
+services:
+  wem.grid.event_listener.get_content_element:
+    class: WEM\GridBundle\EventListener\GetContentElementListener
+    arguments:
+      $gridElementsWrapper: '@wem.classes.grid_elements_wrapper'
+    public: true

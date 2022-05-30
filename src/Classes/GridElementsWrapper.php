@@ -15,18 +15,26 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
-use Contao\Controller;
 use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use WEM\GridBundle\Helper\GridBuilder;
 
 /**
  * Grid Hooks.
  */
-class Hooks extends Controller
+class GridElementsWrapper
 {
+    /** @var TranslatorInterface */
+    protected $translator;
     protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
+
+    public function __construct(
+        TranslatorInterface $translator
+    ) {
+        $this->translator = $translator;
+    }
 
     /**
      * Hook getContentElement : Check if the element is in a Grid and wrap them.
@@ -134,10 +142,10 @@ class Hooks extends Controller
     public function getBackendActionsForContentElement(ContentModel $objElement, bool $withActions): string
     {
         if ($withActions) {
-            $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'], $objElement->id);
-            $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'], $objElement->id);
-            $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'], $objElement->id);
-            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'], $objElement->id) : null;
+            $titleEdit = $this->translator->trans('DCA.edit', [$objElement->id], 'contao_default');
+            $titleDelete = $this->translator->trans('DCA.delete', [$objElement->id], 'contao_default');
+            $titleDrag = $this->translator->trans('DCA.drag', [$objElement->id], 'contao_default');
+            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $this->translator->trans('MSC.deleteConfirm', [$objElement->id], 'contao_default') : null;
 
             $buttons = sprintf('
                 <a
