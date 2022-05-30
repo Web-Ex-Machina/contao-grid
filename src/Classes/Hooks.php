@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2020 Web ex Machina
+ * Copyright (c) 2015-2022 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -13,12 +13,14 @@ declare(strict_types=1);
  */
 
 namespace WEM\GridBundle\Classes;
-use Contao\Controller;
+
 use Contao\ContentModel;
+use Contao\Controller;
+use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
-use Contao\Image;
 use WEM\GridBundle\Helper\GridBuilder;
+
 /**
  * Grid Hooks.
  */
@@ -68,10 +70,11 @@ class Hooks extends Controller
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
             foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-                if (is_array($g['item_classes']['items']) && array_key_exists($objElement->id, $g['item_classes']['items'])) {
+                if (\is_array($g['item_classes']['items']) && \array_key_exists($objElement->id, $g['item_classes']['items'])) {
                     $arrGrid = $g;
                 }
             }
+
             return sprintf(
                 '<div class="%s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
                 implode(' ', $arrGrid['item_classes']['all']),
@@ -80,7 +83,7 @@ class Hooks extends Controller
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridContentElement($objElement,true) : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, true) : '',
                 $strBuffer,
                 GridBuilder::fakeFirstGridElementMarkup((string) $currentGridId)
             );
@@ -102,7 +105,7 @@ class Hooks extends Controller
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement,true) : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, true) : '',
                 $strBuffer
             );
         }
@@ -114,7 +117,7 @@ class Hooks extends Controller
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement,true) : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, true) : '',
                 $strBuffer
             );
         }
@@ -122,63 +125,77 @@ class Hooks extends Controller
         return $strBuffer;
     }
 
+    /**
+     * Returns the HTML code to display a buttons bar for a content element inside a grid.
+     *
+     * @param ContentModel $objElement  The content element
+     * @param bool         $withActions Display actions buttons
+     */
     public function getBackendActionsForContentElement(ContentModel $objElement, bool $withActions): string
     {
-        if($withActions){
-            $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'],$objElement->id);
-            $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'],$objElement->id);
-            $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'],$objElement->id);
-            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'],$objElement->id) : null;
+        if ($withActions) {
+            $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'], $objElement->id);
+            $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'], $objElement->id);
+            $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'], $objElement->id);
+            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'], $objElement->id) : null;
 
             $buttons = sprintf('
-                <a 
-                href="contao?do=article&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s" 
-                title="%s" 
+                <a
+                href="contao?do=article&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s"
+                title="%s"
                 onclick="Backend.openModalIframe({\'title\':\'%s\',\'url\':this.href});return false">
                 %s
-                </a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleEdit),StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)),Image::getHtml('edit.svg', $titleEdit));
+                </a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
 
-            $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleDelete), $confirmDelete ,Image::getHtml('delete.svg', $titleDelete));
+            $buttons .= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
 
-            $buttons.= sprintf('
-                <a 
-                href="#" 
+            $buttons .= sprintf('
+                <a
+                href="#"
                 onClick="return false;"
-                title="%s" 
+                title="%s"
                 class="drag-handle">
                 %s
-                </a>',StringUtil::specialchars($titleDrag),Image::getHtml('drag.svg', $titleDrag));
+                </a>', StringUtil::specialchars($titleDrag), Image::getHtml('drag.svg', $titleDrag));
         }
-        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>',$objElement->type, $objElement->id,$withActions ? ' - ' : '',$withActions ? $buttons : '');
+
+        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
     }
 
-    public function getBackendActionsForGridContentElement(\Contao\ContentModel $objElement, bool $withActions): string
+    /**
+     * Returns the HTML code to display a buttons bar for a grid-start content element inside a grid.
+     *
+     * @param ContentModel $objElement  The content element
+     * @param bool         $withActions Display actions buttons
+     */
+    public function getBackendActionsForGridStartContentElement(ContentModel $objElement, bool $withActions): string
     {
-        if($withActions){
-        $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'],$objElement->id);
-        $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'],$objElement->id);
-        $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'],$objElement->id);
-        $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'],$objElement->id) : null;
+        if ($withActions) {
+            $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'], $objElement->id);
+            $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'], $objElement->id);
+            $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'], $objElement->id);
+            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'], $objElement->id) : null;
 
-        $buttons = sprintf('
-            <a 
-            href="contao?do=article&id=%s&table=tl_content&act=edit&nb=1&amp;rt=%s" 
-            title="%s" 
+            $buttons = sprintf('
+            <a
+            href="contao?do=article&id=%s&table=tl_content&act=edit&nb=1&amp;rt=%s"
+            title="%s"
             target="_blank">
             %s
-            </a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleEdit),Image::getHtml('edit.svg', $titleEdit));
+            </a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
 
-        $buttons.= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>',$objElement->id,REQUEST_TOKEN,StringUtil::specialchars($titleDelete), $confirmDelete ,Image::getHtml('delete.svg', $titleDelete));
+            $buttons .= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
 
-        $buttons.= sprintf('
-            <a 
-            href="#" 
+            $buttons .= sprintf('
+            <a
+            href="#"
             onClick="return false;"
-            title="%s" 
+            title="%s"
             class="drag-handle">
             %s
-            </a>',StringUtil::specialchars($titleDrag),Image::getHtml('drag.svg', $titleDrag));
+            </a>', StringUtil::specialchars($titleDrag), Image::getHtml('drag.svg', $titleDrag));
         }
-        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>',$objElement->type, $objElement->id,$withActions ? ' - ' : '',$withActions ? $buttons : '');
+
+        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
     }
 }

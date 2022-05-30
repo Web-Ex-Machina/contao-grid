@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2020 Web ex Machina
+ * Copyright (c) 2015-2022 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
+use Contao\Widget;
 use WEM\GridBundle\Helper\GridBuilder;
-use Contao\ContentModel;
 
-class GridElementWizard extends \Widget
+class GridElementWizard extends Widget
 {
     /**
      * Submit user input.
@@ -76,13 +76,13 @@ class GridElementWizard extends \Widget
 
         foreach ($varValue as $k => &$v) {
             // Skip _classes items
-            if(false !== strpos((string) $k, "_classes")) {
+            if (false !== strpos((string) $k, '_classes')) {
                 continue;
             }
 
             // Check if the _classes item for this key contains stuff
             // If true, concat the values
-            if($varValue[$k.'_classes']) {
+            if ($varValue[$k.'_classes']) {
                 $v .= ' '.$varValue[$k.'_classes'];
             }
         }
@@ -161,7 +161,7 @@ class GridElementWizard extends \Widget
         if ('' !== $strHelper) {
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
         }
-        if(!\Input::get('grid_preview')){
+        if (!\Input::get('grid_preview')) {
             $strGrid .= GridBuilder::fakeFirstGridElementMarkup((string) $this->id);
         }
 
@@ -208,13 +208,13 @@ class GridElementWizard extends \Widget
 
             $objItems->isForGridElementWizard = true;
 
-            if('grid-start' === $objItems->type){
+            if ('grid-start' === $objItems->type) {
                 $strElement = $this->getContentElement($objItems->current());
-            }else{
-                $strElement = $this->BEGridItemSettings(end($currentGridId),('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id, $this->getContentElement($objItems->current()));
+            } else {
+                $strElement = $this->BEGridItemSettings(end($currentGridId), ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id, $this->getContentElement($objItems->current()));
             }
-            
-            if('grid-start' === $objItems->type){
+
+            if ('grid-start' === $objItems->type) {
                 $currentGridId[] = $objItems->id;
             }
             $strGrid .= $strElement;
@@ -223,8 +223,7 @@ class GridElementWizard extends \Widget
         // Add CSS & JS to the Wizard
         $this->addAssets();
 
-        if(!\Input::get('grid_preview')){
-
+        if (!\Input::get('grid_preview')) {
             $strGrid .= GridBuilder::fakeLastGridElementMarkup();
             $strGrid .= GridBuilder::fakeNewGridElementMarkup();
         }
@@ -262,6 +261,13 @@ class GridElementWizard extends \Widget
         return $strReturn;
     }
 
+    /**
+     * Returns HTML markup to edit a grid item' settings.
+     *
+     * @param string $gridId     The grid id inside $GLOBALS['WEM']['GRID']
+     * @param string $objItemId  The content element's id
+     * @param string $strElement The generated HTML markup
+     */
     protected function BEGridItemSettings(string $gridId, string $objItemId, string $strElement): string
     {
         // Add the input to the grid item
@@ -270,7 +276,6 @@ class GridElementWizard extends \Widget
 
         // if (false !== $pos && !\Input::get('grid_preview') && 1 >= $intGridStop) {
         if (false !== $pos && !\Input::get('grid_preview')) {
-
             // Build a select options html with the number of possibilities
             $options = '<option value="">-</option>';
             $cols = $GLOBALS['WEM']['GRID'][$gridId]['cols'];
@@ -298,7 +303,7 @@ class GridElementWizard extends \Widget
                 $options,
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
-                $this->varValue[$objItemId . '_classes'],
+                $this->varValue[$objItemId.'_classes'],
             );
 
             $strElement = substr_replace($strElement, $select.$search, $pos, \strlen($search));
@@ -307,7 +312,8 @@ class GridElementWizard extends \Widget
         return $strElement;
     }
 
-    protected function addAssets(){
+    protected function addAssets(): void
+    {
         $GLOBALS['TL_CSS']['wemgrid'] = 'bundles/wemgrid/css/backend.css';
         $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
@@ -328,5 +334,4 @@ class GridElementWizard extends \Widget
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 12).'");
         </script>';
     }
-
 }
