@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2020 Web ex Machina
+ * Copyright (c) 2015-2022 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -14,13 +14,17 @@ declare(strict_types=1);
 
 // Update grid content elements callbacks
 $GLOBALS['TL_DCA']['tl_content']['config']['onsubmit_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'createGridStop'];
+$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'includeJSCSS'];
+$GLOBALS['TL_DCA']['tl_content']['config']['oncut_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'oncutCallback'];
+$GLOBALS['TL_DCA']['tl_content']['config']['oncopy_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'oncopyCallback'];
+$GLOBALS['TL_DCA']['tl_content']['config']['ondelete_callback'][] = ['\WEM\GridBundle\Helper\GridBuilder', 'ondeleteCallback'];
 
 // Update grid content elements palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'grid_preset';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-start'] = '{type_legend},type;{grid_legend},grid_preset;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-stop'] = '{type_legend},type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
-$GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid'] = 'grid_cols,grid_items';
+$GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_preset_cssgrid'] = 'grid_cols,grid_gap,grid_items';
 
 // Update tl_content fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_preset'] = [
@@ -47,6 +51,13 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_cols'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_cols'],
     'exclude' => true,
     'inputType' => 'gridBreakpointsValuesWizard',
+    'eval' => ['tl_class' => ''],
+    'sql' => 'blob NULL',
+];
+$GLOBALS['TL_DCA']['tl_content']['fields']['grid_gap'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_gap'],
+    'exclude' => true,
+    'inputType' => 'gridGapValuesWizard',
     'eval' => ['tl_class' => ''],
     'sql' => 'blob NULL',
 ];

@@ -30,6 +30,18 @@
         <source>Values</source>
         <target>Valeurs</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.resolutionLabel">
+        <source>Resolution</source>
+        <target>Résolution</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsLabel">
+        <source>Number of columns</source>
+        <target>Nombre de colonnes</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.gapValueLabel">
+        <source>Gap space between elemnts</source>
+        <target>Espace inter-éléments</target>
+      </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbColsSelectLabel">
         <source>Nb of cols for this item:</source>
         <target>Nb de colonnes pour cet élément :</target>
@@ -53,6 +65,14 @@
       <trans-unit id="WEM.GRID.BE.inputItemPlaceholder">
         <source>Add a class to this item's wrapper</source>
         <target>Ajoutez une classe au conteneur de cet item</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridStart">
+        <source>Drag and drop the element here to place it at the grid's start</source>
+        <target>Glissez l'élement de contenu ici pour le placer au début de la grille</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridEnd">
+        <source>Drag and drop the element here to place it at the grid's end</source>
+        <target>Glissez l'élement de contenu ici pour le placer à la fin de la grille</target>
       </trans-unit>
     </body>
   </file>

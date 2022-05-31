@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2020 Web ex Machina
+ * Copyright (c) 2015-2022 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -31,8 +31,9 @@ $GLOBALS['TL_WRAPPERS']['start'][] = 'grid-start';
 $GLOBALS['TL_WRAPPERS']['stop'][] = 'grid-stop';
 
 // Add Hook
-$GLOBALS['TL_HOOKS']['getContentElement'][] = ['WEM\GridBundle\Classes\Hooks', 'wrapGridElements'];
+$GLOBALS['TL_HOOKS']['getContentElement'][] = ['wem.grid.event_listener.get_content_element', '__invoke'];
 
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = 'WEM\GridBundle\Widgets\GridElementWizard';
 $GLOBALS['BE_FFL']['gridBreakpointsValuesWizard'] = 'WEM\GridBundle\Widgets\GridBreakpointsValuesWizard';
+$GLOBALS['BE_FFL']['gridGapValuesWizard'] = 'WEM\GridBundle\Widgets\GridGapValuesWizard';

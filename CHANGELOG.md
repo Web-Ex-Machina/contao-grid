@@ -1,6 +1,10 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+0.5 - 2022-05-30
+---
+- Visual builder when editing the grid-start content element
+
 0.4 - 2020-03-23
 ---
 - Use a new system to setup a grid with its breakpoints

@@ -1,0 +1,36 @@
+<div class="grid_gap_values_wizard" id="ctrl_<?= $this->strId; ?>">
+	<div class="d-grid cols-6">
+		<div>
+			<h3>
+				<label for="ctrl_select_gap_<?= $this->strId; ?>">
+					<?= $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['gapValueLabel'] ?>
+				</label>
+			</h3>
+			<select class="tl_select" name="<?= $this->input ?>[value]" id="ctrl_select_gap_<?= $this->strId; ?>">
+			<?php for($i = 0; $i <= 6; $i++): ?>
+				<option value="<?= $i; ?>" <?= $this->value == $i ? 'selected' : ''; ?> >
+					<?= $i; ?>
+				</option>
+			<?php endfor; ?>
+			</select>
+		</div>
+		<div>
+			<h3>
+				<label for="ctrl_select_gap_unit_<?= $this->strId; ?>">
+				</label>
+			</h3>
+			<select class="tl_select" name="<?= $this->input ?>[unit]" id="ctrl_select_gap_unit_<?= $this->strId; ?>">
+				<option value="" <?= $this->unit == '' ? 'selected' : ''; ?>>
+					-
+				</option>
+				<option value="em" <?= $this->unit == 'em' ? 'selected' : ''; ?>>
+					em
+				</option>
+				<option value="rem" <?= $this->unit == 'rem' ? 'selected' : ''; ?>>
+					rem
+				</option>
+			</select>
+		</div>
+		<div class="cols-span-4"></div>
+	</div>
+</div>

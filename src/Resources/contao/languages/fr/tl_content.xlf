@@ -5,7 +5,6 @@
         <source>Grid settings</source>
         <target>Paramètres de la grille</target>
       </trans-unit>
-
       <trans-unit id="tl_content.grid_preset.0">
         <source>Preset</source>
         <target>Preset</target>
@@ -22,7 +21,6 @@
         <source>CSS Grid</source>
         <target>CSS Grid</target>
       </trans-unit>
-
       <trans-unit id="tl_content.grid_rows.0">
         <source>Rows</source>
         <target>Lignes</target>
@@ -47,7 +45,6 @@
         <source>Container</source>
         <target>Container</target>
       </trans-unit>
-
       <trans-unit id="tl_content.grid_cols.0">
         <source>Columns</source>
         <target>Colonnes</target>
@@ -56,7 +53,14 @@
         <source>Enter the number of columns</source>
         <target>Indiquez le nombre de colonnes</target>
       </trans-unit>
-
+      <trans-unit id="tl_content.grid_gap.0">
+        <source>Gap</source>
+        <target>Espace</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_gap.1">
+        <source>Enter the gap between elements</source>
+        <target>Indiquez l'espace inter-éléménts</target>
+      </trans-unit>
       <trans-unit id="tl_content.grid_items.0">
         <source>Items</source>
         <target>Éléments</target>
