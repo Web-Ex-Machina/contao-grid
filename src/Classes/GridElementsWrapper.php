@@ -94,13 +94,13 @@ class GridElementsWrapper
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
                 TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
                 $strBuffer,
-                GridBuilder::fakeFirstGridElementMarkup((string) $currentGridId)
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? GridBuilder::fakeFirstGridElementMarkup((string) $currentGridId) : ''
             );
         }
         if ('grid-stop' === $objElement->type && true === $arrGrid['subgrid']) {
             return sprintf(
                 '%s<div data-id="%s" data-type="%s">%s</div></div>',
-                GridBuilder::fakeLastGridElementMarkup(),
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? GridBuilder::fakeLastGridElementMarkup() : '',
                 $objElement->id,
                 $objElement->type,
                 $strBuffer
