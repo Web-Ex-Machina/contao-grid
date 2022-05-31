@@ -103,7 +103,7 @@ class GridBreakpointsValuesWizard extends \Widget
             ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'],
             ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'],
             ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
-        ]; /* @todo - make it generic per grid */
+        ];
 
         if ($this->varValue) {
             foreach ($this->arrGridBreakpoints as &$b) {
