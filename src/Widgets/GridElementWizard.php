@@ -132,7 +132,7 @@ class GridElementWizard extends Widget
 
         $GLOBALS['WEM']['GRID'][$this->id]['item_classes']['all'][] = 'be_item_grid helper';
 
-        $strGrid = sprintf('<div class="grid_preview %s">', implode(' ', $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes']));
+        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s">', implode(' ', $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes']), $this->activeRecord->id);
 
         switch ($this->activeRecord->grid_preset) {
             case 'cssgrid':

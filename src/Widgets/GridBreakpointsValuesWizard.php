@@ -96,7 +96,7 @@ class GridBreakpointsValuesWizard extends \Widget
     {
         $this->strGridPreset = $this->activeRecord->grid_preset;
         $this->arrGridBreakpoints = [
-            ['name' => 'all', 'label' => 'Général', 'required' => true],
+            ['name' => 'all', 'label' => 'Général', 'required' => true, 'value' => 2],
             ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'],
             ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'],
             ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'],

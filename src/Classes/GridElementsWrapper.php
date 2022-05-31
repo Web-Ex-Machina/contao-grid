@@ -41,10 +41,11 @@ class GridElementsWrapper
      *
      * @param [ContentModel] $objElement [Content Element Model]
      * @param [String]       $strBuffer  [Content Template parsed]
+     * @param [String]       $do  The $_GET['do'] paramater
      *
      * @return [String] [Content Template, untouched or adjusted]
      */
-    public function wrapGridElements(ContentModel $objElement, $strBuffer)
+    public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
         // Skip elements we never want to wrap or if we are not in a grid
         if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $GLOBALS['WEM']['GRID'] || empty($GLOBALS['WEM']['GRID'])) {
@@ -91,7 +92,7 @@ class GridElementsWrapper
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, true) : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
                 $strBuffer,
                 GridBuilder::fakeFirstGridElementMarkup((string) $currentGridId)
             );
@@ -113,7 +114,7 @@ class GridElementsWrapper
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, true) : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
                 $strBuffer
             );
         }
@@ -125,7 +126,7 @@ class GridElementsWrapper
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, true) : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
                 $strBuffer
             );
         }
@@ -137,9 +138,10 @@ class GridElementsWrapper
      * Returns the HTML code to display a buttons bar for a content element inside a grid.
      *
      * @param ContentModel $objElement  The content element
+     * @param string       $do          The $_GET['do'] value
      * @param bool         $withActions Display actions buttons
      */
-    public function getBackendActionsForContentElement(ContentModel $objElement, bool $withActions): string
+    public function getBackendActionsForContentElement(ContentModel $objElement, string $do, bool $withActions): string
     {
         if ($withActions) {
             $titleEdit = $this->translator->trans('DCA.edit', [$objElement->id], 'contao_default');
@@ -149,13 +151,13 @@ class GridElementsWrapper
 
             $buttons = sprintf('
                 <a
-                href="contao?do=article&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s"
+                href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s"
                 title="%s"
                 onclick="Backend.openModalIframe({\'title\':\'%s\',\'url\':this.href});return false">
                 %s
-                </a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
+                </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
 
-            $buttons .= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
+            $buttons .= sprintf('<a href="contao?do=%s&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
 
             $buttons .= sprintf('
                 <a
@@ -174,9 +176,10 @@ class GridElementsWrapper
      * Returns the HTML code to display a buttons bar for a grid-start content element inside a grid.
      *
      * @param ContentModel $objElement  The content element
+     * @param string       $do          The $_GET['do'] value
      * @param bool         $withActions Display actions buttons
      */
-    public function getBackendActionsForGridStartContentElement(ContentModel $objElement, bool $withActions): string
+    public function getBackendActionsForGridStartContentElement(ContentModel $objElement, string $do, bool $withActions): string
     {
         if ($withActions) {
             $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'], $objElement->id);
@@ -186,13 +189,13 @@ class GridElementsWrapper
 
             $buttons = sprintf('
             <a
-            href="contao?do=article&id=%s&table=tl_content&act=edit&nb=1&amp;rt=%s"
+            href="contao?do=%s&id=%s&table=tl_content&act=edit&nb=1&amp;rt=%s"
             title="%s"
             target="_blank">
             %s
-            </a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
+            </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
 
-            $buttons .= sprintf('<a href="contao?do=article&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
+            $buttons .= sprintf('<a href="contao?do=%s&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
 
             $buttons .= sprintf('
             <a

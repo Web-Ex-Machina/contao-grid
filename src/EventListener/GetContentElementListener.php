@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\EventListener;
 
 use Contao\ContentModel;
+use Contao\Input;
 use WEM\GridBundle\Classes\GridElementsWrapper;
 
 /**
@@ -33,6 +34,6 @@ class GetContentElementListener
 
     public function __invoke(ContentModel $contentModel, string $buffer, $element): string
     {
-        return $this->gridElementsWrapper->wrapGridElements($contentModel, $buffer);
+        return $this->gridElementsWrapper->wrapGridElements($contentModel, $buffer, Input::get('do') ?? '');
     }
 }

@@ -171,12 +171,12 @@ WEM.Grid  = WEM.Grid || {};
 
             var elementIndex = 0;
             var element = elements[elementIndex];
-            while(-1 < element.getAttribute('data-type').indexOf('fake-')){
+            while(-1 < element.getAttribute('data-type').indexOf('fake-') && elementIndex < elements.length){
                 elementIndex++;
                 element = elements[elementIndex];
             }
 
-            return element;
+            return -1 < element.getAttribute('data-type').indexOf('fake-') ? null : element;
         }
         ,getGridLastRealElement:function(fromElement){
             // var grid = document.querySelector(self.selectors.grid);
@@ -186,7 +186,7 @@ WEM.Grid  = WEM.Grid || {};
 
             var elementIndex = elements.length-1;
             var element = elements[elementIndex];
-            while(-1 < element.getAttribute('data-type').indexOf('fake-')){
+            while(-1 < element.getAttribute('data-type').indexOf('fake-') && elementIndex > 0){
                 elementIndex--;
                 element = elements[elementIndex];
             }
@@ -196,13 +196,12 @@ WEM.Grid  = WEM.Grid || {};
                 element = gridStops[gridStops.length-1];
             }
 
-            return element;
+            return -1 < element.getAttribute('data-type').indexOf('fake-') ? null : element;
         }
         ,getGridFromElement:function(element){
-            if(-1 < element.className.indexOf('d-grid')
-            && ( -1 < element.className.indexOf(self.selectors.grid.substring(1))
-                || -1 < element.className.indexOf('ce_grid-start')
-            )
+            if(-1 < element.className.indexOf(self.selectors.grid.substring(1))
+            ||  -1 < element.className.indexOf('d-grid')
+            || -1 < element.className.indexOf('ce_grid-start')
             ){
                 return element;
             }else{
@@ -354,6 +353,9 @@ window.addEvent("domready", function () {
 
     document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
         var lastElement = WEM.Grid.Drag.getGridLastRealElement(container);
+        if(null == lastElement){
+            lastElement = WEM.Grid.Drag.getGridFromElement(container);
+        }
         container.addEventListener("click", function (e) {
             e.preventDefault();
             openModalIframe({
@@ -367,28 +369,50 @@ window.addEvent("domready", function () {
     });
 
     for(var i =0; i<= 6; i++){
-        document.querySelector('[name="grid_cols['+i+'][value]"]').addEventListener('keyup',function(event){
-            var nbColumns = parseInt(event.target.value);
-            if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
-                return;
+        var input = document.querySelector('[name="grid_cols['+i+'][value]"]');
+        if(null !== input){
+            input.addEventListener('keyup',function(event){
+                var nbColumns = parseInt(event.target.value);
+                if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
+                    return;
+                }
+                // Update the main grid size
+                updateMainGridNbOfColumns(nbColumns);
+                // Update the fake elements size
+                updateMainGridFakeElementsNbOfColumns(nbColumns);
+                
+                WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), nbColumns);
+            });
+        }
+    }
+    var selectBreakpoints = document.querySelector('select[name="ctrl_select_breakpoints_"]');
+    if(null != selectBreakpoints){
+        selectBreakpoints.addEventListener('change',function(event){
+            var input = document.querySelector('input[data-breakpoint="'+event.target.value+'"]');
+            if(null != input){
+                input.dispatchEvent(new Event('keyup'));
             }
-            // Update the main grid size
-            updateMainGridNbOfColumns(nbColumns);
-            // Update the fake elements size
-            updateMainGridFakeElementsNbOfColumns(nbColumns);
-            
-            WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), nbColumns);
         });
     }
-    document.querySelector('select[name="ctrl_select_breakpoints_"]').addEventListener('change',function(event){
-        document.querySelector('input[data-breakpoint="'+event.target.value+'"]').dispatchEvent(new Event('keyup'));
-    });
-    document.querySelector('select[name="grid_gap[value]"]').addEventListener('change',function(event){
-        updateMainGridGap(event.target.value, document.querySelector('select[name="grid_gap[unit]"]').value);
-    });
-    document.querySelector('select[name="grid_gap[unit]"]').addEventListener('change',function(event){
-        updateMainGridGap(document.querySelector('select[name="grid_gap[value]"]').value, event.target.value);
-    });
+    var selectGridGapValue= document.querySelector('select[name="grid_gap[value]"]');
+    if(null != selectGridGapValue){
+        selectGridGapValue.addEventListener('change',function(event){
+            var selectGridGapUnit= document.querySelector('select[name="grid_gap[unit]"]');
+            if(null != selectGridGapUnit){
+                updateMainGridGap(event.target.value, selectGridGapUnit.value);
+            }
+        });
+    }
+
+    var selectGridGapUnit= document.querySelector('select[name="grid_gap[unit]"]');
+    if(null != selectGridGapUnit){
+        selectGridGapUnit.addEventListener('change',function(event){
+            var selectGridGapValue= document.querySelector('select[name="grid_gap[value]"]');
+            if(null != selectGridGapValue){
+                updateMainGridGap(selectGridGapValue.value, event.target.value);
+            }
+        });
+    }
 
     function updateMainGridGap(gapValue,gapUnit){
         var grid = document.querySelector(WEM.Grid.Drag.selectors.grid);
