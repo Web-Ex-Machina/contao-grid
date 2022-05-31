@@ -164,7 +164,6 @@ WEM.Grid  = WEM.Grid || {};
 
         }
         ,getGridFirstRealElement:function(fromElement){
-            // var grid = document.querySelector(self.selectors.grid);
             var grid = self.getGridFromElement(fromElement);
 
             var elements = grid.querySelectorAll('[data-type]');
@@ -179,7 +178,6 @@ WEM.Grid  = WEM.Grid || {};
             return -1 < element.getAttribute('data-type').indexOf('fake-') ? null : element;
         }
         ,getGridLastRealElement:function(fromElement){
-            // var grid = document.querySelector(self.selectors.grid);
             var grid = self.getGridFromElement(fromElement);
 
             var elements = grid.querySelectorAll('[data-type]');
@@ -200,7 +198,7 @@ WEM.Grid  = WEM.Grid || {};
         }
         ,getGridFromElement:function(element){
             if(-1 < element.className.indexOf(self.selectors.grid.substring(1))
-            ||  -1 < element.className.indexOf('d-grid')
+            // ||  -1 < element.className.indexOf('d-grid')
             || -1 < element.className.indexOf('ce_grid-start')
             ){
                 return element;
