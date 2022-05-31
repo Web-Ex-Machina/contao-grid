@@ -36,3 +36,4 @@ $GLOBALS['TL_HOOKS']['getContentElement'][] = ['wem.grid.event_listener.get_cont
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = 'WEM\GridBundle\Widgets\GridElementWizard';
 $GLOBALS['BE_FFL']['gridBreakpointsValuesWizard'] = 'WEM\GridBundle\Widgets\GridBreakpointsValuesWizard';
+$GLOBALS['BE_FFL']['gridGapValuesWizard'] = 'WEM\GridBundle\Widgets\GridGapValuesWizard';

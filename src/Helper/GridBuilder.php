@@ -47,6 +47,12 @@ class GridBuilder extends Controller
             $cols = $objElement->grid_cols;
         }
 
+        if (!\is_array($objElement->grid_gap)) {
+            $gap = deserialize($objElement->grid_gap);
+        } else {
+            $gap = $objElement->grid_gap;
+        }
+
         // We don't need rows, but what's the point of a grid without cols ?
         if (!\is_array($cols)) {
             return [];
@@ -89,6 +95,10 @@ class GridBuilder extends Controller
                             $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
                         }
                     }
+                }
+
+                if (\is_array($gap)) {
+                    $arrClasses[] = sprintf('gap-%d%s', $gap['value'], '' !== $gap['unit'] ? sprintf('-%s', $gap['unit']) : '');
                 }
                 break;
 

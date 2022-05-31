@@ -366,22 +366,49 @@ window.addEvent("domready", function () {
         });
     });
 
-    document.querySelector('[name="grid_cols[0][value]"]').addEventListener('keyup',function(event){
-        var nbColumns = parseInt(event.target.value);
-        if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
-            return;
+    for(var i =0; i<= 6; i++){
+        document.querySelector('[name="grid_cols['+i+'][value]"]').addEventListener('keyup',function(event){
+            var nbColumns = parseInt(event.target.value);
+            if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
+                return;
+            }
+            // Update the main grid size
+            updateMainGridNbOfColumns(nbColumns);
+            // Update the fake elements size
+            updateMainGridFakeElementsNbOfColumns(nbColumns);
+            
+            WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), nbColumns);
+        });
+    }
+    document.querySelector('select[name="ctrl_select_breakpoints_"]').addEventListener('change',function(event){
+        document.querySelector('input[data-breakpoint="'+event.target.value+'"]').dispatchEvent(new Event('keyup'));
+    });
+    document.querySelector('select[name="grid_gap[value]"]').addEventListener('change',function(event){
+        updateMainGridGap(event.target.value, document.querySelector('select[name="grid_gap[unit]"]').value);
+    });
+    document.querySelector('select[name="grid_gap[unit]"]').addEventListener('change',function(event){
+        updateMainGridGap(document.querySelector('select[name="grid_gap[value]"]').value, event.target.value);
+    });
+
+    function updateMainGridGap(gapValue,gapUnit){
+        var grid = document.querySelector(WEM.Grid.Drag.selectors.grid);
+        if(-1 < grid.className.indexOf('gap')){
+            grid.className = grid.className.replace(/gap-([0-6]{1})([-rem]{0,4})/,'gap-'+gapValue+('' != gapUnit ? '-'+gapUnit : ''));
+        }else{
+            grid.className = grid.className.concat('gap-'+gapValue+('' != gapUnit ? '-'+gapUnit : ''));
         }
-        // Update the main grid size
-        var grid = document.querySelector('.grid_preview');
+    }
+
+    function updateMainGridNbOfColumns(nbColumns){
+        var grid = document.querySelector(WEM.Grid.Drag.selectors.grid);
         grid.className = grid.className.replace(/cols-([0-9]{1,2})/,'cols-'+nbColumns);
-        // Update the fake elements size
-        document.querySelectorAll('.grid_preview > .be_item_grid_fake').forEach(function(item){
+    }
+
+    function updateMainGridFakeElementsNbOfColumns(nbColumns){
+        document.querySelectorAll(WEM.Grid.Drag.selectors.grid + ' > .be_item_grid_fake').forEach(function(item){
             item.className = item.className.replace(/cols-span-([0-9]{1,2})/,'cols-span-'+nbColumns);
         });
-
-        WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), nbColumns);
-        
-    });
+    }
 
     /**
      * Override of Backend.openModalIframe to allow onShow & onHide callbacks

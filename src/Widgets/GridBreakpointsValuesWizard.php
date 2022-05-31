@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2020 Web ex Machina
+ * Copyright (c) 2015-2022 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -96,19 +96,19 @@ class GridBreakpointsValuesWizard extends \Widget
     {
         $this->strGridPreset = $this->activeRecord->grid_preset;
         $this->arrGridBreakpoints = [
-            ['name' => 'all', 'label' => 'Général', 'required'=>true],
+            ['name' => 'all', 'label' => 'Général', 'required' => true],
             ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'],
             ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'],
             ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'],
             ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'],
             ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'],
             ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
-        ]; /** @todo - make it generic per grid */
+        ]; /* @todo - make it generic per grid */
 
-        if($this->varValue) {
-            foreach($this->arrGridBreakpoints as &$b) {
-                foreach($this->varValue as $v) {
-                    if($b['name'] == $v['key']) {
+        if ($this->varValue) {
+            foreach ($this->arrGridBreakpoints as &$b) {
+                foreach ($this->varValue as $v) {
+                    if ($b['name'] === $v['key']) {
                         $b['value'] = $v['value'];
                     }
                 }
@@ -119,6 +119,7 @@ class GridBreakpointsValuesWizard extends \Widget
         $objTemplate->input = $this->strId;
         $objTemplate->preset = $this->strGridPreset;
         $objTemplate->breakpoints = $this->arrGridBreakpoints;
+
         return $objTemplate->parse();
     }
 }
