@@ -274,39 +274,53 @@ class GridElementWizard extends Widget
         $search = '</div>';
         $pos = strrpos($strElement, $search);
 
-        // if (false !== $pos && !\Input::get('grid_preview') && 1 >= $intGridStop) {
         if (false !== $pos && !\Input::get('grid_preview')) {
-            // Build a select options html with the number of possibilities
-            $options = '<option value="">-</option>';
-            $cols = $GLOBALS['WEM']['GRID'][$gridId]['cols'];
-            foreach ($cols as $c) {
-                if ('all' === $c['key']) {
-                    $v = $this->varValue[$objItemId];
-                    for ($i = 1; $i <= $c['value']; ++$i) {
-                        $options .= sprintf(
-                            '<option value="cols-span-%s"%s>%s</option>',
-                            $i,
-                            ($v === 'cols-span-'.$i) ? ' selected' : '',
-                            sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $i)
-                        );
+            $breakpoints = ['all', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl'];
+            $selects = [];
+            foreach ($breakpoints as $breakpoint) {
+                // Build a select options html with the number of possibilities
+                $options = '<option value="">-</option>';
+                $cols = $GLOBALS['WEM']['GRID'][$gridId]['cols'];
+                foreach ($cols as $c) {
+                    if ('all' === $c['key']) {
+                        $v = $this->varValue[$objItemId][$breakpoint];
+                        for ($i = 1; $i <= $c['value']; ++$i) {
+                            $optionValue = sprintf('cols-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
+                            $options .= sprintf(
+                                '<option value="%s"%s>%s</option>',
+                                $optionValue,
+                                ($v === $optionValue) ? ' selected' : '',
+                                sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $i)
+                            );
+                        }
                     }
                 }
+
+                $selects[] = sprintf('
+                        <label for="ctrl_%1$s_%2$s_%6$s">%4$s</label><select id="ctrl_%1$s_%2$s_%6$s" name="%1$s[%2$s][%6$s]" class="tl_select" data-breakpoint="%6$s">%3$s</select>',
+                    $this->strId,
+                    $objItemId,
+                    $options,
+                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
+                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
+                    $breakpoint
+                );
             }
 
-            $select = sprintf(
+            $itemSettings = sprintf(
                 '<div class="item-classes">
-                    <label for="ctrl_%1$s_%2$s">%4$s</label><select id="ctrl_%1$s_%2$s" name="%1$s[%2$s]" class="tl_select">%3$s</select>
+                    %3$s
                     <label for="ctrl_%1$s_%2$s_classes">%5$s</label><input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text" value="%6$s" />
                 </div>',
                 $this->strId,
                 $objItemId,
-                $options,
+                implode('', $selects),
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
                 $this->varValue[$objItemId.'_classes'],
             );
 
-            $strElement = substr_replace($strElement, $select.$search, $pos, \strlen($search));
+            $strElement = substr_replace($strElement, $itemSettings.$search, $pos, \strlen($search));
         }
 
         return $strElement;

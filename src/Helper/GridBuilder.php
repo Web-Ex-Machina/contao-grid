@@ -160,6 +160,12 @@ class GridBuilder extends Controller
                 $items = $objElement->grid_items;
             }
 
+            foreach ($items as $itemId => $classes) {
+                if (\is_array($classes)) {
+                    $items[$itemId] = trim(implode(' ', $classes));
+                }
+            }
+
             if (0 < \count($items)) {
                 $arrItemsClasses = $items;
             }
@@ -300,7 +306,7 @@ class GridBuilder extends Controller
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems));
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    $gridItems[$objItem->id] = '';
+                    $gridItems[$objItem->id] = \array_key_exists($objItem->id, $gridItemsSave) ? $gridItemsSave[$objItem->id] : '';
                     $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
@@ -312,7 +318,7 @@ class GridBuilder extends Controller
                 return $objItemsIdsToSkip;
             } else {
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    $gridItems[$objItem->id] = '';
+                    $gridItems[$objItem->id] = \array_key_exists($objItem->id, $gridItemsSave) ? $gridItemsSave[$objItem->id] : '';
                     $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
