@@ -201,22 +201,33 @@ class GridElementWizard extends Widget
             // And break the loop if we hit a grid-stop element
             if ('grid-stop' === $objItems->type) {
                 --$intGridStop;
-                array_pop($currentGridId);
+                // array_pop($currentGridId);
                 if (0 === $intGridStop) {
                     break;
                 }
             }
 
             $objItems->isForGridElementWizard = true;
-
+            // dump($objItems->type.' ('.$objItems->id.') => '.end($currentGridId).' with '.$strGridStartId);
             if ('grid-start' === $objItems->type) {
                 $strElement = $this->getContentElement($objItems->current());
             } else {
-                $strElement = $this->BEGridItemSettings(end($currentGridId), ('grid-stop' === $objItems->type) ? $strGridStartId : $objItems->id, $this->getContentElement($objItems->current()));
+                $tempGridId = end($currentGridId);
+                if ('grid-stop' === $objItems->type) {
+                    // we're on grid stop, so its settings are in the parent grid, not the current one
+                    $currentGridIdCopy = $currentGridId;
+                    array_pop($currentGridIdCopy);
+                    $tempGridId = end($currentGridIdCopy);
+                }
+                $strElement = $this->BEGridItemSettings($tempGridId, ('grid-stop' === $objItems->type) ? end($currentGridId) : $objItems->id, $this->getContentElement($objItems->current()));
             }
 
             if ('grid-start' === $objItems->type) {
                 $currentGridId[] = $objItems->id;
+            }
+
+            if ('grid-stop' === $objItems->type) {
+                array_pop($currentGridId);
             }
             $strGrid .= $strElement;
         }
@@ -284,7 +295,8 @@ class GridElementWizard extends Widget
                 $options = '<option value="">-</option>';
                 foreach ($cols as $c) {
                     if ($breakpoint === $c['key']) {
-                        $v = $this->varValue[$objItemId.'_cols'][$breakpoint];
+                        // $v = $this->varValue[$objItemId.'_cols'][$breakpoint];
+                        $v = $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_cols'][$breakpoint];
                         for ($i = 1; $i <= $c['value']; ++$i) {
                             $optionValue = sprintf('cols-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                             $options .= sprintf(
@@ -309,7 +321,8 @@ class GridElementWizard extends Widget
 
                 $options = '<option value="">-</option>';
                 for ($i = 1; $i <= 12; ++$i) {
-                    $v = $this->varValue[$objItemId.'_rows'][$breakpoint];
+                    // $v = $this->varValue[$objItemId.'_rows'][$breakpoint];
+                    $v = $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_classes'][$objItemId.'_rows'][$breakpoint];
                     $optionValue = sprintf('rows-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                     $options .= sprintf(
                         '<option value="%s"%s>%s</option>',
@@ -338,7 +351,8 @@ class GridElementWizard extends Widget
                 $this->strId,
                 $objItemId,
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
-                $this->varValue[$objItemId.'_classes'],
+                // $this->varValue[$objItemId.'_classes'],
+                $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_classes'],
                 $this->User->isAdmin ? '' : 'hidden'
             );
 

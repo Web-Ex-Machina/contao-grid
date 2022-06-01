@@ -227,6 +227,15 @@ class GridBuilder extends Controller
         $GLOBALS['TL_CSS'][] = 'bundles/wemgrid/css/backend.css';
     }
 
+    public function onsubmitCallback(DataContainer $dc): void
+    {
+        $this->createGridStop($dc);
+        $objItem = ContentModel::findOneById($dc->activeRecord->id);
+        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
+        // When submitting a grid with subgrids, all styles are saved in parent grid instead of each subgrids
+        $this->recalculateGridItemsByPidAndPtable((int) $dc->activeRecord->pid, $dc->activeRecord->ptable, true);
+    }
+
     public function oncutCallback(DataContainer $dc): void
     {
         $objItem = ContentModel::findOneById($dc->id);
@@ -266,20 +275,29 @@ class GridBuilder extends Controller
     /**
      * Recalculate grid items by pid and ptable.
      *
-     * @param int    $pid    The pid
-     * @param string $ptable The ptable
+     * @param int    $pid              The pid
+     * @param string $ptable           The ptable
+     * @param bool   $keepItemsClasses true to keep the item classes between grids
      */
-    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable): void
+    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable, bool $keepItemsClasses = false): void
     {
         $objItems = ContentModel::findBy(['pid = ?', 'ptable = ?'], [$pid, $ptable], ['order' => 'sorting ASC']);
         $objItemsIdsToSkip = [];
+        $itemsClasses = [];
+        // first we keep track of all grid_items settings
+        foreach ($objItems as $index => $objItem) {
+            if ('grid-start' === $objItem->type) {
+                $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? deserialize($objItem->grid_items) : []);
+            }
+        }
+        // throw new \Exception(print_r($itemsClasses, true));
         foreach ($objItems as $index => $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
             }
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems));
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
             }
         }
     }
@@ -290,13 +308,14 @@ class GridBuilder extends Controller
      * @param ContentModel             $gridStart         The "grid-start" content element
      * @param array                    $objItemsIdsToSkip Array of content elements' ID to skip (not in the grid started by the current content element)
      * @param \Contao\Model\Collection $objItems          Array of all content elements sharing the same pid & ptable with the current content element
+     * @param array                    $itemsClasses      items classes across grids
      *
      * @return array Array of content elements' ID to skip (for the next grid to not use the current content elements items)
      */
-    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems): array
+    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses, bool $keepItemsClasses): array
     {
         $gridItems = []; // reset grid items
-        $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
+        // $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
 
         foreach ($objItems as $index => $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
@@ -304,10 +323,16 @@ class GridBuilder extends Controller
             }
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems));
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    $gridItems[$objItem->id] = \array_key_exists($objItem->id, $gridItemsSave) ? $gridItemsSave[$objItem->id] : '';
-                    $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
+                    // $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_cols'] : '';
+                    // $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_rows'] : '';
+                    // $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
+                    // if($keepItemsClasses){
+                    $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $itemsClasses) ? $itemsClasses[$objItem->id.'_cols'] : '';
+                    $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $itemsClasses) ? $itemsClasses[$objItem->id.'_rows'] : '';
+                    $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $itemsClasses) ? $itemsClasses[$objItem->id.'_classes'] : '';
+                    // }
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
                 }
@@ -318,8 +343,14 @@ class GridBuilder extends Controller
                 return $objItemsIdsToSkip;
             } else {
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    $gridItems[$objItem->id] = \array_key_exists($objItem->id, $gridItemsSave) ? $gridItemsSave[$objItem->id] : '';
-                    $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
+                    // $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_cols'] : '';
+                    // $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_rows'] : '';
+                    // $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
+                    // if($keepItemsClasses){
+                    $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $itemsClasses) ? $itemsClasses[$objItem->id.'_cols'] : '';
+                    $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $itemsClasses) ? $itemsClasses[$objItem->id.'_rows'] : '';
+                    $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $itemsClasses) ? $itemsClasses[$objItem->id.'_classes'] : '';
+                    // }
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
                 }

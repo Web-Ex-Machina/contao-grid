@@ -139,7 +139,7 @@ WEM.Grid  = WEM.Grid || {};
                 
                 // move the grid elements
                 pid = id; // the grid start becomes the PID
-                var gridElements = draggableElement.querySelectorAll('[data-type]');
+                var gridElements = draggableElement.querySelectorAll('div[data-type]');
                 gridElements.forEach(function(gridElement){
                     if(-1 == gridElement.getAttribute('data-type').indexOf('fake-')){
                         id = gridElement.getAttribute('data-id');
