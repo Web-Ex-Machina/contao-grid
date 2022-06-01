@@ -185,7 +185,7 @@ WEM.Grid  = WEM.Grid || {};
         ,getGridFirstRealElement:function(fromElement){
             var grid = self.getGridFromElement(fromElement);
 
-            var elements = grid.querySelectorAll('[data-type]');
+            var elements = grid.querySelectorAll('div[data-type]');
 
             var elementIndex = 0;
             var element = elements[elementIndex];
@@ -199,7 +199,7 @@ WEM.Grid  = WEM.Grid || {};
         ,getGridLastRealElement:function(fromElement){
             var grid = self.getGridFromElement(fromElement);
 
-            var elements = grid.querySelectorAll('[data-type]');
+            var elements = grid.querySelectorAll('div[data-type]');
 
             var elementIndex = elements.length-1;
             var element = elements[elementIndex];
@@ -267,10 +267,9 @@ WEM.Grid  = WEM.Grid || {};
             // Update the items' available size options
             grid.querySelectorAll(':scope > .be_item_grid').forEach(function(item){
                 if("grid-start" === item.getAttribute('data-type')){
-                    self.updateGridElementsAvailableColumns(item, breakpoint, item.getAttribute('data-nb-cols'));
+                    self.updateGridElementsAvailableColumns(item.querySelector('.ce_grid-start'), breakpoint, item.getAttribute('data-nb-cols'));
                 }
-
-                var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+']['+breakpoint+']"]');
+                var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+'_cols]['+breakpoint+']"]');
                 var dataAttributeName='data-cols-span'+('all' == breakpoint ? '' : '-'+breakpoint);
                 var classNameBase='cols-span'+('all' == breakpoint ? '' : '-'+breakpoint)+'-';
 
@@ -314,7 +313,6 @@ window.addEvent("domready", function () {
     document.querySelectorAll('.gridelement .be_item_grid').forEach(function (item) {
         // Retrieve value of select and input
         var classes = [];
-
         item.querySelectorAll('select').forEach(function(select){
             classes.push(select.value);
         });
@@ -331,19 +329,27 @@ window.addEvent("domready", function () {
         item.setAttribute('data-class', c.trim());
     });
 
-    document.querySelectorAll('.gridelement select').forEach(function (i) {
+    document.querySelectorAll('.gridelement select[data-type="cols"]').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            var itemgrid = this.parentNode.parentNode;
-            var strClass = this.value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'') + ' ' + this.parentNode.querySelector('input').value;
-            itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass);
+            var itemgridA = this.parentNode.parentNode.parentNode.parentNode;
+            var strClass = this.value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'') + ' ' + itemgridA.querySelector('input').value + ' ' + itemgridA.querySelector('select[data-type="rows"][data-breakpoint="'+i.getAttribute('data-breakpoint')+'"]').value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'');
+            itemgridA.setAttribute('class', itemgridA.getAttribute('data-class')+' '+strClass);
+        });
+    });
+
+    document.querySelectorAll('.gridelement select[data-type="rows"]').forEach(function (i) {
+        i.addEventListener("change", function (e) {
+            var itemgridB = this.parentNode.parentNode.parentNode.parentNode;
+            var strClass = this.value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'') + ' ' + itemgridB.querySelector('input').value + ' ' + itemgridB.querySelector('select[data-type="cols"][data-breakpoint="'+i.getAttribute('data-breakpoint')+'"]').value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'');
+            itemgridB.setAttribute('class', itemgridB.getAttribute('data-class')+' '+strClass);
         });
     });
 
     document.querySelectorAll('.gridelement input').forEach(function (i) {
         i.addEventListener("keyup", function (e) {
-            var itemgrid = this.parentNode.parentNode;
-            var strClass = this.value + ' ' + this.parentNode.querySelector('select').value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'');
-            itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass);
+            var itemgridC = this.parentNode.parentNode;
+            var strClass = this.value + ' ' + this.parentNode.querySelector('select[data-type="cols"]:not(.hidden)').value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'') + ' ' + this.parentNode.querySelector('select[data-type="rows"]:not(.hidden)').value.replace(/(-xxs|-xs|-sm|-md|-lg|-xl)/,'');
+            itemgridC.setAttribute('class', itemgridC.getAttribute('data-class')+' '+strClass);
         });
     });
 
@@ -521,8 +527,9 @@ window.addEvent("domready", function () {
     function updateGridElementsSelectNbColumnsVisibility(breakpoint){
         document.querySelectorAll(WEM.Grid.Drag.selectors.grid + ' select').forEach(function(item){
             if(null != item.getAttribute('data-breakpoint')){
-                item.classList.toggle('hidden', breakpoint != item.getAttribute('data-breakpoint'));
-                document.querySelector('label[for="'+item.id+'"]').classList.toggle('hidden', breakpoint != item.getAttribute('data-breakpoint'));
+                var shouldBeHidden = breakpoint != item.getAttribute('data-breakpoint') || "1" == item.getAttribute('data-force-hidden');
+                item.classList.toggle('hidden', shouldBeHidden);
+                document.querySelector('label[for="'+item.id+'"]').classList.toggle('hidden', shouldBeHidden);
                 if(breakpoint == item.getAttribute('data-breakpoint')){
                     item.dispatchEvent(new Event('change'));
                 }

@@ -46,6 +46,10 @@
         <source>Nb of cols for this item:</source>
         <target>Nb de colonnes pour cet élément :</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbRowsSelectLabel">
+        <source>Nb of rows for this item:</source>
+        <target>Nb de lignes pour cet élément :</target>
+      </trans-unit>
       <trans-unit id="WEM.GRID.BE.additionalClassesLabel">
         <source>Additional classes:</source>
         <target>Additional classes:</target>
@@ -53,6 +57,10 @@
       <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
         <source>%s column(s)</source>
         <target>%s colonne(s)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbRowsOptionLabel">
+        <source>%s row(s)</source>
+        <target>%s ligne(s)</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.toggleHelpers">
         <source>Display/Hide visual help</source>

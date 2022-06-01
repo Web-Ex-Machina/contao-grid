@@ -97,6 +97,7 @@ class GridElementWizard extends Widget
      */
     public function generate()
     {
+        $this->import(\Contao\BackendUser::class, 'User');
         // Since it's only tl_content for the moment, it's a bit overkill, but it's to ease the future integrations.
         switch ($this->strTable) {
             case 'tl_content':
@@ -273,17 +274,17 @@ class GridElementWizard extends Widget
         // Add the input to the grid item
         $search = '</div>';
         $pos = strrpos($strElement, $search);
-
         if (false !== $pos && !\Input::get('grid_preview')) {
             $breakpoints = ['all', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl'];
-            $selects = [];
+            $selectsCols = [];
+            $selectsRows = [];
+            $cols = $GLOBALS['WEM']['GRID'][$gridId]['cols'];
             foreach ($breakpoints as $breakpoint) {
                 // Build a select options html with the number of possibilities
                 $options = '<option value="">-</option>';
-                $cols = $GLOBALS['WEM']['GRID'][$gridId]['cols'];
                 foreach ($cols as $c) {
-                    if ('all' === $c['key']) {
-                        $v = $this->varValue[$objItemId][$breakpoint];
+                    if ($breakpoint === $c['key']) {
+                        $v = $this->varValue[$objItemId.'_cols'][$breakpoint];
                         for ($i = 1; $i <= $c['value']; ++$i) {
                             $optionValue = sprintf('cols-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                             $options .= sprintf(
@@ -296,28 +297,66 @@ class GridElementWizard extends Widget
                     }
                 }
 
-                $selects[] = sprintf('
-                        <label for="ctrl_%1$s_%2$s_%6$s">%4$s</label><select id="ctrl_%1$s_%2$s_%6$s" name="%1$s[%2$s][%6$s]" class="tl_select" data-breakpoint="%6$s">%3$s</select>',
+                $selectsCols[] = sprintf('
+                        <label for="ctrl_%1$s_%2$s_cols_%5$s">%4$s</label>
+                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select" data-breakpoint="%5$s" data-type="cols">%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
-                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
                     $breakpoint
+                );
+
+                $options = '<option value="">-</option>';
+                for ($i = 1; $i <= 12; ++$i) {
+                    $v = $this->varValue[$objItemId.'_rows'][$breakpoint];
+                    $optionValue = sprintf('rows-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
+                    $options .= sprintf(
+                        '<option value="%s"%s>%s</option>',
+                        $optionValue,
+                        ($v === $optionValue) ? ' selected' : '',
+                        sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsOptionLabel'], $i)
+                    );
+                }
+
+                $selectsRows[] = sprintf('
+                        <label for="ctrl_%1$s_%2$s_rows_%5$s" class="%6$s" data-force-hidden="%7$s">%4$s</label>
+                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %6$s" data-breakpoint="%5$s" data-type="rows" data-force-hidden="%7$s">%3$s</select>',
+                    $this->strId,
+                    $objItemId,
+                    $options,
+                    $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
+                    $breakpoint,
+                    $this->User->isAdmin ? '' : 'hidden',
+                    !$this->User->isAdmin
                 );
             }
 
-            $itemSettings = sprintf(
-                '<div class="item-classes">
-                    %3$s
-                    <label for="ctrl_%1$s_%2$s_classes">%5$s</label><input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text" value="%6$s" />
-                </div>',
+            $inputClasses = sprintf(
+                '<label for="ctrl_%1$s_%2$s_classes" class="%5$s">%3$s</label>
+                <input type="text" id="ctrl_%1$s_%2$s_classes" name="%1$s[%2$s_classes]" class="tl_text %5$s" value="%4$s" />',
                 $this->strId,
                 $objItemId,
-                implode('', $selects),
-                $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
                 $this->varValue[$objItemId.'_classes'],
+                $this->User->isAdmin ? '' : 'hidden'
+            );
+
+            $itemSettings = sprintf(
+                '<div class="item-classes">
+                    <div class="d-grid cols-2">
+                        <div>
+                        %s
+                        </div>
+                        <div>
+                        %s
+                        </div>
+                    </div>
+                    %s
+                </div>',
+                implode('', $selectsCols),
+                implode('', $selectsRows),
+                $inputClasses
             );
 
             $strElement = substr_replace($strElement, $itemSettings.$search, $pos, \strlen($search));

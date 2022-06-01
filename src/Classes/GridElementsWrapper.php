@@ -79,15 +79,17 @@ class GridElementsWrapper
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
             foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-                if (\is_array($g['item_classes']['items']) && \array_key_exists($objElement->id, $g['item_classes']['items'])) {
+                if (\is_array($g['item_classes']['items']) && \array_key_exists($objElement->id.'_classes', $g['item_classes']['items'])) {
                     $arrGrid = $g;
+                    break;
                 }
             }
 
             return sprintf(
-                '<div class="%s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
+                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
                 implode(' ', $arrGrid['item_classes']['all']),
-                $arrGrid['item_classes']['items'][$objElement->id] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_cols'] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_rows'] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
@@ -108,9 +110,10 @@ class GridElementsWrapper
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true) && true === $arrGrid['subgrid']) {
             return sprintf(
-                '<div class="%s %s %s be_subgrid_item" data-id="%s" data-type="%s">%s%s</div>',
+                '<div class="%s %s %s %s be_subgrid_item" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
-                $arrGrid['item_classes']['items'][$objElement->id] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_cols'] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_rows'] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
@@ -120,9 +123,10 @@ class GridElementsWrapper
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return sprintf(
-                '<div class="%s %s %s" data-id="%s" data-type="%s">%s%s</div>',
+                '<div class="%s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $arrGrid['item_classes']['all']),
-                $arrGrid['item_classes']['items'][$objElement->id] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_cols'] ?: '',
+                $arrGrid['item_classes']['items'][$objElement->id.'_rows'] ?: '',
                 $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
                 $objElement->id,
                 $objElement->type,
