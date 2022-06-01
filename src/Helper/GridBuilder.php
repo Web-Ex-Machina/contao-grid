@@ -232,6 +232,10 @@ class GridBuilder extends Controller
     {
         $objItem = ContentModel::findOneById($itemId);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
+        // ugly fix to allow duplication of element in grid edition
+        $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
+        $objItem->save();
+        // end of ugly fix
         $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 

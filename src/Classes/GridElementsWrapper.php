@@ -145,6 +145,7 @@ class GridElementsWrapper
     {
         if ($withActions) {
             $titleEdit = $this->translator->trans('DCA.edit', [$objElement->id], 'contao_default');
+            $titleCopy = $this->translator->trans('DCA.copy', [$objElement->id], 'contao_default');
             $titleDelete = $this->translator->trans('DCA.delete', [$objElement->id], 'contao_default');
             $titleDrag = $this->translator->trans('DCA.drag', [$objElement->id], 'contao_default');
             $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $this->translator->trans('MSC.deleteConfirm', [$objElement->id], 'contao_default') : null;
@@ -157,7 +158,24 @@ class GridElementsWrapper
                 %s
                 </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
 
-            $buttons .= sprintf('<a href="contao?do=%s&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
+            $buttons .= sprintf('
+                <a class="item-copy"
+                href="#"
+                data-element-id="%s"
+                title="%s"
+                >
+                %s
+                </a>', $objElement->id, StringUtil::specialchars($titleCopy), Image::getHtml('copy.svg', $titleCopy));
+
+            $buttons .= sprintf('
+                <a class="item-delete"
+                href="#"
+                data-element-id="%s"
+                title="%s"
+                onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()"
+                >
+                %s
+                </a>', $objElement->id, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
 
             $buttons .= sprintf('
                 <a
@@ -182,29 +200,38 @@ class GridElementsWrapper
     public function getBackendActionsForGridStartContentElement(ContentModel $objElement, string $do, bool $withActions): string
     {
         if ($withActions) {
-            $titleEdit = sprintf($GLOBALS['TL_LANG']['DCA']['edit'], $objElement->id);
-            $titleDelete = sprintf($GLOBALS['TL_LANG']['DCA']['delete'], $objElement->id);
-            $titleDrag = sprintf($GLOBALS['TL_LANG']['DCA']['drag'], $objElement->id);
-            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? sprintf($GLOBALS['TL_LANG']['MSC']['deleteConfirm'], $objElement->id) : null;
+            $titleEdit = $this->translator->trans('DCA.edit', [$objElement->id], 'contao_default');
+            $titleCopy = $this->translator->trans('DCA.copy', [$objElement->id], 'contao_default');
+            $titleDelete = $this->translator->trans('DCA.delete', [$objElement->id], 'contao_default');
+            $titleDrag = $this->translator->trans('DCA.drag', [$objElement->id], 'contao_default');
+            $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $this->translator->trans('MSC.deleteConfirm', [$objElement->id], 'contao_default') : null;
 
             $buttons = sprintf('
-            <a
-            href="contao?do=%s&id=%s&table=tl_content&act=edit&nb=1&amp;rt=%s"
-            title="%s"
-            target="_blank">
-            %s
-            </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
-
-            $buttons .= sprintf('<a href="contao?do=%s&id=%s&table=tl_content&act=delete&popup=1&nb=1&amp;rt=%s" title="%s" onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()">%s</a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
+                <a
+                href="contao?do=%s&id=%s&table=tl_content&act=edit&nb=1&amp;rt=%s"
+                title="%s"
+                target="_blank">
+                %s
+                </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
 
             $buttons .= sprintf('
-            <a
-            href="#"
-            onClick="return false;"
-            title="%s"
-            class="drag-handle">
-            %s
-            </a>', StringUtil::specialchars($titleDrag), Image::getHtml('drag.svg', $titleDrag));
+                <a class="item-delete"
+                href="#"
+                data-element-id="%s"
+                title="%s"
+                onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()"
+                >
+                %s
+                </a>', $objElement->id, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
+
+            $buttons .= sprintf('
+                <a
+                href="#"
+                onClick="return false;"
+                title="%s"
+                class="drag-handle">
+                %s
+                </a>', StringUtil::specialchars($titleDrag), Image::getHtml('drag.svg', $titleDrag));
         }
 
         return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');

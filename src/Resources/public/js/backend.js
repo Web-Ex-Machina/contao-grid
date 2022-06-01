@@ -365,6 +365,71 @@ window.addEvent("domready", function () {
             });
         });
     });
+    document.querySelectorAll('.item-copy').forEach(function (a){
+        a.addEventListener('click', function(e){
+            e.preventDefault();
+            var target = e.target;
+            while('A' != target.nodeName){
+                target = target.parentNode;
+            }
+            var id = target.getAttribute('data-element-id');
+
+            var urlCopy = window.location.href.replace('act=edit','act=paste&mode=copy').replace(/\&id=([0-9]+)/,'&id='+id);
+            var urlPaste = window.location.href.replace('act=edit','act=copy&mode=1').replace(/\&id=([0-9]+)/,'&id='+id+'&pid='+id);
+
+            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+            fetch(urlCopy,{
+                method:'get',
+                redirect:'manual'
+            })
+            .then(data => {
+                fetch(urlPaste,{
+                    method:'get',
+                    redirect:'manual'
+                })
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    AjaxRequest.hideBox();
+                });
+            })
+            .catch(error => {
+                AjaxRequest.hideBox();
+            });
+
+
+            return false;
+        });
+    });
+    document.querySelectorAll('.item-delete').forEach(function (a){
+        a.addEventListener('click', function(e){
+            e.preventDefault();
+            var target = e.target;
+            while('A' != target.nodeName){
+                target = target.parentNode;
+            }
+            var id = target.getAttribute('data-element-id');
+
+            var url = window.location.href.replace('act=edit','act=delete').replace(/\&id=([0-9]+)/,'&id='+id);
+
+            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+
+                fetch(url,{
+                    method:'get',
+                    redirect:'manual'
+                })
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    AjaxRequest.hideBox();
+                });
+
+
+            return false;
+        });
+    });
 
     for(var i =0; i<= 6; i++){
         var input = document.querySelector('[name="grid_cols['+i+'][value]"]');
