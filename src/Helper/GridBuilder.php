@@ -233,14 +233,14 @@ class GridBuilder extends Controller
         $objItem = ContentModel::findOneById($dc->activeRecord->id);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         // When submitting a grid with subgrids, all styles are saved in parent grid instead of each subgrids
-        $this->recalculateGridItemsByPidAndPtable((int) $dc->activeRecord->pid, $dc->activeRecord->ptable, true);
+        self::recalculateGridItemsByPidAndPtable((int) $dc->activeRecord->pid, $dc->activeRecord->ptable, true);
     }
 
     public function oncutCallback(DataContainer $dc): void
     {
         $objItem = ContentModel::findOneById($dc->id);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+        self::recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
     public function oncopyCallback(int $itemId, DataContainer $dc): void
@@ -251,17 +251,23 @@ class GridBuilder extends Controller
         $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
         $objItem->save();
         // end of ugly fix
-        $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+        self::recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
     public function ondeleteCallback(DataContainer $dc, int $undoItemId): void
     {
+        if (!$dc->id) {
+            return;
+        }
         $objItem = ContentModel::findOneById($dc->id);
+        if (!$objItem) {
+            return;
+        }
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         if ('grid-start' === $objItem->type) {
             $this->deleteClosestGridStopFromGridStart($objItem);
         }
-        $this->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+        self::recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
     public function deleteClosestGridStopFromGridStart(ContentModel $gridStart): void
@@ -279,7 +285,7 @@ class GridBuilder extends Controller
      * @param string $ptable           The ptable
      * @param bool   $keepItemsClasses true to keep the item classes between grids
      */
-    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable, bool $keepItemsClasses = false): void
+    public static function recalculateGridItemsByPidAndPtable(int $pid, string $ptable, bool $keepItemsClasses = false): void
     {
         $objItems = ContentModel::findBy(['pid = ?', 'ptable = ?'], [$pid, $ptable], ['order' => 'sorting ASC']);
         $objItemsIdsToSkip = [];
@@ -297,7 +303,7 @@ class GridBuilder extends Controller
             }
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, self::recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
             }
         }
     }
@@ -312,7 +318,7 @@ class GridBuilder extends Controller
      *
      * @return array Array of content elements' ID to skip (for the next grid to not use the current content elements items)
      */
-    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses, bool $keepItemsClasses): array
+    protected static function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses, bool $keepItemsClasses): array
     {
         $gridItems = []; // reset grid items
         // $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
@@ -323,11 +329,8 @@ class GridBuilder extends Controller
             }
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, self::recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    // $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_cols'] : '';
-                    // $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_rows'] : '';
-                    // $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
                     // if($keepItemsClasses){
                     $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $itemsClasses) ? $itemsClasses[$objItem->id.'_cols'] : '';
                     $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $itemsClasses) ? $itemsClasses[$objItem->id.'_rows'] : '';
@@ -343,9 +346,6 @@ class GridBuilder extends Controller
                 return $objItemsIdsToSkip;
             } else {
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    // $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_cols'] : '';
-                    // $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_rows'] : '';
-                    // $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $gridItemsSave) ? $gridItemsSave[$objItem->id.'_classes'] : '';
                     // if($keepItemsClasses){
                     $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $itemsClasses) ? $itemsClasses[$objItem->id.'_cols'] : '';
                     $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $itemsClasses) ? $itemsClasses[$objItem->id.'_rows'] : '';
