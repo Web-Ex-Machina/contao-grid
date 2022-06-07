@@ -32,6 +32,7 @@ class GridStartManipulator
     public const PROPERTIES = [self::PROPERTY_COLS, self::PROPERTY_ROWS, self::PROPERTY_CLASSES];
     public const RESOLUTIONS = [self::RESOLUTION_ALL, self::RESOLUTION_XXS, self::RESOLUTION_XS, self::RESOLUTION_SM, self::RESOLUTION_MD, self::RESOLUTION_LG, self::RESOLUTION_XL,
     ];
+    /* warning : This format depends on the widget used to manage the grid_cols in tl_content DCA */
     public const DEFAULT_GRID_COLS = [
         ['key' => self::RESOLUTION_ALL, 'value' => ''],
         ['key' => self::RESOLUTION_XXS, 'value' => ''],
@@ -92,7 +93,10 @@ class GridStartManipulator
         return (new self())->setGridStart($gridStart);
     }
 
-    public function recalculateElements(): self
+    /**
+     * Recalculate grid items for all grids sharing the same pid & ptable.
+     */
+    public function recalculateElementsForAllGridSharingTheSamePidAndPtable(): self
     {
         \WEM\GridBundle\Helper\GridBuilder::recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
         $this->gridStart->refresh();
@@ -100,70 +104,122 @@ class GridStartManipulator
         return $this;
     }
 
+    /**
+     * Allow to set the grid cols settings.
+     *
+     * @param int $all The settings for all resolutions
+     * @param int $xxs The settings for the XXS resolution
+     * @param int $xs  The settings for the XS resolution
+     * @param int $sm  The settings for the SM resolution
+     * @param int $md  The settings for the MD resolution
+     * @param int $lg  The settings for the LG resolution
+     * @param int $xl  The settings for the XL resolution
+     */
     public function setGridCols(?int $all, ?int $xxs, ?int $xs, ?int $sm, ?int $md, ?int $lg, ?int $xl): self
     {
-        $this->gridStart->grid_cols = serialize([
-            self::RESOLUTION_ALL => $all,
-            self::RESOLUTION_XXS => $xxs,
-            self::RESOLUTION_XS => $xs,
-            self::RESOLUTION_SM => $sm,
-            self::RESOLUTION_MD => $md,
-            self::RESOLUTION_LG => $lg,
-            self::RESOLUTION_XL => $xl,
-        ]);
-
-        return $this;
+        return $this
+            ->setGridColsAll($all)
+            ->setGridColsXxs($xxs)
+            ->setGridColsXs($xs)
+            ->setGridColsSm($sm)
+            ->setGridColsMd($md)
+            ->setGridColsLg($lg)
+            ->setGridColsXl($xl)
+        ;
     }
 
-    public function setGridColsAll(?int $all): self
+    /**
+     * Set the grid cols value for all resolution.
+     *
+     * @param int $value the value
+     */
+    public function setGridColsAll(?int $value): self
     {
-        $this->setGridColsByKeyAndValue(self::RESOLUTION_ALL, $all);
+        $this->setGridColsByKeyAndValue(self::RESOLUTION_ALL, $value);
 
         return $this;
     }
 
-    public function setGridColsXxs(?int $xxs): self
+    /**
+     * Set the grid cols value for XXS resolution.
+     *
+     * @param int $value the value
+     */
+    public function setGridColsXxs(?int $value): self
     {
-        $this->setGridColsByKeyAndValue(self::RESOLUTION_XXS, $xxs);
+        $this->setGridColsByKeyAndValue(self::RESOLUTION_XXS, $value);
 
         return $this;
     }
 
-    public function setGridColsXs(?int $xs): self
+    /**
+     * Set the grid cols value for XS resolution.
+     *
+     * @param int $value the value
+     */
+    public function setGridColsXs(?int $value): self
     {
-        $this->setGridColsByKeyAndValue(self::RESOLUTION_XS, $xs);
+        $this->setGridColsByKeyAndValue(self::RESOLUTION_XS, $value);
 
         return $this;
     }
 
-    public function setGridColsSm(?int $sm): self
+    /**
+     * Set the grid cols value for SM resolution.
+     *
+     * @param int $value the value
+     */
+    public function setGridColsSm(?int $value): self
     {
-        $this->setGridColsByKeyAndValue(self::RESOLUTION_SM, $sm);
+        $this->setGridColsByKeyAndValue(self::RESOLUTION_SM, $value);
 
         return $this;
     }
 
-    public function setGridColsMd(?int $md): self
+    /**
+     * Set the grid cols value for MD resolution.
+     *
+     * @param int $value the value
+     */
+    public function setGridColsMd(?int $value): self
     {
-        $this->setGridColsByKeyAndValue(self::RESOLUTION_MD, $md);
+        $this->setGridColsByKeyAndValue(self::RESOLUTION_MD, $value);
 
         return $this;
     }
 
-    public function setGridColsLg(?int $lg): self
+    /**
+     * Set the grid cols value for LG resolution.
+     *
+     * @param int $value the value
+     */
+    public function setGridColsLg(?int $value): self
     {
-        $this->setGridColsByKeyAndValue(self::RESOLUTION_LG, $lg);
+        $this->setGridColsByKeyAndValue(self::RESOLUTION_LG, $value);
 
         return $this;
     }
 
-    public function setGridColsXl(?int $xl): self
+    /**
+     * Set the grid cols value for XL resolution.
+     *
+     * @param int $value the value
+     */
+    public function setGridColsXl(?int $value): self
     {
-        $this->setGridColsByKeyAndValue(self::RESOLUTION_XL, $xl);
+        $this->setGridColsByKeyAndValue(self::RESOLUTION_XL, $value);
 
         return $this;
     }
 
+    /**
+     * Allow to set the item's settings in the grid.
+     *
+     * @param int    $itemId  The item's ID
+     * @param array  $cols    The cols settings
+     * @param array  $rows    The rows settings
+     * @param string $classes The CSS classes
+     */
     public function setGridItemsSettingsForItem(int $itemId, array $cols, array $rows, string $classes): self
     {
         $previousValues = null !== $this->gridStart->grid_items ? unserialize($this->gridStart->grid_items) : [];
@@ -175,17 +231,36 @@ class GridStartManipulator
         return $this;
     }
 
+    /**
+     * Returns the current settings for a certain item's ID.
+     *
+     * @param int $itemId The item's ID
+     */
     public function getGridItemsSettingsForItem(int $itemId): array
     {
         $values = null !== $this->gridStart->grid_items ? unserialize($this->gridStart->grid_items) : [];
 
         return [
-            $itemId.'_'.self::PROPERTY_COLS => \array_key_exists($itemId.'_'.self::PROPERTY_COLS, $values) ? $values[$itemId.'_'.self::PROPERTY_COLS] : self::DEFAULT_GRID_ITEMS[self::PROPERTY_COLS],
-            $itemId.'_'.self::PROPERTY_ROWS => \array_key_exists($itemId.'_'.self::PROPERTY_ROWS, $values) ? $values[$itemId.'_'.self::PROPERTY_ROWS] : self::DEFAULT_GRID_ITEMS[self::PROPERTY_ROWS],
-            $itemId.'_'.self::PROPERTY_CLASSES => \array_key_exists($itemId.'_'.self::PROPERTY_CLASSES, $values) ? $values[$itemId.'_'.self::PROPERTY_CLASSES] : self::DEFAULT_GRID_ITEMS[self::PROPERTY_CLASSES],
+            $itemId.'_'.self::PROPERTY_COLS => \array_key_exists($itemId.'_'.self::PROPERTY_COLS, $values)
+                ? $values[$itemId.'_'.self::PROPERTY_COLS]
+                : self::DEFAULT_GRID_ITEMS[self::PROPERTY_COLS],
+            $itemId.'_'.self::PROPERTY_ROWS => \array_key_exists($itemId.'_'.self::PROPERTY_ROWS, $values)
+                ? $values[$itemId.'_'.self::PROPERTY_ROWS]
+                : self::DEFAULT_GRID_ITEMS[self::PROPERTY_ROWS],
+            $itemId.'_'.self::PROPERTY_CLASSES => \array_key_exists($itemId.'_'.self::PROPERTY_CLASSES, $values)
+                ? $values[$itemId.'_'.self::PROPERTY_CLASSES]
+                : self::DEFAULT_GRID_ITEMS[self::PROPERTY_CLASSES],
         ];
     }
 
+    /**
+     * Set the value of a property on a certain resolution for a specified item ID.
+     *
+     * @param int    $itemId     The item's ID
+     * @param string $property   The property
+     * @param string $resolution The resolution
+     * @param string $value      The value
+     */
     public function setGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, string $resolution, string $value): self
     {
         $this->validateProperty($property);
@@ -199,6 +274,165 @@ class GridStartManipulator
         return $this;
     }
 
+    /**
+     * Set cols value for all resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemColsAll(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_ALL, $value);
+    }
+
+    /**
+     * Set cols value for XXS resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemColsXxs(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XXS, $value);
+    }
+
+    /**
+     * Set cols value for XS resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemColsXs(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XS, $value);
+    }
+
+    /**
+     * Set cols value for SM resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemColsSm(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_SM, $value);
+    }
+
+    /**
+     * Set cols value for MD resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemColsMd(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_MD, $value);
+    }
+
+    /**
+     * Set cols value for LG resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemColsLg(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_LG, $value);
+    }
+
+    /**
+     * Set cols value for XL resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemColsXl(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XL, $value);
+    }
+
+    /**
+     * Set rows value for all resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemRowsAll(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_ALL, $value);
+    }
+
+    /**
+     * Set rows value for XXS resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemRowsXxs(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XXS, $value);
+    }
+
+    /**
+     * Set rows value for XS resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemRowsXs(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XS, $value);
+    }
+
+    /**
+     * Set rows value for SM resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemRowsSm(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_SM, $value);
+    }
+
+    /**
+     * Set rows value for MD resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemRowsMd(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_MD, $value);
+    }
+
+    /**
+     * Set rows value for LG resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemRowsLg(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_LG, $value);
+    }
+
+    /**
+     * Set rows value for XL resolution for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemRowsXl(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XL, $value);
+    }
+
+    /**
+     * Returns a correctly formatted array of configuration for a certain item.
+     *
+     * @param int $itemId The item's ID
+     */
     public function getDefaultItemSettingsForItem(int $itemId): array
     {
         return [
@@ -208,11 +442,17 @@ class GridStartManipulator
         ];
     }
 
-    protected function setGridColsByKeyAndValue(string $key, ?int $value): self
+    /**
+     * Set the cols value for a certain resolution.
+     *
+     * @param string   $resolution The resolution
+     * @param int|null $value      The value
+     */
+    protected function setGridColsByKeyAndValue(string $resolution, ?int $value): self
     {
         $previousValues = null !== $this->gridStart->grid_cols ? unserialize($this->gridStart->grid_cols) : self::DEFAULT_GRID_COLS;
         foreach ($previousValues as $resolutionIndex => $resolutionSettings) {
-            if ($key === $resolutionSettings['key']) {
+            if ($resolution === $resolutionSettings['key']) {
                 $previousValues[$resolutionIndex]['value'] = $value;
             }
         }
@@ -221,6 +461,11 @@ class GridStartManipulator
         return $this;
     }
 
+    /**
+     * Validate the property key.
+     *
+     * @param string $property The property key
+     */
     protected function validateProperty(string $property): void
     {
         if (!\in_array($property, self::PROPERTIES, true)) {
@@ -228,6 +473,11 @@ class GridStartManipulator
         }
     }
 
+    /**
+     * Validate the resolution key.
+     *
+     * @param string $resolution The resolution key
+     */
     protected function validateResolution(string $resolution): void
     {
         if (!\in_array($resolution, self::RESOLUTIONS, true)) {

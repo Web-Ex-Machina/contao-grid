@@ -297,7 +297,6 @@ class GridBuilder extends Controller
                 $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? deserialize($objItem->grid_items) : []);
             }
         }
-        // throw new \Exception(print_r($itemsClasses, true));
         foreach ($objItems as $index => $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
