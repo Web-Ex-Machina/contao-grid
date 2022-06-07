@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+
+  php_tu:
+    extends:
+      file: docker-compose-base.yml
+      service: php
+    build: 
+      context: ./php/${IMAGE_PHP_DIR}
+      target: php_test_unit
+    restart: unless-stopped
+    tty: true
+    entrypoint: /bin/bash -c
+    container_name: ${COMPOSE_PROJECT_NAME_SHORT}_php_tu
+    # hack to verify composer has finished its job and phpunit is available
+    healthcheck:
+      test: >
+        ls -la vendor/bin | grep 'phpunit'
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command:
+    - >-
+        sleep 5 &&
+        composer install --dev --prefer-dist --no-progress &&
+        sleep infinity
+
+  # this container will only be built 
+  # when the "php" one is built and is considered "healthy"
+  # (stupid hack to force docker-compose to wait for composer to finish its work in the "php" container)
+  php_dependencies_loaded_tu:
+    container_name: ${COMPOSE_PROJECT_NAME_SHORT}_php_dependencies_loaded_tu
+    image: alpine:latest
+    depends_on:
+      php_tu:
+        condition: service_healthy
+
+#Docker Networks
+networks:
+  common:
+    name: ${COMPOSE_PROJECT_NAME_SHORT}_network_common_tu
+  php:
+    name: ${COMPOSE_PROJECT_NAME_SHORT}_network_php_tu
+  db:
+    name: ${COMPOSE_PROJECT_NAME_SHORT}_network_db_tu
+
+volumes:
+  static-content:
+    name: ${COMPOSE_PROJECT_NAME_SHORT}-volume-shared-php-web-tu

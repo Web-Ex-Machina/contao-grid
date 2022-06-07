@@ -213,6 +213,62 @@ class GridStartManipulator
     }
 
     /**
+     * Get the grid cols value for all resolution.
+     */
+    public function getGridColsAll(): ?int
+    {
+        return $this->getGridColsByResolution(self::RESOLUTION_ALL);
+    }
+
+    /**
+     * Get the grid cols value for XXS resolution.
+     */
+    public function getGridColsXxs(): ?int
+    {
+        return $this->getGridColsByResolution(self::RESOLUTION_XXS);
+    }
+
+    /**
+     * Get the grid cols value for XS resolution.
+     */
+    public function getGridColsXs(): ?int
+    {
+        return $this->getGridColsByResolution(self::RESOLUTION_XS);
+    }
+
+    /**
+     * Get the grid cols value for SM resolution.
+     */
+    public function getGridColsSm(): ?int
+    {
+        return $this->getGridColsByResolution(self::RESOLUTION_SM);
+    }
+
+    /**
+     * Get the grid cols value for MD resolution.
+     */
+    public function getGridColsMd(): ?int
+    {
+        return $this->getGridColsByResolution(self::RESOLUTION_MD);
+    }
+
+    /**
+     * Get the grid cols value for LG resolution.
+     */
+    public function getGridColsLg(): ?int
+    {
+        return $this->getGridColsByResolution(self::RESOLUTION_LG);
+    }
+
+    /**
+     * Get the grid cols value for XL resolution.
+     */
+    public function getGridColsXl(): ?int
+    {
+        return $this->getGridColsByResolution(self::RESOLUTION_XL);
+    }
+
+    /**
      * Allow to set the item's settings in the grid.
      *
      * @param int    $itemId  The item's ID
@@ -289,7 +345,7 @@ class GridStartManipulator
      */
     public function setGridItemClasses(int $itemId, string $value): self
     {
-        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, null, $value);
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_CLASSES, null, $value);
     }
 
     /**
@@ -470,7 +526,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemClasses(int $itemId): self
+    public function getGridItemClasses(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_CLASSES);
     }
@@ -480,7 +536,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemColsAll(int $itemId): self
+    public function getGridItemColsAll(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_ALL);
     }
@@ -490,7 +546,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemColsXxs(int $itemId): self
+    public function getGridItemColsXxs(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XXS);
     }
@@ -500,7 +556,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemColsXs(int $itemId): self
+    public function getGridItemColsXs(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XS);
     }
@@ -510,7 +566,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemColsSm(int $itemId): self
+    public function getGridItemColsSm(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_SM);
     }
@@ -520,7 +576,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemColsMd(int $itemId): self
+    public function getGridItemColsMd(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_MD);
     }
@@ -530,7 +586,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemColsLg(int $itemId): self
+    public function getGridItemColsLg(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_LG);
     }
@@ -540,7 +596,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemColsXl(int $itemId): self
+    public function getGridItemColsXl(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XL);
     }
@@ -550,7 +606,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemRowsAll(int $itemId): self
+    public function getGridItemRowsAll(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_ALL);
     }
@@ -560,7 +616,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemRowsXxs(int $itemId): self
+    public function getGridItemRowsXxs(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XXS);
     }
@@ -570,7 +626,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemRowsXs(int $itemId): self
+    public function getGridItemRowsXs(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XS);
     }
@@ -580,7 +636,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemRowsSm(int $itemId): self
+    public function getGridItemRowsSm(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_SM);
     }
@@ -590,7 +646,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemRowsMd(int $itemId): self
+    public function getGridItemRowsMd(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_MD);
     }
@@ -600,7 +656,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemRowsLg(int $itemId): self
+    public function getGridItemRowsLg(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_LG);
     }
@@ -610,7 +666,7 @@ class GridStartManipulator
      *
      * @param int $itemId The item's ID
      */
-    public function getGridItemRowsXl(int $itemId): self
+    public function getGridItemRowsXl(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XL);
     }
@@ -627,6 +683,30 @@ class GridStartManipulator
             $itemId.'_'.self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEMS[self::PROPERTY_ROWS],
             $itemId.'_'.self::PROPERTY_CLASSES => self::DEFAULT_GRID_ITEMS[self::PROPERTY_CLASSES],
         ];
+    }
+
+    /**
+     * Validate the property key.
+     *
+     * @param string $property The property key
+     */
+    public function validateProperty(string $property): void
+    {
+        if (!\in_array($property, self::PROPERTIES, true)) {
+            throw new InvalidArgumentException('The property value must be one of the following : "'.implode('", "', self::PROPERTIES).'"');
+        }
+    }
+
+    /**
+     * Validate the resolution key.
+     *
+     * @param string $resolution The resolution key
+     */
+    public function validateResolution(string $resolution): void
+    {
+        if (!\in_array($resolution, self::RESOLUTIONS, true)) {
+            throw new InvalidArgumentException('The resolution value must be one of the following : "'.implode('", "', self::RESOLUTIONS).'"');
+        }
     }
 
     /**
@@ -649,26 +729,19 @@ class GridStartManipulator
     }
 
     /**
-     * Validate the property key.
+     * Set the cols value for a certain resolution.
      *
-     * @param string $property The property key
+     * @param string $resolution The resolution
      */
-    protected function validateProperty(string $property): void
+    protected function getGridColsByResolution(string $resolution): ?int
     {
-        if (!\in_array($property, self::PROPERTIES, true)) {
-            throw new InvalidArgumentException('The property value must be one of the following : '.implode('', self::PROPERTIES));
+        $previousValues = null !== $this->gridStart->grid_cols ? unserialize($this->gridStart->grid_cols) : self::DEFAULT_GRID_COLS;
+        foreach ($previousValues as $resolutionIndex => $resolutionSettings) {
+            if ($resolution === $resolutionSettings['key']) {
+                return $previousValues[$resolutionIndex]['value'];
+            }
         }
-    }
 
-    /**
-     * Validate the resolution key.
-     *
-     * @param string $resolution The resolution key
-     */
-    protected function validateResolution(string $resolution): void
-    {
-        if (!\in_array($resolution, self::RESOLUTIONS, true)) {
-            throw new InvalidArgumentException('The resolution value must be one of the following : '.implode('', self::RESOLUTIONS));
-        }
+        return null;
     }
 }

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  php:
+    build: 
+      context: ./php/${IMAGE_PHP_DIR}
+      target: php_base
+      args:
+        image: ${IMAGE_PHP}        
+        workdir_base: ${WORKDIR_BASE}
+        workdir_init: ${WORKDIR_INIT}
+        workdir_contao: ${WORKDIR_CONTAO}
+        workdir_contao_public: ${WORKDIR_CONTAO_PUBLIC}
+        workdir_bundle: ${WORKDIR_BUNDLE}
+        workdir_simlink_base: ${WORKDIR_SIMLINK_BASE}
+        workdir_bundle_end_slash: ${WORKDIR_BUNDLE_END_SLASH}
+    environment:
+      PRJ_NAME: ${PRJ_NAME}
+      WORKDIR_BUNDLE: ${WORKDIR_BUNDLE}
+      WORKDIR_CONTAO: ${WORKDIR_CONTAO}
+      BUNDLE_NAME: ${BUNDLE_NAME}
+    container_name: ${COMPOSE_PROJECT_NAME_SHORT}_php_base
+    volumes:
+      # - ..:${WORKDIR_BASE}/${BUNDLE_NAME}
+      - ..:${WORKDIR_BUNDLE}
+      - ./contao/${CONTAO_VERSION}:${WORKDIR_BASE}/init:ro
+      - type: volume
+        source: static-content
+        target : ${WORKDIR_BASE}/${PRJ_NAME}
+    networks:
+      - common
+      - php
+
+volumes:
+  static-content:
+    name: ${COMPOSE_PROJECT_NAME_SHORT}-volume-shared-php-web-base
+
+#Docker Networks
+networks:
+  common:
+  php:
+  db:
