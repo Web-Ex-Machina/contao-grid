@@ -18,6 +18,7 @@ use Contao\ContentModel;
 use Contao\Controller;
 use Contao\Database\Result as DatabaseResult;
 use Contao\DataContainer;
+use WEM\GridBundle\Classes\GridStartManipulator;
 
 /**
  * Function to centralize generic code to.
@@ -331,10 +332,17 @@ class GridBuilder extends Controller
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, self::recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
+                    $gridItems = array_merge($gridItems, GridStartManipulator::getDefaultItemSettingsForItem((int) $objItem->id));
                     // if($keepItemsClasses){
-                    $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $itemsClasses) ? $itemsClasses[$objItem->id.'_cols'] : '';
-                    $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $itemsClasses) ? $itemsClasses[$objItem->id.'_rows'] : '';
-                    $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $itemsClasses) ? $itemsClasses[$objItem->id.'_classes'] : '';
+                    if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
+                        $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
+                    }
+                    if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
+                        $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
+                    }
+                    if (\array_key_exists($objItem->id.'_classes', $itemsClasses)) {
+                        $gridItems[$objItem->id.'_classes'] = $itemsClasses[$objItem->id.'_classes'];
+                    }
                     // }
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
@@ -346,10 +354,17 @@ class GridBuilder extends Controller
                 return $objItemsIdsToSkip;
             } else {
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
+                    $gridItems = array_merge($gridItems, GridStartManipulator::getDefaultItemSettingsForItem((int) $objItem->id));
                     // if($keepItemsClasses){
-                    $gridItems[$objItem->id.'_cols'] = \array_key_exists($objItem->id.'_cols', $itemsClasses) ? $itemsClasses[$objItem->id.'_cols'] : '';
-                    $gridItems[$objItem->id.'_rows'] = \array_key_exists($objItem->id.'_rows', $itemsClasses) ? $itemsClasses[$objItem->id.'_rows'] : '';
-                    $gridItems[$objItem->id.'_classes'] = \array_key_exists($objItem->id.'_classes', $itemsClasses) ? $itemsClasses[$objItem->id.'_classes'] : '';
+                    if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
+                        $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
+                    }
+                    if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
+                        $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
+                    }
+                    if (\array_key_exists($objItem->id.'_classes', $itemsClasses)) {
+                        $gridItems[$objItem->id.'_classes'] = $itemsClasses[$objItem->id.'_classes'];
+                    }
                     // }
                     $gridStart->grid_items = serialize($gridItems);
                     $gridStart->save();
