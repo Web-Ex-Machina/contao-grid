@@ -333,12 +333,12 @@ class GridBuilder extends Controller
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
                     $gridItems = array_merge($gridItems, GridStartManipulator::getDefaultItemSettingsForItem((int) $objItem->id));
                     // if($keepItemsClasses){
-                    if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
-                        $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
-                    }
-                    if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
-                        $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
-                    }
+                    // if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
+                    //     $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
+                    // }
+                    // if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
+                    //     $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
+                    // }
                     if (\array_key_exists($objItem->id.'_classes', $itemsClasses)) {
                         $gridItems[$objItem->id.'_classes'] = $itemsClasses[$objItem->id.'_classes'];
                     }
@@ -355,12 +355,12 @@ class GridBuilder extends Controller
                 if (!\in_array($objItem->id, array_keys($gridItems), true)) {
                     $gridItems = array_merge($gridItems, GridStartManipulator::getDefaultItemSettingsForItem((int) $objItem->id));
                     // if($keepItemsClasses){
-                    if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
-                        $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
-                    }
-                    if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
-                        $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
-                    }
+                    // if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
+                    //     $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
+                    // }
+                    // if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
+                    //     $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
+                    // }
                     if (\array_key_exists($objItem->id.'_classes', $itemsClasses)) {
                         $gridItems[$objItem->id.'_classes'] = $itemsClasses[$objItem->id.'_classes'];
                     }

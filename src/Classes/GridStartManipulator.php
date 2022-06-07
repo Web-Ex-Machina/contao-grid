@@ -261,17 +261,35 @@ class GridStartManipulator
      * @param string $resolution The resolution
      * @param string $value      The value
      */
-    public function setGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, string $resolution, string $value): self
+    public function setGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, ?string $resolution, string $value): self
     {
         $this->validateProperty($property);
-        $this->validateResolution($resolution);
+
+        if (null !== $resolution && self::PROPERTY_CLASSES === $property) {
+            $this->validateResolution($resolution);
+        }
 
         $values = $this->getGridItemsSettingsForItem($itemId);
-        $values[$itemId.'_'.$property][$resolution] = $value;
+        if (self::PROPERTY_CLASSES === $property) {
+            $values[$itemId.'_'.$property] = $value;
+        } else {
+            $values[$itemId.'_'.$property][$resolution] = $value;
+        }
 
         $this->setGridItemsSettingsForItem($itemId, $values[$itemId.'_'.self::PROPERTY_COLS], $values[$itemId.'_'.self::PROPERTY_ROWS], $values[$itemId.'_'.self::PROPERTY_CLASSES]);
 
         return $this;
+    }
+
+    /**
+     * Set classes value for an item.
+     *
+     * @param int    $itemId The item's ID
+     * @param string $value  The value
+     */
+    public function setGridItemClasses(int $itemId, string $value): self
+    {
+        return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, null, $value);
     }
 
     /**
@@ -426,6 +444,175 @@ class GridStartManipulator
     public function setGridItemRowsXl(int $itemId, string $value): self
     {
         return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XL, $value);
+    }
+
+    /**
+     * Get the value of a property on a certain resolution for a specified item ID.
+     *
+     * @param int    $itemId     The item's ID
+     * @param string $property   The property
+     * @param string $resolution The resolution
+     */
+    public function getGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, ?string $resolution = null)
+    {
+        $this->validateProperty($property);
+        if (null !== $resolution && self::PROPERTY_CLASSES === $property) {
+            $this->validateResolution($resolution);
+        }
+
+        $values = $this->getGridItemsSettingsForItem($itemId);
+
+        return self::PROPERTY_CLASSES === $property ? $values[$itemId.'_'.$property] : $values[$itemId.'_'.$property][$resolution];
+    }
+
+    /**
+     * Get classes value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemClasses(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_CLASSES);
+    }
+
+    /**
+     * Get cols value for all resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemColsAll(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_ALL);
+    }
+
+    /**
+     * Get cols value for XXS resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemColsXxs(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XXS);
+    }
+
+    /**
+     * Get cols value for XS resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemColsXs(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XS);
+    }
+
+    /**
+     * Get cols value for SM resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemColsSm(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_SM);
+    }
+
+    /**
+     * Get cols value for MD resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemColsMd(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_MD);
+    }
+
+    /**
+     * Get cols value for LG resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemColsLg(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_LG);
+    }
+
+    /**
+     * Get cols value for XL resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemColsXl(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_COLS, self::RESOLUTION_XL);
+    }
+
+    /**
+     * Get rows value for all resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRowsAll(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_ALL);
+    }
+
+    /**
+     * Get rows value for XXS resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRowsXxs(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XXS);
+    }
+
+    /**
+     * Get rows value for XS resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRowsXs(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XS);
+    }
+
+    /**
+     * Get rows value for SM resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRowsSm(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_SM);
+    }
+
+    /**
+     * Get rows value for MD resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRowsMd(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_MD);
+    }
+
+    /**
+     * Get rows value for LG resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRowsLg(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_LG);
+    }
+
+    /**
+     * Get rows value for XL resolution for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRowsXl(int $itemId): self
+    {
+        return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_ROWS, self::RESOLUTION_XL);
     }
 
     /**
