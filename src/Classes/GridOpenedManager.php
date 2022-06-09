@@ -38,9 +38,15 @@ class GridOpenedManager
         return self::$instance;
     }
 
+    /**
+     * Open a new grid.
+     *
+     * @param ContentModel|DbResult $element   The grid-start element
+     * @param bool|bool             $isSubGrid Is the grid a subgrid ?
+     */
     public function openGrid($element, ?bool $isSubGrid = false): void
     {
-        $this->validateElement($element);
+        $this->validateElementAsAGridStart($element);
 
         $grid = [
             'preset' => $element->grid_preset,
@@ -64,12 +70,20 @@ class GridOpenedManager
         ++$this->level;
     }
 
+    /**
+     * Closes the last opened grid.
+     */
     public function closeLastOpenedGrid(): void
     {
         --$this->level;
         array_pop($GLOBALS['WEM']['GRID']);
     }
 
+    /**
+     * Returns the last opened grid.
+     *
+     * @return array the last openend grid
+     */
     public function getLastOpenedGrid(): array
     {
         $grid = end($GLOBALS['WEM']['GRID']);
@@ -79,6 +93,11 @@ class GridOpenedManager
         return $grid;
     }
 
+    /**
+     * Returns the last opened grid id.
+     *
+     * @return string the last openend grid id
+     */
     public function getLastOpenedGridId(): string
     {
         end($GLOBALS['WEM']['GRID']);
@@ -90,7 +109,16 @@ class GridOpenedManager
         return (string) $key;
     }
 
-    public function getGridById(string $id)
+    /**
+     * Find a grid by its ID.
+     *
+     * @param string $id The id
+     *
+     * @throws Exception if no grid is found
+     *
+     * @return array the grid
+     */
+    public function getGridById(string $id): array
     {
         if (!\array_key_exists('WEM', $GLOBALS)
             || !\array_key_exists('GRID', $GLOBALS['WEM'])
@@ -102,7 +130,14 @@ class GridOpenedManager
         return $GLOBALS['WEM']['GRID'][$id];
     }
 
-    public function fillGridChildren(ContentModel $element): ?string
+    /**
+     * Add the element as a child of all open grids.
+     *
+     * @param ContentModel $element The element
+     *
+     * @return ?string The latest grid's ID
+     */
+    public function addElementAsAChildOfAllOpenGrids(ContentModel $element): ?string
     {
         $currentGridId = null;
         foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
@@ -118,6 +153,13 @@ class GridOpenedManager
         return (string) $currentGridId;
     }
 
+    /**
+     * Return the parent grid of an element.
+     *
+     * @param ContentModel $element [description]
+     *
+     * @return array|null The grid if found, null otherwise
+     */
     public function getParentGrid(ContentModel $element): ?array
     {
         $arrGrid = null;
@@ -131,7 +173,14 @@ class GridOpenedManager
         return $arrGrid;
     }
 
-    public function validateElement($element): void
+    /**
+     * Check if an element is a grid-start.
+     *
+     * @param ContentModel|DbResult $element The element to check
+     *
+     * @throws Exception if the element is not a grid start
+     */
+    public function validateElementAsAGridStart($element): void
     {
         if (!(is_a($element, DbResult::class) || is_a($element, ContentModel::class))
             || 'grid-start' !== $element->type

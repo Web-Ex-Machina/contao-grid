@@ -88,6 +88,13 @@ class GridStartManipulator
         return $this;
     }
 
+    /**
+     * Creates a new GridStartManipulator.
+     *
+     * @param ContentModel $gridStart The grid-start element
+     *
+     * @return self
+     */
     public static function create(ContentModel $gridStart)
     {
         return (new self())->setGridStart($gridStart);
@@ -709,11 +716,25 @@ class GridStartManipulator
         }
     }
 
+    /**
+     * Check if an item is in the grid.
+     *
+     * @param ContentModel $item The item
+     *
+     * @return bool true if found, false otherwise
+     */
     public function isItemInGrid(ContentModel $item): bool
     {
         return $this->isItemIdInGrid((int) $item->id);
     }
 
+    /**
+     * Check if an item is in the grid by its id.
+     *
+     * @param int $id The item's id
+     *
+     * @return bool true if found, false otherwise
+     */
     public function isItemIdInGrid(int $id): bool
     {
         return \array_key_exists($id.'_'.self::PROPERTY_CLASSES, unserialize($this->gridStart->grid_items));

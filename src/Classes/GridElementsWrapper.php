@@ -59,7 +59,7 @@ class GridElementsWrapper
         $currentGridId = $k;
 
         // For each opened grid, we will add the elements into it
-        $gop->fillGridChildren($objElement);
+        $gop->addElementAsAChildOfAllOpenGrids($objElement);
 
         // We won't need this grid anymore so we pop the global grid array
         if ('grid-stop' === $objElement->type) {
