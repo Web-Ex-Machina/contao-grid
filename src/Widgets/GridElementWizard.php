@@ -177,7 +177,7 @@ class GridElementWizard extends Widget
 
             // If we hit another grid-start, increment the number of "grid stops" authorized
             if ('grid-start' === $objItems->type) {
-                $this->gridOpenedManager->openGrid($objItems->id);
+                $this->gridOpenedManager->openGrid($objItems->current(), true);
 
                 $strGridStartId = $objItems->id;
                 ++$intGridStop;

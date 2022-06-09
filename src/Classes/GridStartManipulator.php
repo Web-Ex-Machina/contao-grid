@@ -356,6 +356,36 @@ class GridStartManipulator
     }
 
     /**
+     * Set cols value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function setGridItemCols(int $itemId, array $cols): self
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+        $values[$itemId.'_'.self::PROPERTY_COLS] = $cols;
+
+        $this->setGridItemsSettingsForItem($itemId, $values[$itemId.'_'.self::PROPERTY_COLS], $values[$itemId.'_'.self::PROPERTY_ROWS], $values[$itemId.'_'.self::PROPERTY_CLASSES]);
+
+        return $this;
+    }
+
+    /**
+     * Set rows value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function setGridItemRows(int $itemId, array $rows): self
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+        $values[$itemId.'_'.self::PROPERTY_ROWS] = $rows;
+
+        $this->setGridItemsSettingsForItem($itemId, $values[$itemId.'_'.self::PROPERTY_COLS], $values[$itemId.'_'.self::PROPERTY_ROWS], $values[$itemId.'_'.self::PROPERTY_CLASSES]);
+
+        return $this;
+    }
+
+    /**
      * Set cols value for all resolution for an item.
      *
      * @param int    $itemId The item's ID
@@ -536,6 +566,30 @@ class GridStartManipulator
     public function getGridItemClasses(int $itemId): ?string
     {
         return $this->getGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_CLASSES);
+    }
+
+    /**
+     * Get cols value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemCols(int $itemId): ?array
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+
+        return $values[$itemId.'_'.self::PROPERTY_COLS];
+    }
+
+    /**
+     * Get rows value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRows(int $itemId): ?array
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+
+        return $values[$itemId.'_'.self::PROPERTY_ROWS];
     }
 
     /**
