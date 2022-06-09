@@ -22,6 +22,21 @@ Installation
 
 Clone the extension from Packagist (Contao 4 - Manager Edition)
 
+Unit-testing with docker
+-------------------
+
+A `docker` folder is present in the project, it contains everything needed to run project's unit-tests.
+
+In your terminal, just type :
+
+```
+./docker/build.sh
+```
+
+The script will give you all options to run a working contao in a docker environment.
+
+All the informations regarding path, ports and everything else are located in the [docker/.env file][5]
+
 Documentation
 -------------
 
