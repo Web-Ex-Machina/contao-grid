@@ -115,7 +115,7 @@ class GridBuilder extends Controller
      *
      * @param ContentModel|DatabaseResult $objElement [description]
      */
-    public static function getItemClasses($objElement): array
+    public static function getItemClasses($objElement, ?bool $forForm = false): array
     {
         $arrClasses = [];
         if (\is_array($objElement->grid_cols)) {
@@ -160,10 +160,11 @@ class GridBuilder extends Controller
             } else {
                 $items = $objElement->grid_items;
             }
-
-            foreach ($items as $itemId => $classes) {
-                if (\is_array($classes)) {
-                    $items[$itemId] = trim(implode(' ', $classes));
+            if (!$forForm) {
+                foreach ($items as $itemId => $classes) {
+                    if (\is_array($classes)) {
+                        $items[$itemId] = trim(implode(' ', $classes));
+                    }
                 }
             }
 
@@ -320,56 +321,38 @@ class GridBuilder extends Controller
      */
     protected static function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses, bool $keepItemsClasses): array
     {
-        $gridItems = []; // reset grid items
-        // $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
+        $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
+        $gridStart->grid_items = serialize([]);
+        $gsm = GridStartManipulator::create($gridStart);
 
         foreach ($objItems as $index => $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
             }
-            if ('grid-start' === $objItem->type) {
-                $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, self::recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
-                if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    $gridItems = array_merge($gridItems, GridStartManipulator::getDefaultItemSettingsForItem((int) $objItem->id));
-                    // if($keepItemsClasses){
-                    // if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
-                    //     $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
-                    // }
-                    // if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
-                    //     $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
-                    // }
-                    if (\array_key_exists($objItem->id.'_classes', $itemsClasses)) {
-                        $gridItems[$objItem->id.'_classes'] = $itemsClasses[$objItem->id.'_classes'];
-                    }
-                    // }
-                    $gridStart->grid_items = serialize($gridItems);
-                    $gridStart->save();
-                }
-                $objItemsIdsToSkip[] = $objItem->id;
-            } elseif ('grid-stop' === $objItem->type) {
+            if ('grid-stop' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
 
                 return $objItemsIdsToSkip;
-            } else {
-                if (!\in_array($objItem->id, array_keys($gridItems), true)) {
-                    $gridItems = array_merge($gridItems, GridStartManipulator::getDefaultItemSettingsForItem((int) $objItem->id));
-                    // if($keepItemsClasses){
-                    // if (\array_key_exists($objItem->id.'_cols', $itemsClasses)) {
-                    //     $gridItems[$objItem->id.'_cols'] = $itemsClasses[$objItem->id.'_cols'];
-                    // }
-                    // if (\array_key_exists($objItem->id.'_rows', $itemsClasses)) {
-                    //     $gridItems[$objItem->id.'_rows'] = $itemsClasses[$objItem->id.'_rows'];
-                    // }
-                    if (\array_key_exists($objItem->id.'_classes', $itemsClasses)) {
-                        $gridItems[$objItem->id.'_classes'] = $itemsClasses[$objItem->id.'_classes'];
-                    }
-                    // }
-                    $gridStart->grid_items = serialize($gridItems);
-                    $gridStart->save();
-                }
-                $objItemsIdsToSkip[] = $objItem->id;
             }
+            if ('grid-start' === $objItem->type) {
+                $objItemsIdsToSkip[] = $objItem->id;
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, self::recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
+            }
+
+            if (!$gsm->isItemInGrid($objItem)) {
+                $gsm->setGridItemsSettingsForItem((int) $objItem->id,
+                        $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS] ?? [],
+                        $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
+                        $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
+                    );
+                if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
+                    $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES]);
+                }
+                $gridStart = $gsm->getGridStart();
+                $gridStart->save();
+                $gsm->setGridStart($gridStart);
+            }
+            $objItemsIdsToSkip[] = $objItem->id;
         }
 
         return $objItemsIdsToSkip;

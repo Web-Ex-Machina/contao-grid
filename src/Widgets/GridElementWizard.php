@@ -308,7 +308,7 @@ class GridElementWizard extends Widget
                 foreach ($cols as $c) {
                     if ($breakpoint === $c['key']) {
                         // $v = $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_cols'][$breakpoint];
-                        $v = $grid['item_classes']['items'][$objItemId.'_cols'][$breakpoint];
+                        $v = $grid['item_classes_form']['items'][$objItemId.'_cols'][$breakpoint];
                         for ($i = 1; $i <= $c['value']; ++$i) {
                             $optionValue = sprintf('cols-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                             $options .= sprintf(
@@ -332,9 +332,10 @@ class GridElementWizard extends Widget
                 );
 
                 $options = '<option value="">-</option>';
+
                 for ($i = 1; $i <= 12; ++$i) {
                     // $v = $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_classes'][$objItemId.'_rows'][$breakpoint];
-                    $v = $grid['item_classes']['items'][$objItemId.'_classes'][$objItemId.'_rows'][$breakpoint];
+                    $v = $grid['item_classes_form']['items'][$objItemId.'_rows'][$breakpoint];
                     $optionValue = sprintf('rows-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                     $options .= sprintf(
                         '<option value="%s"%s>%s</option>',
@@ -364,7 +365,7 @@ class GridElementWizard extends Widget
                 $objItemId,
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
                 // $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_classes'],
-                $grid['item_classes']['items'][$objItemId.'_classes'],
+                $grid['item_classes_form']['items'][$objItemId.'_classes'],
                 $this->User->isAdmin ? '' : 'hidden'
             );
 

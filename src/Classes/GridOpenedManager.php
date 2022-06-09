@@ -47,6 +47,7 @@ class GridOpenedManager
             'cols' => !\is_array($element->grid_cols) ? deserialize($element->grid_cols) : $element->grid_cols,
             'wrapper_classes' => GridBuilder::getWrapperClasses($element),
             'item_classes' => GridBuilder::getItemClasses($element),
+            'item_classes_form' => GridBuilder::getItemClasses($element, true),
             'level' => $this->level,
             'id' => (string) $element->id,
         ];

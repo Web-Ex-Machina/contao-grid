@@ -279,8 +279,8 @@ class GridStartManipulator
     public function setGridItemsSettingsForItem(int $itemId, array $cols, array $rows, string $classes): self
     {
         $previousValues = null !== $this->gridStart->grid_items ? unserialize($this->gridStart->grid_items) : [];
-        $previousValues[$itemId.'_'.self::PROPERTY_COLS] = $cols;
-        $previousValues[$itemId.'_'.self::PROPERTY_ROWS] = $rows;
+        $previousValues[$itemId.'_'.self::PROPERTY_COLS] = array_merge(self::DEFAULT_GRID_ITEM_COLS, $cols);
+        $previousValues[$itemId.'_'.self::PROPERTY_ROWS] = array_merge(self::DEFAULT_GRID_ITEM_ROWS, $rows);
         $previousValues[$itemId.'_'.self::PROPERTY_CLASSES] = $classes;
         $this->gridStart->grid_items = serialize($previousValues);
 
@@ -707,6 +707,16 @@ class GridStartManipulator
         if (!\in_array($resolution, self::RESOLUTIONS, true)) {
             throw new InvalidArgumentException('The resolution value must be one of the following : "'.implode('", "', self::RESOLUTIONS).'"');
         }
+    }
+
+    public function isItemInGrid(ContentModel $item): bool
+    {
+        return $this->isItemIdInGrid((int) $item->id);
+    }
+
+    public function isItemIdInGrid(int $id): bool
+    {
+        return \array_key_exists($id.'_'.self::PROPERTY_CLASSES, unserialize($this->gridStart->grid_items));
     }
 
     /**
