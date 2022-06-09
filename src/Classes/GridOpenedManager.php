@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
+use Contao\Database\Result as DbResult;
 use Exception;
+use WEM\GridBundle\Helper\GridBuilder;
 
 class GridOpenedManager
 {
@@ -36,30 +38,29 @@ class GridOpenedManager
         return self::$instance;
     }
 
-    public function openGrid(ContentModel $element, ?bool $isSubGrid = false): void
+    public function openGrid($element, ?bool $isSubGrid = false): void
     {
         $this->validateElement($element);
-        ++$this->level;
 
-        $GLOBALS['WEM']['GRID'][(string) $element->id] = [
+        $grid = [
             'preset' => $element->grid_preset,
             'cols' => !\is_array($element->grid_cols) ? deserialize($element->grid_cols) : $element->grid_cols,
             'wrapper_classes' => GridBuilder::getWrapperClasses($element),
             'item_classes' => GridBuilder::getItemClasses($element),
-            'level' => 0,
+            'level' => $this->level,
             'id' => (string) $element->id,
         ];
 
         if ('' !== $element->cssID[1]) {
-            $GLOBALS['WEM']['GRID'][$element->id]['wrapper_classes'][] = $element->cssID[1];
+            $grid['wrapper_classes'][] = $element->cssID[1];
         }
 
-        $GLOBALS['WEM']['GRID'][$element->id]['item_classes']['all'][] = 'be_item_grid helper';
+        $grid['item_classes']['all'][] = 'be_item_grid helper';
+        $grid['subgrid'] = $isSubGrid;
 
-        if ($isSubGrid) {
-            $GLOBALS['WEM']['GRID'][$element->id]['subgrid'] = true;
-            $GLOBALS['WEM']['GRID'][$element->id]['level'] = $this->level;
-        }
+        $GLOBALS['WEM']['GRID'][(string) $element->id] = $grid;
+
+        ++$this->level;
     }
 
     public function closeLastOpenedGrid(): void
@@ -68,9 +69,72 @@ class GridOpenedManager
         array_pop($GLOBALS['WEM']['GRID']);
     }
 
-    public function validateElement(ContentModel $element): void
+    public function getLastOpenedGrid(): array
     {
-        if ('grid-start' !== $element->type) {
+        $grid = end($GLOBALS['WEM']['GRID']);
+
+        reset($GLOBALS['WEM']['GRID']);
+
+        return $grid;
+    }
+
+    public function getLastOpenedGridId(): string
+    {
+        end($GLOBALS['WEM']['GRID']);
+
+        $key = key($GLOBALS['WEM']['GRID']);
+
+        reset($GLOBALS['WEM']['GRID']);
+
+        return (string) $key;
+    }
+
+    public function getGridById(string $id)
+    {
+        if (!\array_key_exists('WEM', $GLOBALS)
+            || !\array_key_exists('GRID', $GLOBALS['WEM'])
+            || !\array_key_exists($id, $GLOBALS['WEM']['GRID'])
+        ) {
+            throw new Exception('The grid doesn\'t exists.');
+        }
+
+        return $GLOBALS['WEM']['GRID'][$id];
+    }
+
+    public function fillGridChildren(ContentModel $element): ?string
+    {
+        $currentGridId = null;
+        foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
+            if ($k !== $element->id) {
+                if (!\array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
+                    $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
+                }
+                $GLOBALS['WEM']['GRID'][$k]['elements'][] = $element->id;
+                $currentGridId = $k;
+            }
+        }
+
+        return (string) $currentGridId;
+    }
+
+    public function getParentGrid(ContentModel $element): ?array
+    {
+        $arrGrid = null;
+        foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
+            if (\is_array($g['item_classes']['items']) && \array_key_exists($element->id.'_classes', $g['item_classes']['items'])) {
+                $arrGrid = $g;
+                break;
+            }
+        }
+
+        return $arrGrid;
+    }
+
+    public function validateElement($element): void
+    {
+        if (!(is_a($element, DbResult::class) || is_a($element, ContentModel::class))
+            || 'grid-start' !== $element->type
+        ) {
             throw new Exception('The element is not a "grid-start"');
         }
     }

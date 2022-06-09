@@ -53,37 +53,45 @@ class GridElementsWrapper
         }
 
         // Get the last open grid
-        $arrGrid = end($GLOBALS['WEM']['GRID']);
-        $k = key($GLOBALS['WEM']['GRID']);
+        // $arrGrid = end($GLOBALS['WEM']['GRID']);
+        // $k = key($GLOBALS['WEM']['GRID']);
+        // $currentGridId = $k;
+        // reset($GLOBALS['WEM']['GRID']);
+
+        $gop = GridOpenedManager::getInstance();
+        $arrGrid = $gop->getLastOpenedGrid();
+        $k = $gop->getLastOpenedGridId();
         $currentGridId = $k;
-        reset($GLOBALS['WEM']['GRID']);
 
         // For each opened grid, we will add the elements into it
-        foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-            if ($k !== $objElement->id) {
-                if (!\array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
-                    $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
-                }
-                $GLOBALS['WEM']['GRID'][$k]['elements'][] = $objElement->id;
-                $currentGridId = $k;
-            }
-        }
+        // foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
+        //     if ($k !== $objElement->id) {
+        //         if (!\array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
+        //             $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
+        //         }
+        //         $GLOBALS['WEM']['GRID'][$k]['elements'][] = $objElement->id;
+        //         $currentGridId = $k;
+        //     }
+        // }
+        $gop->fillGridChildren($objElement);
 
         // We won't need this grid anymore so we pop the global grid array
         if ('grid-stop' === $objElement->type) {
-            array_pop($GLOBALS['WEM']['GRID']);
+            // array_pop($GLOBALS['WEM']['GRID']);
+            $gop->closeLastOpenedGrid();
         }
 
         // If we used grids elements, we had to adjust the behaviour
         if ('grid-start' === $objElement->type && true === $arrGrid['subgrid']) {
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
-            foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-                if (\is_array($g['item_classes']['items']) && \array_key_exists($objElement->id.'_classes', $g['item_classes']['items'])) {
-                    $arrGrid = $g;
-                    break;
-                }
-            }
+            // foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
+            //     if (\is_array($g['item_classes']['items']) && \array_key_exists($objElement->id.'_classes', $g['item_classes']['items'])) {
+            //         $arrGrid = $g;
+            //         break;
+            //     }
+            // }
+            $arrGrid = $gop->getParentGrid($objElement);
 
             return sprintf(
                 '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
