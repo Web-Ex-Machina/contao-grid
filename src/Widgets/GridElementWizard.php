@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
+use Contao\BackendTemplate;
+use Contao\ContentModel;
+use Contao\Input;
 use Contao\Widget;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Helper\GridBuilder;
@@ -106,7 +109,7 @@ class GridElementWizard extends Widget
         // Since it's only tl_content for the moment, it's a bit overkill, but it's to ease the future integrations.
         switch ($this->strTable) {
             case 'tl_content':
-                $objItems = \ContentModel::findPublishedByPidAndTable($this->objDca->activeRecord->pid, $this->objDca->activeRecord->ptable);
+                $objItems = ContentModel::findPublishedByPidAndTable($this->objDca->activeRecord->pid, $this->objDca->activeRecord->ptable);
                 break;
 
             default:
@@ -121,23 +124,7 @@ class GridElementWizard extends Widget
         $blnGridStart = false;
         $blnGridStop = false;
         $intGridStop = 0;
-        // $currentGridId[] = $this->id;
         $currentGridId[] = $this->activeRecord->id;
-
-        // $GLOBALS['WEM']['GRID'][(string) $this->id] = [
-        //     'preset' => $this->activeRecord->grid_preset,
-        //     'cols' => !\is_array($this->activeRecord->grid_cols) ? deserialize($this->activeRecord->grid_cols) : $this->activeRecord->grid_cols,
-        //     'wrapper_classes' => GridBuilder::getWrapperClasses($this->activeRecord),
-        //     'item_classes' => GridBuilder::getItemClasses($this->activeRecord),
-        //     'level' => 0,
-        //     'id' => (string) $this->id,
-        // ];
-
-        // if ('' !== $this->activeRecord->cssID[1]) {
-        //     $GLOBALS['WEM']['GRID'][$this->id]['wrapper_classes'][] = $this->cssID[1];
-        // }
-
-        // $GLOBALS['WEM']['GRID'][$this->id]['item_classes']['all'][] = 'be_item_grid helper';
 
         $this->gridOpenedManager->openGrid($this->activeRecord);
 
@@ -170,7 +157,7 @@ class GridElementWizard extends Widget
         if ('' !== $strHelper) {
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
         }
-        if (!\Input::get('grid_preview')) {
+        if (!Input::get('grid_preview')) {
             $strGrid .= GridBuilder::fakeFirstGridElementMarkup((string) $this->activeRecord->id);
         }
 
@@ -190,17 +177,6 @@ class GridElementWizard extends Widget
 
             // If we hit another grid-start, increment the number of "grid stops" authorized
             if ('grid-start' === $objItems->type) {
-                // $GLOBALS['WEM']['GRID'][(string) $objItems->id] = [
-                //     'preset' => $objItems->grid_preset,
-                //     'cols' => !\is_array($objItems->grid_cols) ? deserialize($objItems->grid_cols) : $objItems->grid_cols,
-                //     'wrapper_classes' => GridBuilder::getWrapperClasses($objItems),
-                //     'item_classes' => GridBuilder::getItemClasses($objItems),
-                //     'id' => (string) $objItems->id,
-                // ];
-                // $GLOBALS['WEM']['GRID'][$objItems->id]['item_classes']['all'][] = 'be_item_grid helper';
-                // $GLOBALS['WEM']['GRID'][$objItems->id]['subgrid'] = true;
-                // $GLOBALS['WEM']['GRID'][$objItems->id]['level'] = $intGridStop;
-
                 $this->gridOpenedManager->openGrid($objItems->id);
 
                 $strGridStartId = $objItems->id;
@@ -210,14 +186,12 @@ class GridElementWizard extends Widget
             // And break the loop if we hit a grid-stop element
             if ('grid-stop' === $objItems->type) {
                 --$intGridStop;
-                // array_pop($currentGridId);
                 if (0 === $intGridStop) {
                     break;
                 }
             }
 
             $objItems->isForGridElementWizard = true;
-            // dump($objItems->type.' ('.$objItems->id.') => '.end($currentGridId).' with '.$strGridStartId);
             if ('grid-start' === $objItems->type) {
                 $strElement = $this->getContentElement($objItems->current());
             } else {
@@ -244,15 +218,15 @@ class GridElementWizard extends Widget
         // Add CSS & JS to the Wizard
         $this->addAssets();
 
-        if (!\Input::get('grid_preview')) {
+        if (!Input::get('grid_preview')) {
             $strGrid .= GridBuilder::fakeLastGridElementMarkup();
             $strGrid .= GridBuilder::fakeNewGridElementMarkup();
         }
         $strGrid .= '</div>';
 
         // If we want a preview modal, catch & break
-        if (\Input::get('grid_preview')) {
-            $objTemplate = new \BackendTemplate('be_grid_preview');
+        if (Input::get('grid_preview')) {
+            $objTemplate = new BackendTemplate('be_grid_preview');
             $objTemplate->grid = $strGrid;
             $objTemplate->css = $GLOBALS['TL_CSS'];
             $objResponse = new \Haste\Http\Response\HtmlResponse($objTemplate->parse());
@@ -296,18 +270,16 @@ class GridElementWizard extends Widget
         $pos = strrpos($strElement, $search);
         $grid = $this->gridOpenedManager->getGridById($gridId);
 
-        if (false !== $pos && !\Input::get('grid_preview')) {
+        if (false !== $pos && !Input::get('grid_preview')) {
             $breakpoints = ['all', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl'];
             $selectsCols = [];
             $selectsRows = [];
-            // $cols = $GLOBALS['WEM']['GRID'][$gridId]['cols'];
             $cols = $grid['cols'];
             foreach ($breakpoints as $breakpoint) {
                 // Build a select options html with the number of possibilities
                 $options = '<option value="">-</option>';
                 foreach ($cols as $c) {
                     if ($breakpoint === $c['key']) {
-                        // $v = $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_cols'][$breakpoint];
                         $v = $grid['item_classes_form']['items'][$objItemId.'_cols'][$breakpoint];
                         for ($i = 1; $i <= $c['value']; ++$i) {
                             $optionValue = sprintf('cols-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
@@ -334,7 +306,6 @@ class GridElementWizard extends Widget
                 $options = '<option value="">-</option>';
 
                 for ($i = 1; $i <= 12; ++$i) {
-                    // $v = $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_classes'][$objItemId.'_rows'][$breakpoint];
                     $v = $grid['item_classes_form']['items'][$objItemId.'_rows'][$breakpoint];
                     $optionValue = sprintf('rows-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                     $options .= sprintf(
@@ -364,7 +335,6 @@ class GridElementWizard extends Widget
                 $this->strId,
                 $objItemId,
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
-                // $GLOBALS['WEM']['GRID'][$gridId]['item_classes']['items'][$objItemId.'_classes'],
                 $grid['item_classes_form']['items'][$objItemId.'_classes'],
                 $this->User->isAdmin ? '' : 'hidden'
             );
