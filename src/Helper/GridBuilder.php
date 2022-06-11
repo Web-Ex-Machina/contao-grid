@@ -186,7 +186,7 @@ class GridBuilder extends Controller
     {
         $gop = GridOpenedManager::getInstance();
 
-        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', str_replace('cols-', 'cols-span-', implode(' ', $gop->getGridById($gridId)['wrapper_classes'])), $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
+        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', str_replace('cols-', 'cols-span-', implode(' ', $gop->getGridById($gridId)->getWrapperClasses())), $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
     }
 
     /**

@@ -48,22 +48,39 @@ class GridOpenedManager
     {
         $this->validateElementAsAGridStart($element);
 
-        $grid = [
-            'id' => (string) $element->id,
-            'preset' => $element->grid_preset,
-            'cols' => !\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols,
-            'wrapper_classes' => GridBuilder::getWrapperClasses($element),
-            'item_classes' => GridBuilder::getItemClasses($element),
-            'item_classes_form' => GridBuilder::getItemClasses($element, true),
-            'level' => $this->level,
-        ];
+        // $grid = [
+        //     'id' => (string) $element->id,
+        //     'preset' => $element->grid_preset,
+        //     'cols' => !\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols,
+        //     'wrapper_classes' => GridBuilder::getWrapperClasses($element),
+        //     'item_classes' => GridBuilder::getItemClasses($element),
+        //     'item_classes_form' => GridBuilder::getItemClasses($element, true),
+        //     'level' => $this->level,
+        //     'elements' => [],
+        // ];
 
-        if ('' !== $element->cssID[1]) {
-            $grid['wrapper_classes'][] = $element->cssID[1];
+        // if ('' !== $element->cssID[1]) {
+        //     $grid['wrapper_classes'][] = $element->cssID[1];
+        // }
+
+        // $grid['item_classes']['all'][] = 'be_item_grid helper'; // only for BE
+        // $grid['subgrid'] = 1 <= $this->level;
+
+        $grid = new GridOpened();
+        $grid
+            ->setId((string) $element->id)
+            ->setPreset($element->grid_preset)
+            ->setCols(!\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols)
+            ->setWrapperClasses(GridBuilder::getWrapperClasses($element))
+            ->setItemClasses(GridBuilder::getItemClasses($element))
+            ->setItemClassesForm(GridBuilder::getItemClasses($element, true))
+            ->setLevel($this->level)
+            ->setElements([])
+        ;
+        $grid->addItemClassesForAllResolution('be_item_grid helper');
+        if (!empty($element->cssID[1])) {
+            $grid->addWrapperClasses($element->cssID[1]);
         }
-
-        $grid['item_classes']['all'][] = 'be_item_grid helper'; // only for BE
-        $grid['subgrid'] = 1 <= $this->level;
 
         $GLOBALS['WEM']['GRID'][(string) $element->id] = $grid;
 
@@ -82,9 +99,9 @@ class GridOpenedManager
     /**
      * Returns the last opened grid.
      *
-     * @return array|null the last openend grid if it exists, null otherwise
+     * @return GridOpened|null the last openend grid if it exists, null otherwise
      */
-    public function getLastOpenedGrid(): ?array
+    public function getLastOpenedGrid(): ?GridOpened
     {
         if (!\array_key_exists('WEM', $GLOBALS)
             || !\array_key_exists('GRID', $GLOBALS['WEM'])
@@ -125,9 +142,9 @@ class GridOpenedManager
     /**
      * Returns the previous to last opened grid.
      *
-     * @return array|null the previous to last openend grid if it exists, null otherwise
+     * @return GridOpened|null the previous to last openend grid if it exists, null otherwise
      */
-    public function getPreviousLastOpenedGrid(): ?array
+    public function getPreviousLastOpenedGrid(): ?GridOpened
     {
         if (!\array_key_exists('WEM', $GLOBALS)
             || !\array_key_exists('GRID', $GLOBALS['WEM'])
@@ -177,9 +194,9 @@ class GridOpenedManager
      *
      * @throws Exception if no grid is found
      *
-     * @return array the grid
+     * @return GridOpened the grid
      */
-    public function getGridById(string $id): array
+    public function getGridById(string $id): GridOpened
     {
         if (!\array_key_exists('WEM', $GLOBALS)
             || !\array_key_exists('GRID', $GLOBALS['WEM'])
@@ -203,10 +220,12 @@ class GridOpenedManager
         $currentGridId = null;
         foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
             if ($k !== $element->id) {
-                if (!\array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
-                    $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
-                }
-                $GLOBALS['WEM']['GRID'][$k]['elements'][] = $element->id;
+                // if (!\array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
+                // $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
+                // }
+                // $GLOBALS['WEM']['GRID'][$k]['elements'][] = $element->id;
+                $g->addElement((string) $element->id);
+                $GLOBALS['WEM']['GRID'][$k] = $g;
                 $currentGridId = $k;
             }
         }
@@ -219,13 +238,13 @@ class GridOpenedManager
      *
      * @param ContentModel $element [description]
      *
-     * @return array|null The grid if found, null otherwise
+     * @return GridOpened|null The grid if found, null otherwise
      */
-    public function getParentGrid(ContentModel $element): ?array
+    public function getParentGrid(ContentModel $element): ?GridOpened
     {
         $arrGrid = null;
         foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-            if (\is_array($g['item_classes']['items']) && \array_key_exists($element->id.'_classes', $g['item_classes']['items'])) {
+            if (\is_array($g->getItemClasses()['items']) && \array_key_exists($element->id.'_classes', $g->getItemClasses()['items'])) {
                 $arrGrid = $g;
                 break;
             }

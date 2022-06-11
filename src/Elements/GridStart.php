@@ -91,9 +91,9 @@ class GridStart extends \ContentElement
 
         // Add the classes to the Model so the main class can use it correct
         if (\is_array($this->objModel->classes)) {
-            $this->objModel->classes = array_merge($arrGrid['wrapper_classes'], $this->objModel->classes);
+            $this->objModel->classes = array_merge($arrGrid->getWrapperClasses(), $this->objModel->classes);
         } else {
-            $this->objModel->classes = $arrGrid['wrapper_classes'];
+            $this->objModel->classes = $arrGrid->getWrapperClasses();
         }
 
         // Send the grid_id to template
