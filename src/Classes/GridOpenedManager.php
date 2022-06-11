@@ -17,6 +17,7 @@ namespace WEM\GridBundle\Classes;
 use Contao\ContentModel;
 use Contao\Database\Result as DbResult;
 use Exception;
+use WEM\GridBundle\Elements\GridStart as GridStartElement;
 use WEM\GridBundle\Helper\GridBuilder;
 
 class GridOpenedManager
@@ -41,29 +42,28 @@ class GridOpenedManager
     /**
      * Open a new grid.
      *
-     * @param ContentModel|DbResult $element   The grid-start element
-     * @param bool|bool             $isSubGrid Is the grid a subgrid ?
+     * @param ContentModel|DbResult|GridStartElement $element The grid-start element
      */
-    public function openGrid($element, ?bool $isSubGrid = false): void
+    public function openGrid($element): void
     {
         $this->validateElementAsAGridStart($element);
 
         $grid = [
+            'id' => (string) $element->id,
             'preset' => $element->grid_preset,
-            'cols' => !\is_array($element->grid_cols) ? deserialize($element->grid_cols) : $element->grid_cols,
+            'cols' => !\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols,
             'wrapper_classes' => GridBuilder::getWrapperClasses($element),
             'item_classes' => GridBuilder::getItemClasses($element),
             'item_classes_form' => GridBuilder::getItemClasses($element, true),
             'level' => $this->level,
-            'id' => (string) $element->id,
         ];
 
         if ('' !== $element->cssID[1]) {
             $grid['wrapper_classes'][] = $element->cssID[1];
         }
 
-        $grid['item_classes']['all'][] = 'be_item_grid helper';
-        $grid['subgrid'] = $isSubGrid;
+        $grid['item_classes']['all'][] = 'be_item_grid helper'; // only for BE
+        $grid['subgrid'] = 1 <= $this->level;
 
         $GLOBALS['WEM']['GRID'][(string) $element->id] = $grid;
 
@@ -243,10 +243,10 @@ class GridOpenedManager
      */
     public function validateElementAsAGridStart($element): void
     {
-        if (!(is_a($element, DbResult::class) || is_a($element, ContentModel::class))
+        if (!(is_a($element, DbResult::class) || is_a($element, ContentModel::class) || is_a($element, GridStartElement::class))
             || 'grid-start' !== $element->type
         ) {
-            throw new Exception('The element is not a "grid-start"');
+            throw new Exception('The element "'.\get_class($element).'" is not a "grid-start"');
         }
     }
 }

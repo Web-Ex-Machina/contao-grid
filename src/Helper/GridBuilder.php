@@ -18,6 +18,7 @@ use Contao\ContentModel;
 use Contao\Controller;
 use Contao\Database\Result as DatabaseResult;
 use Contao\DataContainer;
+use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Classes\GridStartManipulator;
 
 /**
@@ -183,7 +184,9 @@ class GridBuilder extends Controller
      */
     public static function fakeFirstGridElementMarkup(string $gridId): string
     {
-        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', str_replace('cols-', 'cols-span-', implode(' ', $GLOBALS['WEM']['GRID'][$gridId]['wrapper_classes'])), $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
+        $gop = GridOpenedManager::getInstance();
+
+        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', str_replace('cols-', 'cols-span-', implode(' ', $gop->getGridById($gridId)['wrapper_classes'])), $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
     }
 
     /**

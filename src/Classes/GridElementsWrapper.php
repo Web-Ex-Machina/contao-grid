@@ -47,12 +47,12 @@ class GridElementsWrapper
      */
     public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
+        $gop = GridOpenedManager::getInstance();
         // Skip elements we never want to wrap or if we are not in a grid
-        if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $GLOBALS['WEM']['GRID'] || empty($GLOBALS['WEM']['GRID'])) {
+        if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
             return $strBuffer;
         }
 
-        $gop = GridOpenedManager::getInstance();
         // Get the last open grid
         $arrGrid = $gop->getLastOpenedGrid();
         $k = $gop->getLastOpenedGridId();
