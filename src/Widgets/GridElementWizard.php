@@ -263,14 +263,12 @@ class GridElementWizard extends Widget
             $breakpoints = ['all', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl'];
             $selectsCols = [];
             $selectsRows = [];
-            // $cols = $grid['cols'];
             $cols = $grid->getCols();
             foreach ($breakpoints as $breakpoint) {
                 // Build a select options html with the number of possibilities
                 $options = '<option value="">-</option>';
                 foreach ($cols as $c) {
                     if ($breakpoint === $c['key']) {
-                        // $v = $grid['item_classes_form']['items'][$objItemId.'_cols'][$breakpoint];
                         $v = $grid->getItemClassesFormColsForItemIdAndResolution($objItemId, $breakpoint);
                         for ($i = 1; $i <= $c['value']; ++$i) {
                             $optionValue = sprintf('cols-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
@@ -297,7 +295,6 @@ class GridElementWizard extends Widget
                 $options = '<option value="">-</option>';
 
                 for ($i = 1; $i <= 12; ++$i) {
-                    // $v = $grid['item_classes_form']['items'][$objItemId.'_rows'][$breakpoint];
                     $v = $grid->getItemClassesFormRowsForItemIdAndResolution($objItemId, $breakpoint);
                     $optionValue = sprintf('rows-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                     $options .= sprintf(
@@ -327,7 +324,6 @@ class GridElementWizard extends Widget
                 $this->strId,
                 $objItemId,
                 $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['additionalClassesLabel'],
-                // $grid['item_classes_form']['items'][$objItemId.'_classes'],
                 $grid->getItemClassesFormClassesForItemId($objItemId),
                 $this->User->isAdmin ? '' : 'hidden'
             );

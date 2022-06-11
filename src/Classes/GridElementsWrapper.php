@@ -55,8 +55,7 @@ class GridElementsWrapper
 
         // Get the last open grid
         $openGrid = $gop->getLastOpenedGrid();
-        $k = $gop->getLastOpenedGridId();
-        $currentGridId = $k;
+        $currentGridId = $gop->getLastOpenedGridId();
 
         // For each opened grid, we will add the elements into it
         $gop->addElementAsAChildOfAllOpenGrids($objElement);

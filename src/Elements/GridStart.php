@@ -76,7 +76,6 @@ class GridStart extends \ContentElement
         $objNextElement = \Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute([$this->pid, $this->ptable, $this->sorting]);
 
         // Update : I need it opened otherwise empty nested grid is buggy in BE
-        // if (1 > $objNextElement->numRows || 'grid-stop' === $objNextElement->type) {
         if (1 > $objNextElement->numRows) {
             $this->Template->doNotPrint = true;
         }

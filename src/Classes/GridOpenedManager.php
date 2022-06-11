@@ -48,24 +48,6 @@ class GridOpenedManager
     {
         $this->validateElementAsAGridStart($element);
 
-        // $grid = [
-        //     'id' => (string) $element->id,
-        //     'preset' => $element->grid_preset,
-        //     'cols' => !\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols,
-        //     'wrapper_classes' => GridBuilder::getWrapperClasses($element),
-        //     'item_classes' => GridBuilder::getItemClasses($element),
-        //     'item_classes_form' => GridBuilder::getItemClasses($element, true),
-        //     'level' => $this->level,
-        //     'elements' => [],
-        // ];
-
-        // if ('' !== $element->cssID[1]) {
-        //     $grid['wrapper_classes'][] = $element->cssID[1];
-        // }
-
-        // $grid['item_classes']['all'][] = 'be_item_grid helper'; // only for BE
-        // $grid['subgrid'] = 1 <= $this->level;
-
         $grid = new GridOpened();
         $grid
             ->setId((string) $element->id)
@@ -220,10 +202,6 @@ class GridOpenedManager
         $currentGridId = null;
         foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
             if ($k !== $element->id) {
-                // if (!\array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
-                // $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
-                // }
-                // $GLOBALS['WEM']['GRID'][$k]['elements'][] = $element->id;
                 $g->addElement((string) $element->id);
                 $GLOBALS['WEM']['GRID'][$k] = $g;
                 $currentGridId = $k;
