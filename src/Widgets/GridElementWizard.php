@@ -120,11 +120,7 @@ class GridElementWizard extends Widget
             return '';
         }
 
-        $arrItems = [];
         $blnGridStart = false;
-        $blnGridStop = false;
-        $intGridStop = 0;
-        $currentGridId[] = $this->activeRecord->id;
 
         $this->gridOpenedManager->openGrid($this->activeRecord);
 
@@ -166,7 +162,6 @@ class GridElementWizard extends Widget
             // If we start a grid, start fetching items for the wizard
             if ($objItems->id === $this->activeRecord->id) {
                 $blnGridStart = true;
-                ++$intGridStop;
                 continue;
             }
 
@@ -175,18 +170,14 @@ class GridElementWizard extends Widget
                 continue;
             }
 
-            // If we hit another grid-start, increment the number of "grid stops" authorized
+            // If we hit another grid-start, open a new grid
             if ('grid-start' === $objItems->type) {
                 $this->gridOpenedManager->openGrid($objItems->current(), true);
-
-                $strGridStartId = $objItems->id;
-                ++$intGridStop;
             }
 
-            // And break the loop if we hit a grid-stop element
+            // And break the loop if we hit the grid-stop element corresponding to the very first grid
             if ('grid-stop' === $objItems->type) {
-                --$intGridStop;
-                if (0 === $intGridStop) {
+                if ($this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
                     break;
                 }
             }
@@ -194,24 +185,20 @@ class GridElementWizard extends Widget
             $objItems->isForGridElementWizard = true;
             if ('grid-start' === $objItems->type) {
                 $strElement = $this->getContentElement($objItems->current());
+            } elseif ('grid-stop' === $objItems->type) {
+                $strElement = $this->BEGridItemSettings(
+                    $this->gridOpenedManager->getPreviousLastOpenedGridId(),
+                    $this->gridOpenedManager->getLastOpenedGridId(),
+                    $this->getContentElement($objItems->current())
+                );
             } else {
-                $tempGridId = end($currentGridId);
-                if ('grid-stop' === $objItems->type) {
-                    // we're on grid stop, so its settings are in the parent grid, not the current one
-                    $currentGridIdCopy = $currentGridId;
-                    array_pop($currentGridIdCopy);
-                    $tempGridId = end($currentGridIdCopy);
-                }
-                $strElement = $this->BEGridItemSettings($tempGridId, ('grid-stop' === $objItems->type) ? end($currentGridId) : $objItems->id, $this->getContentElement($objItems->current()));
+                $strElement = $this->BEGridItemSettings(
+                    $this->gridOpenedManager->getLastOpenedGridId(),
+                    $objItems->id,
+                    $this->getContentElement($objItems->current())
+                );
             }
 
-            if ('grid-start' === $objItems->type) {
-                $currentGridId[] = $objItems->id;
-            }
-
-            if ('grid-stop' === $objItems->type) {
-                array_pop($currentGridId);
-            }
             $strGrid .= $strElement;
         }
 

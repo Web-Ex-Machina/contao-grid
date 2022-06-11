@@ -82,10 +82,17 @@ class GridOpenedManager
     /**
      * Returns the last opened grid.
      *
-     * @return array the last openend grid
+     * @return array|null the last openend grid if it exists, null otherwise
      */
-    public function getLastOpenedGrid(): array
+    public function getLastOpenedGrid(): ?array
     {
+        if (!\array_key_exists('WEM', $GLOBALS)
+            || !\array_key_exists('GRID', $GLOBALS['WEM'])
+            || 0 === \count($GLOBALS['WEM']['GRID'])
+        ) {
+            return null;
+        }
+
         $grid = end($GLOBALS['WEM']['GRID']);
 
         reset($GLOBALS['WEM']['GRID']);
@@ -96,15 +103,69 @@ class GridOpenedManager
     /**
      * Returns the last opened grid id.
      *
-     * @return string the last openend grid id
+     * @return string|null the last openend grid id if it exists, null otherwise
      */
-    public function getLastOpenedGridId(): string
+    public function getLastOpenedGridId(): ?string
     {
+        if (!\array_key_exists('WEM', $GLOBALS)
+            || !\array_key_exists('GRID', $GLOBALS['WEM'])
+            || 0 === \count($GLOBALS['WEM']['GRID'])
+        ) {
+            return null;
+        }
         end($GLOBALS['WEM']['GRID']);
 
         $key = key($GLOBALS['WEM']['GRID']);
 
         reset($GLOBALS['WEM']['GRID']);
+
+        return (string) $key;
+    }
+
+    /**
+     * Returns the previous to last opened grid.
+     *
+     * @return array|null the previous to last openend grid if it exists, null otherwise
+     */
+    public function getPreviousLastOpenedGrid(): ?array
+    {
+        if (!\array_key_exists('WEM', $GLOBALS)
+            || !\array_key_exists('GRID', $GLOBALS['WEM'])
+            || 1 >= \count($GLOBALS['WEM']['GRID'])
+        ) {
+            return null;
+        }
+        $gridsCopy = $GLOBALS['WEM']['GRID'];
+        array_pop($gridsCopy);
+
+        $grid = end($gridsCopy);
+
+        unset($gridsCopy);
+
+        return $grid;
+    }
+
+    /**
+     * Returns the previous to last opened grid id.
+     *
+     * @return string|null the previous to last openend grid id if it exists, null otherwise
+     */
+    public function getPreviousLastOpenedGridId(): ?string
+    {
+        if (!\array_key_exists('WEM', $GLOBALS)
+            || !\array_key_exists('GRID', $GLOBALS['WEM'])
+            || 1 >= \count($GLOBALS['WEM']['GRID'])
+        ) {
+            return null;
+        }
+        $gridsCopy = $GLOBALS['WEM']['GRID'];
+        array_pop($gridsCopy);
+
+        end($gridsCopy);
+
+        $key = key($gridsCopy);
+
+        unset($gridsCopy);
 
         return (string) $key;
     }
