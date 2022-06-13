@@ -58,7 +58,6 @@ class GridOpenedManager
             ->setItemClasses(GridBuilder::getItemClasses($element))
             ->setItemClassesForm(GridBuilder::getItemClasses($element, true))
             ->setLevel($this->level)
-            ->setElements([])
         ;
         $grid->addItemClassesForAllResolution('be_item_grid helper');
         if (!empty($element->cssID[1])) {
@@ -194,27 +193,6 @@ class GridOpenedManager
     }
 
     /**
-     * Add the element as a child of all open grids.
-     *
-     * @param ContentModel $element The element
-     *
-     * @return ?string The latest grid's ID
-     */
-    public function addElementAsAChildOfAllOpenGrids(ContentModel $element): ?string
-    {
-        $currentGridId = null;
-        foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-            if ($k !== $element->id) {
-                $g->addElement((string) $element->id);
-                $GLOBALS['WEM']['GRID'][$k] = $g;
-                $currentGridId = $k;
-            }
-        }
-
-        return (string) $currentGridId;
-    }
-
-    /**
      * Return the parent grid of an element.
      *
      * @param ContentModel $element [description]
@@ -225,7 +203,7 @@ class GridOpenedManager
     {
         $arrGrid = null;
         foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-            if (\is_array($g->getItemClasses()['items']) && \array_key_exists($element->id.'_classes', $g->getItemClasses()['items'])) {
+            if ($g->hasChildByItemId($element->id)) {
                 $arrGrid = $g;
                 break;
             }

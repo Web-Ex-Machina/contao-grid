@@ -30,8 +30,6 @@ class GridOpened
     protected $item_classes_form;
     /** @var int */
     protected $level;
-    /** @var array */
-    protected $elements;
 
     public function __construct()
     {
@@ -84,16 +82,14 @@ class GridOpened
         return $this->item_classes_form['items'][$itemId.'_classes'];
     }
 
+    public function hasChildByItemId(string $itemId): bool
+    {
+        return \array_key_exists($itemId.'_classes', $this->item_classes['items']);
+    }
+
     public function addWrapperClasses(string $classes): self
     {
         $this->wrapper_classes[] = $classes;
-
-        return $this;
-    }
-
-    public function addElement(string $elementId)
-    {
-        $this->elements[] = $elementId;
 
         return $this;
     }
@@ -178,18 +174,6 @@ class GridOpened
     public function setLevel(int $level): self
     {
         $this->level = $level;
-
-        return $this;
-    }
-
-    public function getElements(): ?array
-    {
-        return $this->elements;
-    }
-
-    public function setElements(array $elements): self
-    {
-        $this->elements = $elements;
 
         return $this;
     }

@@ -236,6 +236,37 @@ class GridOpenedManagerTest extends ContaoTestCase
         }
     }
 
+    public function testGetParentGrid(): void
+    {
+        $gridStartFoo = new \Contao\ContentModel();
+        $gridStartFoo->id = 'foo';
+        $gridStartFoo->type = 'grid-start';
+        $gridStartFoo->grid_preset = 'bs4';
+        $gridStartFoo->grid_cols = serialize([]);
+        $gridStartFoo->grid_items = serialize([
+            'barElement_classes' => [],
+        ]);
+
+        $gridStartBar = new \Contao\ContentModel();
+        $gridStartBar->id = 'bar';
+        $gridStartBar->type = 'grid-start';
+        $gridStartBar->grid_preset = 'bs4';
+        $gridStartBar->grid_cols = serialize([]);
+
+        $element = new \Contao\ContentModel();
+        $element->id = 'barElement';
+
+        $this->sut->openGrid($gridStartFoo);
+        $this->sut->openGrid($gridStartBar);
+
+        $this->assertSame('foo', $this->sut->getParentGrid($element)->getId());
+
+        $this->sut->closeLastOpenedGrid();
+        $this->sut->closeLastOpenedGrid();
+
+        $this->assertNull($this->sut->getParentGrid($element));
+    }
+
     public function dpForTestOpenGridWillFail(): array
     {
         return [
