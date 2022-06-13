@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
+use Contao\System;
 use InvalidArgumentException;
 
 class GridStartManipulator
@@ -72,6 +73,8 @@ class GridStartManipulator
     public const DEFAULT_GRID_CLASSES = '';
     public const DEFAULT_GRID_ITEMS = [self::PROPERTY_COLS => self::DEFAULT_GRID_ITEM_COLS, self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEM_ROWS, self::PROPERTY_CLASSES => self::DEFAULT_GRID_CLASSES];
     private $gridStart;
+    /** @var GridElementsCalculator */
+    private $gridElementCalculator;
 
     public function getGridStart(): ContentModel
     {
@@ -97,7 +100,10 @@ class GridStartManipulator
      */
     public static function create(ContentModel $gridStart)
     {
-        return (new self())->setGridStart($gridStart);
+        return (new self())
+            ->setGridStart($gridStart)
+            ->setGridElementsCalculator(System::getContainer()->get('wem.classes.grid_elements_calculator'))
+        ;
     }
 
     /**
@@ -105,7 +111,7 @@ class GridStartManipulator
      */
     public function recalculateElementsForAllGridSharingTheSamePidAndPtable(): self
     {
-        \WEM\GridBundle\Helper\GridBuilder::recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
+        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
         $this->gridStart->refresh();
 
         return $this;
@@ -792,6 +798,24 @@ class GridStartManipulator
     public function isItemIdInGrid(int $id): bool
     {
         return \array_key_exists($id.'_'.self::PROPERTY_CLASSES, unserialize($this->gridStart->grid_items));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGridElementsCalculator(): ?GridElementsCalculator
+    {
+        return $this->gridElementCalculator;
+    }
+
+    /**
+     * @param mixed $gridElementCalculator
+     */
+    public function setGridElementsCalculator(GridElementsCalculator $gridElementCalculator): self
+    {
+        $this->gridElementCalculator = $gridElementCalculator;
+
+        return $this;
     }
 
     /**

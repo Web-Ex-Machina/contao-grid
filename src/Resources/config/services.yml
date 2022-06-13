@@ -4,3 +4,17 @@ services:
     arguments:
       $translator: '@contao.translation.translator'
     public: true
+
+  wem.classes.grid_start_manipulator:
+    class: WEM\GridBundle\Classes\GridStartManipulator
+    public: true
+
+  wem.classes.grid_elements_calculator:
+    class: WEM\GridBundle\Classes\GridElementsCalculator
+    public: true
+
+  wem.helper.tl_content_callback:
+    class: WEM\GridBundle\Helper\tlContentCallback
+    arguments:
+      $gridElementsCalculator: '@wem.classes.grid_elements_calculator'
+    public: true

@@ -15,16 +15,13 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Helper;
 
 use Contao\ContentModel;
-use Contao\Controller;
 use Contao\Database\Result as DatabaseResult;
-use Contao\DataContainer;
 use WEM\GridBundle\Classes\GridOpenedManager;
-use WEM\GridBundle\Classes\GridStartManipulator;
 
 /**
  * Function to centralize generic code to.
  */
-class GridBuilder extends Controller
+class GridBuilder
 {
     /**
      * Generate wrapper classes, depending of the element.
@@ -203,167 +200,5 @@ class GridBuilder extends Controller
     public static function fakeNewGridElementMarkup(): string
     {
         return '<div class="item-grid be_item_grid fake-helper be_item_grid_fake" dropable="false" draggable="false"><div class="item-new"></div></div>';
-    }
-
-    /**
-     * Automaticly create a GridStop element when creating a GridStart element.
-     */
-    public function createGridStop(DataContainer $dc): void
-    {
-        if (null !== $dc->activeRecord && 'grid-start' === $dc->activeRecord->type) {
-            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-start']);
-            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-stop']);
-
-            if ($gridStarts > $gridStops) {
-                $objElement = new ContentModel();
-                $objElement->tstamp = time();
-                $objElement->pid = $dc->activeRecord->pid;
-                $objElement->ptable = $dc->activeRecord->ptable;
-                $objElement->type = 'grid-stop';
-                // $objElement->sorting = $dc->activeRecord->sorting + 64;
-                $objElement->sorting = $dc->activeRecord->sorting + 1;
-                $objElement->save();
-            }
-        }
-    }
-
-    public function includeJSCSS(): void
-    {
-        $GLOBALS['TL_CSS'][] = 'bundles/wemgrid/css/backend.css';
-    }
-
-    public function onsubmitCallback(DataContainer $dc): void
-    {
-        $this->createGridStop($dc);
-        $objItem = ContentModel::findOneById($dc->activeRecord->id);
-        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        // When submitting a grid with subgrids, all styles are saved in parent grid instead of each subgrids
-        self::recalculateGridItemsByPidAndPtable((int) $dc->activeRecord->pid, $dc->activeRecord->ptable, true);
-    }
-
-    public function oncutCallback(DataContainer $dc): void
-    {
-        $objItem = ContentModel::findOneById($dc->id);
-        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        self::recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
-    }
-
-    public function oncopyCallback(int $itemId, DataContainer $dc): void
-    {
-        $objItem = ContentModel::findOneById($itemId);
-        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        // ugly fix to allow duplication of element in grid edition
-        $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
-        $objItem->save();
-        // end of ugly fix
-        self::recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
-    }
-
-    public function ondeleteCallback(DataContainer $dc, int $undoItemId): void
-    {
-        if (!$dc->id) {
-            return;
-        }
-        $objItem = ContentModel::findOneById($dc->id);
-        if (!$objItem) {
-            return;
-        }
-        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        if ('grid-start' === $objItem->type) {
-            $this->deleteClosestGridStopFromGridStart($objItem);
-        }
-        self::recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
-    }
-
-    public function deleteClosestGridStopFromGridStart(ContentModel $gridStart): void
-    {
-        $gridStop = ContentModel::findBy(['pid = ?', 'ptable = ?', 'type = ?', 'sorting > ?'], [$gridStart->pid, $gridStart->ptable, 'grid-stop', $gridStart->sorting], ['limit' => 1, 'order' => 'sorting ASC']);
-        if ($gridStop) {
-            $gridStop->delete();
-        }
-    }
-
-    /**
-     * Recalculate grid items by pid and ptable.
-     *
-     * @param int    $pid              The pid
-     * @param string $ptable           The ptable
-     * @param bool   $keepItemsClasses true to keep the item classes between grids
-     */
-    public static function recalculateGridItemsByPidAndPtable(int $pid, string $ptable, bool $keepItemsClasses = false): void
-    {
-        $objItems = ContentModel::findBy(['pid = ?', 'ptable = ?'], [$pid, $ptable], ['order' => 'sorting ASC']);
-        $objItemsIdsToSkip = [];
-        $itemsClasses = [];
-        // first we keep track of all grid_items settings
-        foreach ($objItems as $index => $objItem) {
-            if ('grid-start' === $objItem->type) {
-                $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? deserialize($objItem->grid_items) : []);
-            }
-        }
-        foreach ($objItems as $index => $objItem) {
-            if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
-                continue;
-            }
-            if ('grid-start' === $objItem->type) {
-                $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, self::recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
-            }
-        }
-    }
-
-    /**
-     * Recalculate elements inside a grid.
-     *
-     * @param ContentModel             $gridStart         The "grid-start" content element
-     * @param array                    $objItemsIdsToSkip Array of content elements' ID to skip (not in the grid started by the current content element)
-     * @param \Contao\Model\Collection $objItems          Array of all content elements sharing the same pid & ptable with the current content element
-     * @param array                    $itemsClasses      items classes across grids
-     *
-     * @return array Array of content elements' ID to skip (for the next grid to not use the current content elements items)
-     */
-    protected static function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses, bool $keepItemsClasses): array
-    {
-        $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
-        $gridStart->grid_items = serialize([]);
-        $gsm = GridStartManipulator::create($gridStart);
-
-        foreach ($objItems as $index => $objItem) {
-            if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
-                continue;
-            }
-            if ('grid-stop' === $objItem->type) {
-                $objItemsIdsToSkip[] = $objItem->id;
-
-                return $objItemsIdsToSkip;
-            }
-            if ('grid-start' === $objItem->type) {
-                $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, self::recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
-            }
-
-            if (!$gsm->isItemInGrid($objItem)) {
-                $gsm->setGridItemsSettingsForItem((int) $objItem->id,
-                        $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS] ?? [],
-                        $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
-                        $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
-                    );
-                if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
-                    $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS]);
-                }
-                if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
-                    $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS]);
-                }
-                if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
-                    $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES]);
-                }
-                $gridStart = $gsm->getGridStart();
-                $gridStart->save();
-                $gsm->setGridStart($gridStart);
-            }
-            $objItemsIdsToSkip[] = $objItem->id;
-        }
-
-        return $objItemsIdsToSkip;
     }
 }
