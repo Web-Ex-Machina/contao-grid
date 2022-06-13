@@ -171,12 +171,6 @@ class GridElementWizard extends Widget
                 continue;
             }
 
-            // If we hit another grid-start, open a new grid
-            if ('grid-start' === $objItems->type) {
-                // $this->gridOpenedManager->openGrid($objItems->current(), true);
-                $this->gridOpenedManager->openGrid($objItems->current());
-            }
-
             // And break the loop if we hit the grid-stop element corresponding to the very first grid
             if ('grid-stop' === $objItems->type) {
                 if ($this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {

@@ -52,7 +52,6 @@ class GridElementsWrapper
         if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
             return $strBuffer;
         }
-
         // Get the last open grid
         $openGrid = $gop->getLastOpenedGrid();
         $currentGridId = $gop->getLastOpenedGridId();
@@ -67,6 +66,7 @@ class GridElementsWrapper
 
         // If we used grids elements, we had to adjust the behaviour
         if ('grid-start' === $objElement->type && true === $openGrid->isSubGrid()) {
+            $gop->openGrid($objElement);
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
             $openGrid = $gop->getParentGrid($objElement);
