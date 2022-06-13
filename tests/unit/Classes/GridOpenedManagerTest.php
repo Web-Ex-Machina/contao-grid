@@ -80,6 +80,162 @@ class GridOpenedManagerTest extends ContaoTestCase
         }
     }
 
+    public function testGetLastOpenedGrid(): void
+    {
+        $gridStartFoo = new \Contao\ContentModel();
+        $gridStartFoo->id = 'foo';
+        $gridStartFoo->type = 'grid-start';
+        $gridStartFoo->grid_preset = 'bs4';
+        $gridStartFoo->grid_cols = serialize([]);
+
+        $gridStartBar = new \Contao\ContentModel();
+        $gridStartBar->id = 'bar';
+        $gridStartBar->type = 'grid-start';
+        $gridStartBar->grid_preset = 'bs4';
+        $gridStartBar->grid_cols = serialize([]);
+
+        $this->sut->openGrid($gridStartFoo);
+        $lastOpenedGrid = $this->sut->openGrid($gridStartBar);
+
+        $this->assertSame($lastOpenedGrid, $this->sut->getLastOpenedGrid());
+    }
+
+    public function testGetLastOpenedGridId(): void
+    {
+        $gridStartFoo = new \Contao\ContentModel();
+        $gridStartFoo->id = 'foo';
+        $gridStartFoo->type = 'grid-start';
+        $gridStartFoo->grid_preset = 'bs4';
+        $gridStartFoo->grid_cols = serialize([]);
+
+        $gridStartBar = new \Contao\ContentModel();
+        $gridStartBar->id = 'bar';
+        $gridStartBar->type = 'grid-start';
+        $gridStartBar->grid_preset = 'bs4';
+        $gridStartBar->grid_cols = serialize([]);
+
+        $this->sut->openGrid($gridStartFoo);
+        $lastOpenedGrid = $this->sut->openGrid($gridStartBar);
+
+        $this->assertSame($lastOpenedGrid->getid(), $this->sut->getLastOpenedGridId());
+        $this->assertSame('bar', $this->sut->getLastOpenedGridId());
+    }
+
+    public function testGetPreviousLastOpenedGrid(): void
+    {
+        $gridStartFoo = new \Contao\ContentModel();
+        $gridStartFoo->id = 'foo';
+        $gridStartFoo->type = 'grid-start';
+        $gridStartFoo->grid_preset = 'bs4';
+        $gridStartFoo->grid_cols = serialize([]);
+
+        $gridStartBar = new \Contao\ContentModel();
+        $gridStartBar->id = 'bar';
+        $gridStartBar->type = 'grid-start';
+        $gridStartBar->grid_preset = 'bs4';
+        $gridStartBar->grid_cols = serialize([]);
+
+        $previousOpenedGrid = $this->sut->openGrid($gridStartFoo);
+        $this->sut->openGrid($gridStartBar);
+
+        $this->assertSame($previousOpenedGrid, $this->sut->getPreviousLastOpenedGrid());
+    }
+
+    public function testGetPreviousLastOpenedGridId(): void
+    {
+        $gridStartFoo = new \Contao\ContentModel();
+        $gridStartFoo->id = 'foo';
+        $gridStartFoo->type = 'grid-start';
+        $gridStartFoo->grid_preset = 'bs4';
+        $gridStartFoo->grid_cols = serialize([]);
+
+        $gridStartBar = new \Contao\ContentModel();
+        $gridStartBar->id = 'bar';
+        $gridStartBar->type = 'grid-start';
+        $gridStartBar->grid_preset = 'bs4';
+        $gridStartBar->grid_cols = serialize([]);
+
+        $previousOpenedGrid = $this->sut->openGrid($gridStartFoo);
+        $this->sut->openGrid($gridStartBar);
+
+        $this->assertSame($previousOpenedGrid->getid(), $this->sut->getPreviousLastOpenedGridId());
+        $this->assertSame('foo', $this->sut->getPreviousLastOpenedGridId());
+    }
+
+    public function testGetGridByIdWillSucceed(): void
+    {
+        $gridStartFoo = new \Contao\ContentModel();
+        $gridStartFoo->id = 'foo';
+        $gridStartFoo->type = 'grid-start';
+        $gridStartFoo->grid_preset = 'bs4';
+        $gridStartFoo->grid_cols = serialize([]);
+
+        $gridStartBar = new \Contao\ContentModel();
+        $gridStartBar->id = 'bar';
+        $gridStartBar->type = 'grid-start';
+        $gridStartBar->grid_preset = 'bs4';
+        $gridStartBar->grid_cols = serialize([]);
+
+        $gridStartFooOpened = $this->sut->openGrid($gridStartFoo);
+        $gridStartBarOpened = $this->sut->openGrid($gridStartBar);
+
+        $this->assertSame($gridStartFooOpened, $this->sut->getGridById($gridStartFooOpened->getId()));
+        $this->assertSame($gridStartFooOpened, $this->sut->getGridById('foo'));
+
+        $this->assertSame($gridStartBarOpened, $this->sut->getGridById($gridStartBarOpened->getId()));
+        $this->assertSame($gridStartBarOpened, $this->sut->getGridById('bar'));
+    }
+
+    public function testGetGridByIdWillFail(): void
+    {
+        $gridStartFoo = new \Contao\ContentModel();
+        $gridStartFoo->id = 'foo';
+        $gridStartFoo->type = 'grid-start';
+        $gridStartFoo->grid_preset = 'bs4';
+        $gridStartFoo->grid_cols = serialize([]);
+
+        $gridStartBar = new \Contao\ContentModel();
+        $gridStartBar->id = 'bar';
+        $gridStartBar->type = 'grid-start';
+        $gridStartBar->grid_preset = 'bs4';
+        $gridStartBar->grid_cols = serialize([]);
+
+        $gridStartFooOpened = $this->sut->openGrid($gridStartFoo);
+        $gridStartBarOpened = $this->sut->openGrid($gridStartBar);
+
+        $this->sut->closeLastOpenedGrid();
+
+        try {
+            $this->sut->getGridById($gridStartBarOpened->getId());
+            $this->assertTrue('false', 'An exception should have been raised !');
+        } catch (\Exception $e) {
+            $this->assertSame($e->getMessage(), 'The grid doesn\'t exists.');
+        }
+
+        try {
+            $this->sut->getGridById('bar');
+            $this->assertTrue('false', 'An exception should have been raised !');
+        } catch (\Exception $e) {
+            $this->assertSame($e->getMessage(), 'The grid doesn\'t exists.');
+        }
+
+        $this->sut->closeLastOpenedGrid();
+
+        try {
+            $this->sut->getGridById($gridStartFooOpened->getId());
+            $this->assertTrue('false', 'An exception should have been raised !');
+        } catch (\Exception $e) {
+            $this->assertSame($e->getMessage(), 'The grid doesn\'t exists.');
+        }
+
+        try {
+            $this->sut->getGridById('foo');
+            $this->assertTrue('false', 'An exception should have been raised !');
+        } catch (\Exception $e) {
+            $this->assertSame($e->getMessage(), 'The grid doesn\'t exists.');
+        }
+    }
+
     public function dpForTestOpenGridWillFail(): array
     {
         return [

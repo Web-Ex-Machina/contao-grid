@@ -45,7 +45,7 @@ class GridOpenedManager
      *
      * @param ContentModel|DbResult|GridStartElement $element The grid-start element
      */
-    public function openGrid($element): void
+    public function openGrid($element): GridOpened
     {
         $this->validateElementAsAGridStart($element);
 
@@ -68,6 +68,8 @@ class GridOpenedManager
         $GLOBALS['WEM']['GRID'][(string) $element->id] = $grid;
 
         ++$this->level;
+
+        return $grid;
     }
 
     /**
