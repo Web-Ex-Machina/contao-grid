@@ -17,6 +17,7 @@ use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Elements\GridStart as GridStartElement;
+use WEM\GridBundle\Helper\GridBuilder;
 
 /**
  * GRID for Contao Open Source CMS
@@ -35,13 +36,14 @@ class GridOpenedManagerTest extends ContaoTestCase
 
     protected function setUp(): void
     {
-        $this->sut = GridOpenedManager::getInstance();
-
         $container = $this->getContainerWithContaoConfiguration();
         $container->setParameter('contao.resources_paths', realpath(__DIR__.'/../../../tests/_fake_contao'));
         $container->set('database_connection', $this->createMock(Connection::class));
+        $container->set('wem.helper.grid_builder', new GridBuilder());
         \Contao\System::setContainer($container);
         $this->getTempDir();
+
+        $this->sut = GridOpenedManager::getInstance();
     }
 
     /**

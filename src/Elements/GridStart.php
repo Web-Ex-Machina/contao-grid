@@ -17,6 +17,7 @@ namespace WEM\GridBundle\Elements;
 use Contao\BackendTemplate;
 use Contao\ContentElement;
 use Contao\Database;
+use Contao\System;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Helper\GridBuilder;
 
@@ -54,7 +55,8 @@ class GridStart extends ContentElement
                 ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
             ]; /** @todo - make it generic per grid */
             $breakpoints = [];
-            $arrGridValues = GridBuilder::getWrapperClasses($this);
+            // $arrGridValues = GridBuilder::getWrapperClasses($this);
+            $arrGridValues = System::getContainer()->get('wem.helper.grid_builder')->getWrapperClasses($this);
             foreach ($arrGridValues as $k => $b) {
                 $b = explode('-', $b);
                 if ('cols' !== $b[0]) {
@@ -85,10 +87,10 @@ class GridStart extends ContentElement
 
         $gop = GridOpenedManager::getInstance();
         try {
-            $arrGrid = $gop->getGridById($this->id);
+            $arrGrid = $gop->getGridById((string) $this->id);
         } catch (\Exception $e) {
             $gop->openGrid($this);
-            $arrGrid = $gop->getGridById($this->id);
+            $arrGrid = $gop->getGridById((string) $this->id);
         }
 
         // Add the classes to the Model so the main class can use it correct

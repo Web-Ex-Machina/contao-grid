@@ -3,6 +3,7 @@ services:
     class: WEM\GridBundle\Classes\GridElementsWrapper
     arguments:
       $translator: '@contao.translation.translator'
+      $gridBuilder: '@wem.helper.grid_builder'
     public: true
 
   wem.classes.grid_start_manipulator:
@@ -17,4 +18,8 @@ services:
     class: WEM\GridBundle\Helper\tlContentCallback
     arguments:
       $gridElementsCalculator: '@wem.classes.grid_elements_calculator'
+    public: true
+
+  wem.helper.grid_builder:
+    class: WEM\GridBundle\Helper\GridBuilder
     public: true

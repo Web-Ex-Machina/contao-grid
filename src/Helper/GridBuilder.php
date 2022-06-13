@@ -161,7 +161,7 @@ class GridBuilder
             if (!$forForm) {
                 foreach ($items as $itemId => $classes) {
                     if (\is_array($classes)) {
-                        $items[$itemId] = trim(implode(' ', $classes));
+                        $items[$itemId] = preg_replace('/([\s]+)/', ' ', trim(implode(' ', $classes)));
                     }
                 }
             }
@@ -177,9 +177,9 @@ class GridBuilder
     /**
      * Returns a "fake" grid element to allow element to be placed at the beggining of the grid.
      *
-     * @param int $gridId The grid's id
+     * @param string $gridId The grid's id
      */
-    public static function fakeFirstGridElementMarkup(string $gridId): string
+    public function fakeFirstGridElementMarkup(string $gridId): string
     {
         $gop = GridOpenedManager::getInstance();
 
@@ -189,7 +189,7 @@ class GridBuilder
     /**
      * Returns a "fake" grid element to allow element to be placed at the end of the grid.
      */
-    public static function fakeLastGridElementMarkup(): string
+    public function fakeLastGridElementMarkup(): string
     {
         return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake" dropable="true" draggable="false" data-type="fake-last-element">%s</div>', $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
     }
@@ -197,7 +197,7 @@ class GridBuilder
     /**
      * Returns a "fake" grid element to allow new elements to be added at the end of the grid.
      */
-    public static function fakeNewGridElementMarkup(): string
+    public function fakeNewGridElementMarkup(): string
     {
         return '<div class="item-grid be_item_grid fake-helper be_item_grid_fake" dropable="false" draggable="false"><div class="item-new"></div></div>';
     }

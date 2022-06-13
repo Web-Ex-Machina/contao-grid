@@ -16,6 +16,7 @@ namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
 use Contao\Database\Result as DbResult;
+use Contao\System;
 use Exception;
 use InvalidArgumentException;
 use WEM\GridBundle\Elements\GridStart as GridStartElement;
@@ -26,6 +27,8 @@ class GridOpenedManager
     /** @var int */
     protected $level = 0;
     private static $instance;
+    /** @var GridBuilder */
+    private $gridBuilder;
 
     private function __construct()
     {
@@ -34,7 +37,7 @@ class GridOpenedManager
     public static function getInstance()
     {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::$instance = (new self())->setGridBuilder(System::getContainer()->get('wem.helper.grid_builder'));
         }
 
         return self::$instance;
@@ -54,9 +57,9 @@ class GridOpenedManager
             ->setId((string) $element->id)
             ->setPreset($element->grid_preset)
             ->setCols(!\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols)
-            ->setWrapperClasses(GridBuilder::getWrapperClasses($element))
-            ->setItemClasses(GridBuilder::getItemClasses($element))
-            ->setItemClassesForm(GridBuilder::getItemClasses($element, true))
+            ->setWrapperClasses($this->gridBuilder->getWrapperClasses($element))
+            ->setItemClasses($this->gridBuilder->getItemClasses($element))
+            ->setItemClassesForm($this->gridBuilder->getItemClasses($element, true))
             ->setLevel($this->level)
         ;
         $grid->addItemClassesForAllResolution('be_item_grid helper');
@@ -226,5 +229,17 @@ class GridOpenedManager
         ) {
             throw new InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
         }
+    }
+
+    public function getGridBuilder(): ?GridBuilder
+    {
+        return $this->gridBuilder;
+    }
+
+    public function setGridBuilder(GridBuilder $gridBuilder): self
+    {
+        $this->gridBuilder = $gridBuilder;
+
+        return $this;
     }
 }

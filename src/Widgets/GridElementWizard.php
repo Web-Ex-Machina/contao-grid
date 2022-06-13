@@ -40,6 +40,9 @@ class GridElementWizard extends Widget
     /** @var GridOpenedManager */
     protected $gridOpenedManager;
 
+    /** @var GridBuilder */
+    protected $gridBuilder;
+
     /**
      * Default constructor.
      *
@@ -49,6 +52,7 @@ class GridElementWizard extends Widget
     {
         parent::__construct($arrAttributes);
         $this->gridOpenedManager = GridOpenedManager::getInstance();
+        $this->gridBuilder = new GridBuilder();
     }
 
     /**
@@ -155,7 +159,7 @@ class GridElementWizard extends Widget
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
         }
         if (!Input::get('grid_preview')) {
-            $strGrid .= GridBuilder::fakeFirstGridElementMarkup((string) $this->activeRecord->id);
+            $strGrid .= $this->gridBuilder->fakeFirstGridElementMarkup((string) $this->activeRecord->id);
         }
 
         // Now, we will only fetch the items in the grid
@@ -202,8 +206,8 @@ class GridElementWizard extends Widget
         $this->addAssets();
 
         if (!Input::get('grid_preview')) {
-            $strGrid .= GridBuilder::fakeLastGridElementMarkup();
-            $strGrid .= GridBuilder::fakeNewGridElementMarkup();
+            $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup();
+            $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup();
         }
         $strGrid .= '</div>';
 

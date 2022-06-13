@@ -28,12 +28,16 @@ class GridElementsWrapper
 {
     /** @var TranslatorInterface */
     protected $translator;
+    /** @var GridBuilder */
+    protected $gridBuilder;
     protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
 
     public function __construct(
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        GridBuilder $gridBuilder
     ) {
         $this->translator = $translator;
+        $this->gridBuilder = $gridBuilder;
     }
 
     /**
@@ -79,13 +83,13 @@ class GridElementsWrapper
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
                 TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
                 $strBuffer,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? GridBuilder::fakeFirstGridElementMarkup((string) $currentGridId) : ''
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId) : ''
             );
         }
         if ('grid-stop' === $objElement->type && true === $openGrid->isSubGrid()) {
             return sprintf(
                 '%s<div data-id="%s" data-type="%s">%s</div></div>',
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? GridBuilder::fakeLastGridElementMarkup() : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup() : '',
                 $objElement->id,
                 $objElement->type,
                 $strBuffer
