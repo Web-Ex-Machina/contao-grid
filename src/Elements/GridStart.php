@@ -14,13 +14,16 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Elements;
 
+use Contao\BackendTemplate;
+use Contao\ContentElement;
+use Contao\Database;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Helper\GridBuilder;
 
 /**
  * Content Element "grid-start".
  */
-class GridStart extends \ContentElement
+class GridStart extends ContentElement
 {
     /**
      * Template.
@@ -37,7 +40,7 @@ class GridStart extends \ContentElement
         // Backend template
         if (TL_MODE === 'BE' && !$this->isForGridElementWizard) {
             $this->strTemplate = 'be_wildcard';
-            $this->Template = new \BackendTemplate($this->strTemplate);
+            $this->Template = new BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
             $this->Template->wildcard = $GLOBALS['TL_LANG']['tl_content']['grid_preset'][$this->grid_preset];
 
@@ -73,7 +76,7 @@ class GridStart extends \ContentElement
         }
 
         // Check if the very next element is a grid-stop element
-        $objNextElement = \Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute([$this->pid, $this->ptable, $this->sorting]);
+        $objNextElement = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute([$this->pid, $this->ptable, $this->sorting]);
 
         // Update : I need it opened otherwise empty nested grid is buggy in BE
         if (1 > $objNextElement->numRows) {

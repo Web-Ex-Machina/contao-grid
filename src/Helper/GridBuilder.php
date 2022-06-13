@@ -35,19 +35,19 @@ class GridBuilder
         $arrClasses = [];
 
         if (!\is_array($objElement->grid_rows)) {
-            $rows = deserialize($objElement->grid_rows);
+            $rows = \Contao\StringUtil::deserialize($objElement->grid_rows);
         } else {
             $rows = $objElement->grid_rows;
         }
 
         if (!\is_array($objElement->grid_cols)) {
-            $cols = deserialize($objElement->grid_cols);
+            $cols = \Contao\StringUtil::deserialize($objElement->grid_cols);
         } else {
             $cols = $objElement->grid_cols;
         }
 
         if (!\is_array($objElement->grid_gap)) {
-            $gap = deserialize($objElement->grid_gap);
+            $gap = \Contao\StringUtil::deserialize($objElement->grid_gap);
         } else {
             $gap = $objElement->grid_gap;
         }
@@ -119,7 +119,7 @@ class GridBuilder
         if (\is_array($objElement->grid_cols)) {
             $cols = $objElement->grid_cols;
         } else {
-            $cols = deserialize($objElement->grid_cols);
+            $cols = \Contao\StringUtil::deserialize($objElement->grid_cols);
         }
 
         switch ($objElement->grid_preset) {
@@ -154,7 +154,7 @@ class GridBuilder
         $arrItemsClasses = [];
         if (null !== $objElement->grid_items) {
             if (!\is_array($objElement->grid_items)) {
-                $items = deserialize($objElement->grid_items);
+                $items = \Contao\StringUtil::deserialize($objElement->grid_items);
             } else {
                 $items = $objElement->grid_items;
             }

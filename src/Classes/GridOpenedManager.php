@@ -17,6 +17,7 @@ namespace WEM\GridBundle\Classes;
 use Contao\ContentModel;
 use Contao\Database\Result as DbResult;
 use Exception;
+use InvalidArgumentException;
 use WEM\GridBundle\Elements\GridStart as GridStartElement;
 use WEM\GridBundle\Helper\GridBuilder;
 
@@ -236,14 +237,14 @@ class GridOpenedManager
      *
      * @param ContentModel|DbResult $element The element to check
      *
-     * @throws Exception if the element is not a grid start
+     * @throws InvalidArgumentException if the element is not a grid start
      */
     public function validateElementAsAGridStart($element): void
     {
         if (!(is_a($element, DbResult::class) || is_a($element, ContentModel::class) || is_a($element, GridStartElement::class))
             || 'grid-start' !== $element->type
         ) {
-            throw new Exception('The element "'.\get_class($element).'" is not a "grid-start"');
+            throw new InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
         }
     }
 }
