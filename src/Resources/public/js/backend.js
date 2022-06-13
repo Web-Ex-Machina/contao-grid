@@ -106,7 +106,13 @@ WEM.Grid  = WEM.Grid || {};
                 pid = self.getGridLastRealElement(dropzone).getAttribute('data-id');
                 doDoublePositionning = !self.isGridFirstLevel(gridDest);
             }else if('fake-first-element' == dropzone.getAttribute('data-type')){
+                var previousDropzone = dropzone;
                 dropzone = self.getGridFirstRealElement(dropzone);
+                if(dropzone == draggableElement){
+                    dropzone = previousDropzone;
+                    position = 'after';
+                }
+
                 gridDest = self.getGridFromElement(dropzone);
                 pid = dropzone.getAttribute('data-id');
                 // pid = self.getGridFirstRealElement(dropzone).getAttribute('data-id');
