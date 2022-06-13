@@ -21,11 +21,10 @@ class GridElementsCalculator
     /**
      * Recalculate grid items by pid and ptable.
      *
-     * @param int    $pid              The pid
-     * @param string $ptable           The ptable
-     * @param bool   $keepItemsClasses true to keep the item classes between grids
+     * @param int    $pid    The pid
+     * @param string $ptable The ptable
      */
-    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable, bool $keepItemsClasses = false): void
+    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable): void
     {
         $objItems = ContentModel::findBy(['pid = ?', 'ptable = ?'], [$pid, $ptable], ['order' => 'sorting ASC']);
         $objItemsIdsToSkip = [];
@@ -42,7 +41,7 @@ class GridElementsCalculator
             }
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $keepItemsClasses));
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses));
             }
         }
     }
@@ -53,11 +52,10 @@ class GridElementsCalculator
      * @param ContentModel             $gridStart         The "grid-start" content element
      * @param array                    $objItemsIdsToSkip Array of content elements' ID to skip (not in the grid started by the current content element)
      * @param \Contao\Model\Collection $objItems          Array of all content elements sharing the same pid & ptable with the current content element
-     * @param array                    $itemsClasses      items classes across grids
      *
      * @return array Array of content elements' ID to skip (for the next grid to not use the current content elements items)
      */
-    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses, bool $keepItemsClasses): array
+    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses): array
     {
         $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
         $gridStart->grid_items = serialize([]);

@@ -60,8 +60,7 @@ class tlContentCallback
         $this->createGridStop($dc);
         $objItem = ContentModel::findOneById($dc->activeRecord->id);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        // When submitting a grid with subgrids, all styles are saved in parent grid instead of each subgrids
-        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $dc->activeRecord->pid, $dc->activeRecord->ptable, true);
+        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $dc->activeRecord->pid, $dc->activeRecord->ptable);
     }
 
     public function oncutCallback(DataContainer $dc): void
