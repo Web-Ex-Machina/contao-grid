@@ -28,12 +28,16 @@ class GridElementsWrapper
 {
     /** @var TranslatorInterface */
     protected $translator;
+    /** @var GridBuilder */
+    protected $gridBuilder;
     protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
 
     public function __construct(
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        GridBuilder $gridBuilder
     ) {
         $this->translator = $translator;
+        $this->gridBuilder = $gridBuilder;
     }
 
     /**
@@ -47,74 +51,57 @@ class GridElementsWrapper
      */
     public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
+        $gop = GridOpenedManager::getInstance();
         // Skip elements we never want to wrap or if we are not in a grid
-        if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $GLOBALS['WEM']['GRID'] || empty($GLOBALS['WEM']['GRID'])) {
+        if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
             return $strBuffer;
         }
-
         // Get the last open grid
-        $arrGrid = end($GLOBALS['WEM']['GRID']);
-        $k = key($GLOBALS['WEM']['GRID']);
-        $currentGridId = $k;
-        reset($GLOBALS['WEM']['GRID']);
-
-        // For each opened grid, we will add the elements into it
-        foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-            if ($k !== $objElement->id) {
-                if (!\array_key_exists('elements', $GLOBALS['WEM']['GRID'][$k])) {
-                    $GLOBALS['WEM']['GRID'][$k]['elements'] = [];
-                }
-                $GLOBALS['WEM']['GRID'][$k]['elements'][] = $objElement->id;
-                $currentGridId = $k;
-            }
-        }
+        $openGrid = $gop->getLastOpenedGrid();
+        $currentGridId = $gop->getLastOpenedGridId();
 
         // We won't need this grid anymore so we pop the global grid array
         if ('grid-stop' === $objElement->type) {
-            array_pop($GLOBALS['WEM']['GRID']);
+            $gop->closeLastOpenedGrid();
         }
 
         // If we used grids elements, we had to adjust the behaviour
-        if ('grid-start' === $objElement->type && true === $arrGrid['subgrid']) {
+        if ('grid-start' === $objElement->type && true === $openGrid->isSubGrid()) {
+            $gop->openGrid($objElement);
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
-            foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-                if (\is_array($g['item_classes']['items']) && \array_key_exists($objElement->id.'_classes', $g['item_classes']['items'])) {
-                    $arrGrid = $g;
-                    break;
-                }
-            }
+            $openGrid = $gop->getParentGrid($objElement);
 
             return sprintf(
                 '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
-                implode(' ', $arrGrid['item_classes']['all']),
-                $arrGrid['item_classes']['items'][$objElement->id.'_cols'] ?: '',
-                $arrGrid['item_classes']['items'][$objElement->id.'_rows'] ?: '',
-                $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
+                implode(' ', $openGrid->getItemClassesForAllResolution()),
+                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
                 TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
                 $strBuffer,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? GridBuilder::fakeFirstGridElementMarkup((string) $currentGridId) : ''
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId) : ''
             );
         }
-        if ('grid-stop' === $objElement->type && true === $arrGrid['subgrid']) {
+        if ('grid-stop' === $objElement->type && true === $openGrid->isSubGrid()) {
             return sprintf(
                 '%s<div data-id="%s" data-type="%s">%s</div></div>',
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? GridBuilder::fakeLastGridElementMarkup() : '',
+                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup() : '',
                 $objElement->id,
                 $objElement->type,
                 $strBuffer
             );
         }
-        if (!\in_array($objElement->type, static::$arrSkipContentTypes, true) && true === $arrGrid['subgrid']) {
+        if (!\in_array($objElement->type, static::$arrSkipContentTypes, true) && true === $openGrid->isSubGrid()) {
             return sprintf(
                 '<div class="%s %s %s %s be_subgrid_item" data-id="%s" data-type="%s">%s%s</div>',
-                implode(' ', $arrGrid['item_classes']['all']),
-                $arrGrid['item_classes']['items'][$objElement->id.'_cols'] ?: '',
-                $arrGrid['item_classes']['items'][$objElement->id.'_rows'] ?: '',
-                $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
+                implode(' ', $openGrid->getItemClassesForAllResolution()),
+                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
                 $objElement->id,
                 $objElement->type,
                 TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
@@ -124,10 +111,10 @@ class GridElementsWrapper
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return sprintf(
                 '<div class="%s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
-                implode(' ', $arrGrid['item_classes']['all']),
-                $arrGrid['item_classes']['items'][$objElement->id.'_cols'] ?: '',
-                $arrGrid['item_classes']['items'][$objElement->id.'_rows'] ?: '',
-                $arrGrid['item_classes']['items'][$objElement->id.'_classes'] ?: '',
+                implode(' ', $openGrid->getItemClassesForAllResolution()),
+                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
                 $objElement->id,
                 $objElement->type,
                 TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',

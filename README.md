@@ -35,7 +35,7 @@ In your terminal, just type :
 
 The script will give you all options to run a working contao in a docker environment.
 
-All the informations regarding path, ports and everything else are located in the [docker/.env file][5]
+All the informations regarding path, ports and everything else are located in the [docker/.env file][4]
 
 Documentation
 -------------
@@ -65,3 +65,4 @@ You can get the extension with this repository URL : [Github][2]
 [1]: CHANGELOG.md
 [2]: https://github.com/webexmachina/contao-grid
 [3]: https://www.webexmachina.fr/
+[4]: docker/.env

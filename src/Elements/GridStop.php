@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2020 Web ex Machina
+ * Copyright (c) 2015-2022 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 
 namespace WEM\GridBundle\Elements;
+
+use WEM\GridBundle\Classes\GridOpenedManager;
 
 /**
  * Content Element "grid-stop".
@@ -40,17 +42,9 @@ class GridStop extends \ContentElement
 
         // Get the last open grid
         if (\is_array($GLOBALS['WEM']['GRID'])) {
-            $arrGrid = end($GLOBALS['WEM']['GRID']);
-            reset($GLOBALS['WEM']['GRID']);
-
-            // If no elements contained in the grid, we don't need to close the wrapper (because it won't be opened)
-            // Update : I need it opened otherwise empty nested grid is buggy in BE
-            // if (0 === \count($arrGrid['elements'])) {
-            //     $this->Template->doNotPrint = true;
-            // }
-
+            $gop = GridOpenedManager::getInstance();
             // Send the grid_id to template
-            $this->Template->grid_id = $arrGrid['grid_id'];
+            $this->Template->grid_id = $gop->getLastOpenedGridId();
         }
     }
 }

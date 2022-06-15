@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
+use Contao\System;
 use InvalidArgumentException;
 
 class GridStartManipulator
@@ -72,6 +73,8 @@ class GridStartManipulator
     public const DEFAULT_GRID_CLASSES = '';
     public const DEFAULT_GRID_ITEMS = [self::PROPERTY_COLS => self::DEFAULT_GRID_ITEM_COLS, self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEM_ROWS, self::PROPERTY_CLASSES => self::DEFAULT_GRID_CLASSES];
     private $gridStart;
+    /** @var GridElementsCalculator */
+    private $gridElementCalculator;
 
     public function getGridStart(): ContentModel
     {
@@ -88,9 +91,19 @@ class GridStartManipulator
         return $this;
     }
 
+    /**
+     * Creates a new GridStartManipulator.
+     *
+     * @param ContentModel $gridStart The grid-start element
+     *
+     * @return self
+     */
     public static function create(ContentModel $gridStart)
     {
-        return (new self())->setGridStart($gridStart);
+        return (new self())
+            ->setGridStart($gridStart)
+            ->setGridElementsCalculator(System::getContainer()->get('wem.classes.grid_elements_calculator'))
+        ;
     }
 
     /**
@@ -98,7 +111,7 @@ class GridStartManipulator
      */
     public function recalculateElementsForAllGridSharingTheSamePidAndPtable(): self
     {
-        \WEM\GridBundle\Helper\GridBuilder::recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
+        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
         $this->gridStart->refresh();
 
         return $this;
@@ -279,8 +292,8 @@ class GridStartManipulator
     public function setGridItemsSettingsForItem(int $itemId, array $cols, array $rows, string $classes): self
     {
         $previousValues = null !== $this->gridStart->grid_items ? unserialize($this->gridStart->grid_items) : [];
-        $previousValues[$itemId.'_'.self::PROPERTY_COLS] = $cols;
-        $previousValues[$itemId.'_'.self::PROPERTY_ROWS] = $rows;
+        $previousValues[$itemId.'_'.self::PROPERTY_COLS] = array_merge(self::DEFAULT_GRID_ITEM_COLS, $cols);
+        $previousValues[$itemId.'_'.self::PROPERTY_ROWS] = array_merge(self::DEFAULT_GRID_ITEM_ROWS, $rows);
         $previousValues[$itemId.'_'.self::PROPERTY_CLASSES] = $classes;
         $this->gridStart->grid_items = serialize($previousValues);
 
@@ -346,6 +359,36 @@ class GridStartManipulator
     public function setGridItemClasses(int $itemId, string $value): self
     {
         return $this->setGridItemsSettingsForItemAndPropertyAndResolution($itemId, self::PROPERTY_CLASSES, null, $value);
+    }
+
+    /**
+     * Set cols value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function setGridItemCols(int $itemId, array $cols): self
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+        $values[$itemId.'_'.self::PROPERTY_COLS] = $cols;
+
+        $this->setGridItemsSettingsForItem($itemId, $values[$itemId.'_'.self::PROPERTY_COLS], $values[$itemId.'_'.self::PROPERTY_ROWS], $values[$itemId.'_'.self::PROPERTY_CLASSES]);
+
+        return $this;
+    }
+
+    /**
+     * Set rows value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function setGridItemRows(int $itemId, array $rows): self
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+        $values[$itemId.'_'.self::PROPERTY_ROWS] = $rows;
+
+        $this->setGridItemsSettingsForItem($itemId, $values[$itemId.'_'.self::PROPERTY_COLS], $values[$itemId.'_'.self::PROPERTY_ROWS], $values[$itemId.'_'.self::PROPERTY_CLASSES]);
+
+        return $this;
     }
 
     /**
@@ -532,6 +575,30 @@ class GridStartManipulator
     }
 
     /**
+     * Get cols value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemCols(int $itemId): ?array
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+
+        return $values[$itemId.'_'.self::PROPERTY_COLS];
+    }
+
+    /**
+     * Get rows value for an item.
+     *
+     * @param int $itemId The item's ID
+     */
+    public function getGridItemRows(int $itemId): ?array
+    {
+        $values = $this->getGridItemsSettingsForItem($itemId);
+
+        return $values[$itemId.'_'.self::PROPERTY_ROWS];
+    }
+
+    /**
      * Get cols value for all resolution for an item.
      *
      * @param int $itemId The item's ID
@@ -707,6 +774,48 @@ class GridStartManipulator
         if (!\in_array($resolution, self::RESOLUTIONS, true)) {
             throw new InvalidArgumentException('The resolution value must be one of the following : "'.implode('", "', self::RESOLUTIONS).'"');
         }
+    }
+
+    /**
+     * Check if an item is in the grid.
+     *
+     * @param ContentModel $item The item
+     *
+     * @return bool true if found, false otherwise
+     */
+    public function isItemInGrid(ContentModel $item): bool
+    {
+        return $this->isItemIdInGrid((int) $item->id);
+    }
+
+    /**
+     * Check if an item is in the grid by its id.
+     *
+     * @param int $id The item's id
+     *
+     * @return bool true if found, false otherwise
+     */
+    public function isItemIdInGrid(int $id): bool
+    {
+        return \array_key_exists($id.'_'.self::PROPERTY_CLASSES, unserialize($this->gridStart->grid_items));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGridElementsCalculator(): ?GridElementsCalculator
+    {
+        return $this->gridElementCalculator;
+    }
+
+    /**
+     * @param mixed $gridElementCalculator
+     */
+    public function setGridElementsCalculator(GridElementsCalculator $gridElementCalculator): self
+    {
+        $this->gridElementCalculator = $gridElementCalculator;
+
+        return $this;
     }
 
     /**
