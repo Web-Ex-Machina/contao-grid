@@ -56,7 +56,7 @@ class GridStart extends ContentElement
             ]; /** @todo - make it generic per grid */
             $breakpoints = [];
             // $arrGridValues = GridBuilder::getWrapperClasses($this);
-            $arrGridValues = System::getContainer()->get('wem.helper.grid_builder')->getWrapperClasses($this);
+            $arrGridValues = System::getContainer()->get('wem.grid.helper.grid_builder')->getWrapperClasses($this);
             foreach ($arrGridValues as $k => $b) {
                 $b = explode('-', $b);
                 if ('cols' !== $b[0]) {

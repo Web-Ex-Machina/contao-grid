@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Contao\TestCase\ContaoTestCase;
+use WEM\GridBundle\Classes\GridElementsCalculator;
 use WEM\GridBundle\Classes\GridStartManipulator;
 
 /**
@@ -31,10 +32,13 @@ class GridStartManipulatorTest extends ContaoTestCase //\Codeception\Test\Unit
 
     /** @var GridStartManipulator */
     protected $sut;
+    /** @var GridElementsCalculator */
+    protected $gridElementsCalculator;
 
     protected function setUp(): void
     {
-        $this->sut = new GridStartManipulator();
+        $this->gridElementsCalculator = $this->getMockBuilder(GridElementsCalculator::class)->getMock();
+        $this->sut = new GridStartManipulator($this->gridElementsCalculator);
 
         $container = $this->getContainerWithContaoConfiguration();
         $container->setParameter('contao.resources_paths', realpath(__DIR__.'/../../../tests/_fake_contao'));

@@ -38,5 +38,6 @@ class WEMGridExtension extends Extension
 
         $loader->load('services.yml');
         $loader->load('listeners.yml');
+        $loader->load('controllers.yml');
     }
 }

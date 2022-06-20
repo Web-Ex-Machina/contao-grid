@@ -74,7 +74,12 @@ class GridStartManipulator
     public const DEFAULT_GRID_ITEMS = [self::PROPERTY_COLS => self::DEFAULT_GRID_ITEM_COLS, self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEM_ROWS, self::PROPERTY_CLASSES => self::DEFAULT_GRID_CLASSES];
     private $gridStart;
     /** @var GridElementsCalculator */
-    private $gridElementCalculator;
+    private $gridElementsCalculator;
+
+    public function __construct(GridElementsCalculator $gridElementsCalculator)
+    {
+        $this->gridElementsCalculator = $gridElementsCalculator;
+    }
 
     public function getGridStart(): ContentModel
     {
@@ -100,9 +105,8 @@ class GridStartManipulator
      */
     public static function create(ContentModel $gridStart)
     {
-        return (new self())
+        return (new self(System::getContainer()->get('wem.grid.classes.grid_elements_calculator')))
             ->setGridStart($gridStart)
-            ->setGridElementsCalculator(System::getContainer()->get('wem.classes.grid_elements_calculator'))
         ;
     }
 
@@ -805,15 +809,15 @@ class GridStartManipulator
      */
     public function getGridElementsCalculator(): ?GridElementsCalculator
     {
-        return $this->gridElementCalculator;
+        return $this->gridElementsCalculator;
     }
 
     /**
-     * @param mixed $gridElementCalculator
+     * @param mixed $gridElementsCalculator
      */
-    public function setGridElementsCalculator(GridElementsCalculator $gridElementCalculator): self
+    public function setGridElementsCalculator(GridElementsCalculator $gridElementsCalculator): self
     {
-        $this->gridElementCalculator = $gridElementCalculator;
+        $this->gridElementsCalculator = $gridElementsCalculator;
 
         return $this;
     }
