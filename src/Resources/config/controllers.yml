@@ -1,0 +1,13 @@
+services:
+  # We must do it this way if we want to be able to use dependency injections.
+  # File your complaints to Symfony
+  WEM\GridBundle\Controller\GridBuilderController:
+    alias: 'wem.grid.controller.grid_builder_controller'
+    public: true
+
+  wem.grid.controller.grid_builder_controller:
+    class: WEM\GridBundle\Controller\GridBuilderController
+    arguments:
+        $framework: '@contao.framework'
+        $translator: '@contao.translation.translator'
+    public: true

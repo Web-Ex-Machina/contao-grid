@@ -299,7 +299,7 @@ WEM.Grid  = WEM.Grid || {};
                     }
                 }
 
-                select.dispatchEvent(new Event('change'));
+                select.dispatchEvent(new Event('change_auto'));
             });
         }
     }
@@ -338,25 +338,31 @@ window.addEvent("domready", function () {
 
     document.querySelectorAll('.gridelement select[data-type="cols"]').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            var itemgridA = this.parentNode.parentNode.parentNode.parentNode;
-            var strClassA = this.value.replace(regexpBreakpoints,'') + ' ' + itemgridA.querySelector('input[data-item-id="'+itemgridA.getAttribute('data-id')+'"]').value + ' ' + itemgridA.querySelector('select[data-type="rows"][data-item-id="'+itemgridA.getAttribute('data-id')+'"][data-breakpoint="'+i.getAttribute('data-breakpoint')+'"]').value.replace(regexpBreakpoints,'');
-            itemgridA.setAttribute('class', itemgridA.getAttribute('data-class')+' '+strClassA);
+            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
+            saveItemCols(this.parentNode.parentNode.parentNode.parentNode.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
+        });
+        i.addEventListener("change_auto", function (e) {
+            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
         });
     });
 
     document.querySelectorAll('.gridelement select[data-type="rows"]').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            var itemgridB = this.parentNode.parentNode.parentNode.parentNode;
-            var strClassB = this.value.replace(regexpBreakpoints,'') + ' ' + itemgridB.querySelector('input[data-item-id="'+itemgridB.getAttribute('data-id')+'"]').value + ' ' + itemgridB.querySelector('select[data-type="cols"][data-item-id="'+itemgridB.getAttribute('data-id')+'"][data-breakpoint="'+i.getAttribute('data-breakpoint')+'"]').value.replace(regexpBreakpoints,'');
-            itemgridB.setAttribute('class', itemgridB.getAttribute('data-class')+' '+strClassB);
+            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
+            saveItemRows(this.parentNode.parentNode.parentNode.parentNode.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
+        });
+        i.addEventListener("change_auto", function (e) {
+            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
         });
     });
 
     document.querySelectorAll('.gridelement input').forEach(function (i) {
-        i.addEventListener("keyup", function (e) {
-            var itemgridC = this.parentNode.parentNode;
-            var strClassC = this.value + ' ' + this.parentNode.querySelector('select[data-type="cols"][data-item-id="'+itemgridC.getAttribute('data-id')+'"]:not(.hidden)').value.replace(regexpBreakpoints,'') + ' ' + this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemgridC.getAttribute('data-id')+'"]:not(.hidden)').value.replace(regexpBreakpoints,'');
-            itemgridC.setAttribute('class', itemgridC.getAttribute('data-class')+' '+strClassC);
+        i.addEventListener("change", function (e) {
+            updateItemDataClass(this.parentNode.parentNode,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+this.parentNode.parentNode.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
+            saveItemClass(this.parentNode.parentNode.getAttribute('data-id'),i.value);
+        });
+        i.addEventListener("keyup_auto", function (e) {
+            updateItemDataClass(this.parentNode.parentNode,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+this.parentNode.parentNode.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
         });
     });
 
@@ -399,6 +405,7 @@ window.addEvent("domready", function () {
             });
         });
     });
+
     document.querySelectorAll('.item-copy').forEach(function (a){
         a.addEventListener('click', function(e){
             e.preventDefault();
@@ -436,6 +443,7 @@ window.addEvent("domready", function () {
             return false;
         });
     });
+
     document.querySelectorAll('.item-delete').forEach(function (a){
         a.addEventListener('click', function(e){
             e.preventDefault();
@@ -488,7 +496,7 @@ window.addEvent("domready", function () {
             updateGridElementsSelectNbColumnsVisibility(event.target.value);
             var input = document.querySelector('input[data-breakpoint="'+event.target.value+'"]');
             if(null != input){
-                input.dispatchEvent(new Event('keyup'));
+                input.dispatchEvent(new Event('keyup_auto'));
             }
         });
     }
@@ -540,10 +548,58 @@ window.addEvent("domready", function () {
                 item.classList.toggle('hidden', shouldBeHidden);
                 document.querySelector('label[for="'+item.id+'"]').classList.toggle('hidden', shouldBeHidden);
                 if(breakpoint == item.getAttribute('data-breakpoint')){
-                    item.dispatchEvent(new Event('change'));
+                    item.dispatchEvent(new Event('change_auto'));
                 }
             }
         });
+    }
+
+    function updateItemDataClass(itemgrid, breakpoint){
+        var strClass = itemgrid.querySelector('input[data-item-id="'+itemgrid.getAttribute('data-id')+'"]').value 
+        + ' ' 
+        + itemgrid.querySelector('select[data-type="rows"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]').value.replace(regexpBreakpoints,'') 
+        + ' ' 
+        + itemgrid.querySelector('select[data-type="cols"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]').value.replace(regexpBreakpoints,'');
+        itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass);
+    }
+
+    function saveItemCols(itemId, value, breakpoint){
+        return save({id: itemId, property: 'cols', value: value, breakpoint: breakpoint});
+    }
+    function saveItemRows(itemId, value, breakpoint){
+        return save({id: itemId, property: 'rows', value: value, breakpoint: breakpoint});
+    }
+    function saveItemClass(itemId, value){
+        return save({id: itemId, property: 'classes', value: value});
+    }
+    function save(params){
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        var url = 'contao/grid-builder?grid='+id;
+        for(var property in params){
+            url+="&"+property+"="+params[property];
+        }
+
+        AjaxRequest.displayBox(Contao.lang.loading + ' …');
+
+        fetch(url,{
+            method:'get',
+            redirect:'manual'
+        })
+        .then(response => {
+            if(!response.ok){
+                response.json().then(function(json) {
+                    alert(json.message);
+                });
+            }
+                AjaxRequest.hideBox();
+        })
+        .catch(error => {
+            alert(error.message);
+            AjaxRequest.hideBox();
+        });
+
+        return false;
     }
 
     /**

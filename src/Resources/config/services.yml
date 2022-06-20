@@ -1,25 +1,25 @@
 services:
-  wem.classes.grid_elements_wrapper:
+  wem.grid.classes.grid_elements_wrapper:
     class: WEM\GridBundle\Classes\GridElementsWrapper
     arguments:
       $translator: '@contao.translation.translator'
-      $gridBuilder: '@wem.helper.grid_builder'
+      $gridBuilder: '@wem.grid.helper.grid_builder'
     public: true
 
-  wem.classes.grid_start_manipulator:
+  wem.grid.classes.grid_start_manipulator:
     class: WEM\GridBundle\Classes\GridStartManipulator
     public: true
 
-  wem.classes.grid_elements_calculator:
+  wem.grid.classes.grid_elements_calculator:
     class: WEM\GridBundle\Classes\GridElementsCalculator
     public: true
 
-  wem.helper.tl_content_callback:
+  wem.grid.helper.tl_content_callback:
     class: WEM\GridBundle\Helper\tlContentCallback
     arguments:
-      $gridElementsCalculator: '@wem.classes.grid_elements_calculator'
+      $gridElementsCalculator: '@wem.grid.classes.grid_elements_calculator'
     public: true
 
-  wem.helper.grid_builder:
+  wem.grid.helper.grid_builder:
     class: WEM\GridBundle\Helper\GridBuilder
     public: true

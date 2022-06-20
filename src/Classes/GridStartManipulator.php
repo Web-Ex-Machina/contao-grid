@@ -102,7 +102,7 @@ class GridStartManipulator
     {
         return (new self())
             ->setGridStart($gridStart)
-            ->setGridElementsCalculator(System::getContainer()->get('wem.classes.grid_elements_calculator'))
+            ->setGridElementsCalculator(System::getContainer()->get('wem.grid.classes.grid_elements_calculator'))
         ;
     }
 
@@ -111,7 +111,7 @@ class GridStartManipulator
      */
     public function recalculateElementsForAllGridSharingTheSamePidAndPtable(): self
     {
-        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
+        $this->gridElementCalculator->recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
         $this->gridStart->refresh();
 
         return $this;

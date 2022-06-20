@@ -37,7 +37,7 @@ class GridOpenedManager
     public static function getInstance()
     {
         if (null === self::$instance) {
-            self::$instance = (new self())->setGridBuilder(System::getContainer()->get('wem.helper.grid_builder'));
+            self::$instance = (new self())->setGridBuilder(System::getContainer()->get('wem.grid.helper.grid_builder'));
         }
 
         return self::$instance;
@@ -56,7 +56,11 @@ class GridOpenedManager
         $grid
             ->setId((string) $element->id)
             ->setPreset($element->grid_preset)
-            ->setCols(!\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols)
+            ->setCols(
+                null === $element->grid_cols
+                ? []
+                : (!\is_array($element->grid_cols) ? unserialize($element->grid_cols) : $element->grid_cols)
+            )
             ->setWrapperClasses($this->gridBuilder->getWrapperClasses($element))
             ->setItemClasses($this->gridBuilder->getItemClasses($element))
             ->setItemClassesForm($this->gridBuilder->getItemClasses($element, true))
