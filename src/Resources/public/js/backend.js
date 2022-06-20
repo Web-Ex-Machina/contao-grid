@@ -333,7 +333,7 @@ window.addEvent("domready", function () {
             c = c.replace(classes[i], "");
         }
 
-        item.setAttribute('data-class', c.trim());
+        item.setAttribute('data-class', c.trim().replace('hidden','wem_hidden'));
     });
 
     document.querySelectorAll('.gridelement select[data-type="cols"]').forEach(function (i) {
@@ -560,7 +560,7 @@ window.addEvent("domready", function () {
         + itemgrid.querySelector('select[data-type="rows"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]').value.replace(regexpBreakpoints,'') 
         + ' ' 
         + itemgrid.querySelector('select[data-type="cols"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]').value.replace(regexpBreakpoints,'');
-        itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass);
+        itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass.replace('hidden','wem_hidden'));
     }
 
     function saveItemCols(itemId, value, breakpoint){
