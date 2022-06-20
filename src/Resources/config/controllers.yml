@@ -10,4 +10,5 @@ services:
     arguments:
         $framework: '@contao.framework'
         $translator: '@contao.translation.translator'
+        $gridStartManipulator: '@wem.grid.classes.grid_start_manipulator'
     public: true

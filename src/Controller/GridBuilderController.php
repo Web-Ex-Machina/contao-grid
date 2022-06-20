@@ -37,13 +37,17 @@ class GridBuilderController extends \Contao\Controller
     protected $translator;
     /** @var ContaoFramework */
     protected $framework;
+    /** @var GridStartManipulator */
+    protected $gridStartManipulator;
 
     public function __construct(
         ContaoFramework $framework,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        GridStartManipulator $gridStartManipulator
     ) {
         $this->framework = $framework;
         $this->translator = $translator;
+        $this->gridStartManipulator = $gridStartManipulator;
         $this->framework->initialize();
     }
 
@@ -80,7 +84,7 @@ class GridBuilderController extends \Contao\Controller
         }
 
         $grid = $this->getGridStart((int) Input::get('grid'));
-        $gsm = GridStartManipulator::create($grid);
+        $gsm = $this->gridStartManipulator::create($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_COLS, Input::get('breakpoint'), Input::get('value'));
         $grid = $gsm->getGridStart();
@@ -101,7 +105,7 @@ class GridBuilderController extends \Contao\Controller
         }
 
         $grid = $this->getGridStart((int) Input::get('grid'));
-        $gsm = GridStartManipulator::create($grid);
+        $gsm = $this->gridStartManipulator::create($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_ROWS, Input::get('breakpoint'), Input::get('value'));
         $grid = $gsm->getGridStart();
@@ -118,7 +122,7 @@ class GridBuilderController extends \Contao\Controller
         $response = ['status' => 'success', 'message' => ''];
         $this->validateMandatoryParameters();
         $grid = $this->getGridStart((int) Input::get('grid'));
-        $gsm = GridStartManipulator::create($grid);
+        $gsm = $this->gridStartManipulator::create($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_CLASSES, null, Input::get('value'));
         $grid = $gsm->getGridStart();
