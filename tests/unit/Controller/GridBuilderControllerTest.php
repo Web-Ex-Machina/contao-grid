@@ -102,6 +102,158 @@ class GridBuilderControllerTest extends ContaoTestCase
         $this->assertSame(json_decode($response->getContent(), true)['message'], 'Unknown property');
     }
 
+    public function testSaveCols(): void
+    {
+        Input::setGet('id', 1);
+        Input::setGet('grid', 2);
+        Input::setGet('value', 'col-span-2');
+        Input::setGet('breakpoint', 'xl');
+        $response = $this->sut->saveCols();
+        $this->assertSame($response['status'], 'success');
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', 2);
+            Input::setGet('value', 'col-span-2');
+            Input::setGet('breakpoint', null);
+            $response = $this->sut->saveCols();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No breakpoint provided');
+        }
+
+        try {
+            Input::setGet('id', null);
+            Input::setGet('grid', 2);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->saveCols();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No element ID provided');
+        }
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', null);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->saveCols();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No grid ID provided');
+        }
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', 2);
+            Input::setGet('value', null);
+            $this->sut->saveCols();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No value provided');
+        }
+    }
+
+    public function testSaveRows(): void
+    {
+        Input::setGet('id', 1);
+        Input::setGet('grid', 2);
+        Input::setGet('value', 'col-span-2');
+        Input::setGet('breakpoint', 'xl');
+        $response = $this->sut->saveRows();
+        $this->assertSame($response['status'], 'success');
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', 2);
+            Input::setGet('value', 'col-span-2');
+            Input::setGet('breakpoint', null);
+            $response = $this->sut->saveRows();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No breakpoint provided');
+        }
+
+        try {
+            Input::setGet('id', null);
+            Input::setGet('grid', 2);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->saveRows();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No element ID provided');
+        }
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', null);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->saveRows();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No grid ID provided');
+        }
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', 2);
+            Input::setGet('value', null);
+            $this->sut->saveRows();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No value provided');
+        }
+    }
+
+    public function testSaveClasses(): void
+    {
+        Input::setGet('id', 1);
+        Input::setGet('grid', 2);
+        Input::setGet('value', 'col-span-2');
+        $response = $this->sut->saveClasses();
+        $this->assertSame($response['status'], 'success');
+
+        try {
+            Input::setGet('id', null);
+            Input::setGet('grid', 2);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->saveClasses();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No element ID provided');
+        }
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', null);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->saveClasses();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No grid ID provided');
+        }
+
+        try {
+            Input::setGet('id', 1);
+            Input::setGet('grid', 2);
+            Input::setGet('value', null);
+            $this->sut->saveClasses();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No value provided');
+        }
+    }
+
     public function testValidateMandatoryParameters(): void
     {
         try {
