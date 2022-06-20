@@ -64,6 +64,8 @@ class GridBuilderController extends \Contao\Controller
                 case 'classes':
                     $response = $this->saveClasses();
                 break;
+                default:
+                    throw new Exception('Unknown property');
             }
         } catch (\Exception $e) {
             $response = [
@@ -84,7 +86,7 @@ class GridBuilderController extends \Contao\Controller
         }
 
         $grid = $this->getGridStart((int) Input::get('grid'));
-        $gsm = $this->gridStartManipulator::create($grid);
+        $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_COLS, Input::get('breakpoint'), Input::get('value'));
         $grid = $gsm->getGridStart();
@@ -105,7 +107,7 @@ class GridBuilderController extends \Contao\Controller
         }
 
         $grid = $this->getGridStart((int) Input::get('grid'));
-        $gsm = $this->gridStartManipulator::create($grid);
+        $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_ROWS, Input::get('breakpoint'), Input::get('value'));
         $grid = $gsm->getGridStart();
@@ -122,7 +124,7 @@ class GridBuilderController extends \Contao\Controller
         $response = ['status' => 'success', 'message' => ''];
         $this->validateMandatoryParameters();
         $grid = $this->getGridStart((int) Input::get('grid'));
-        $gsm = $this->gridStartManipulator::create($grid);
+        $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_CLASSES, null, Input::get('value'));
         $grid = $gsm->getGridStart();
@@ -134,7 +136,7 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
-    protected function validateMandatoryParameters(): void
+    public function validateMandatoryParameters(): void
     {
         if (null === Input::get('id')) {
             throw new Exception('No element ID provided');
@@ -149,7 +151,7 @@ class GridBuilderController extends \Contao\Controller
 
     protected function getGridStart(int $id): ContentModel
     {
-        $grid = ContentModel::findOneById($id);
+        $grid = $this->framework->getAdapter(ContentModel::class)->findOneById($id); // to allow Unit Tests to run
         if (!$grid) {
             throw new Exception('No grid found with the provided ID');
         }

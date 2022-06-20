@@ -39,7 +39,7 @@ class GridOpenedManagerTest extends ContaoTestCase
         $container = $this->getContainerWithContaoConfiguration();
         $container->setParameter('contao.resources_paths', realpath(__DIR__.'/../../../tests/_fake_contao'));
         $container->set('database_connection', $this->createMock(Connection::class));
-        $container->set('wem.helper.grid_builder', new GridBuilder());
+        $container->set('wem.grid.helper.grid_builder', new GridBuilder());
         \Contao\System::setContainer($container);
         $this->getTempDir();
 

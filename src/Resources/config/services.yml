@@ -8,6 +8,8 @@ services:
 
   wem.grid.classes.grid_start_manipulator:
     class: WEM\GridBundle\Classes\GridStartManipulator
+    arguments:
+      $gridElementsCalculator: '@wem.grid.classes.grid_elements_calculator'
     public: true
 
   wem.grid.classes.grid_elements_calculator:
