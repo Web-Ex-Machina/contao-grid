@@ -79,19 +79,29 @@ class GridBuilder
                     if (0 === $k) {
                         $arrClasses[] = sprintf('cols-%d', $col['value']);
                     } else {
-                        $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
+                        if ('FE' === TL_MODE) {
+                            if (0 !== (int) $col['value']) {
+                                $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
+                            }
+                        } else {
+                            $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
+                        }
                     }
                 }
 
-                if (!\is_array($rows)) {
-                    // $arrClasses = [];
-                } else {
+                if (\is_array($rows)) {
                     foreach ($rows as $k => $row) {
                         // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                         if (0 === $k) {
                             $arrClasses[] = sprintf('rows-%d', $row['value']);
                         } else {
-                            $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                            if ('FE' === TL_MODE) {
+                                if (0 !== (int) $row['value']) {
+                                    $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                                }
+                            } else {
+                                $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                            }
                         }
                     }
                 }

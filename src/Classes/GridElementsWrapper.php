@@ -72,54 +72,13 @@ class GridElementsWrapper
             // Retrieve the parent
             $openGrid = $gop->getParentGrid($objElement);
 
-            return sprintf(
-                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
-                implode(' ', $openGrid->getItemClassesForAllResolution()),
-                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
-                $objElement->id,
-                $objElement->type,
-                !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
-                $strBuffer,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId) : ''
-            );
+            return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }
         if ('grid-stop' === $objElement->type && true === $openGrid->isSubGrid()) {
-            return sprintf(
-                '%s<div data-id="%s" data-type="%s">%s</div></div>',
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup() : '',
-                $objElement->id,
-                $objElement->type,
-                $strBuffer
-            );
-        }
-        if (!\in_array($objElement->type, static::$arrSkipContentTypes, true) && true === $openGrid->isSubGrid()) {
-            return sprintf(
-                '<div class="%s %s %s %s be_subgrid_item" data-id="%s" data-type="%s">%s%s</div>',
-                implode(' ', $openGrid->getItemClassesForAllResolution()),
-                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
-                $objElement->id,
-                $objElement->type,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
-                $strBuffer
-            );
+            return $this->getGridStopHTMLMarkup($objElement, $strBuffer);
         }
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
-            return sprintf(
-                '<div class="%s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
-                implode(' ', $openGrid->getItemClassesForAllResolution()),
-                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
-                $objElement->id,
-                $objElement->type,
-                TL_MODE === 'BE' && !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
-                $strBuffer
-            );
+            return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }
 
         return $strBuffer;
@@ -226,5 +185,78 @@ class GridElementsWrapper
         }
 
         return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
+    }
+
+    protected function getSubGridStartHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
+    {
+        if (TL_MODE === 'BE') {
+            return sprintf(
+                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
+                implode(' ', $openGrid->getItemClassesForAllResolution()),
+                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+                $objElement->id,
+                $objElement->type,
+                !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
+                !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
+                $strBuffer,
+                !Input::get('grid_preview') ? $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId) : ''
+            );
+        }
+
+        return sprintf(
+            '<div class="%s %s %s %s">%s',
+            implode(' ', $openGrid->getItemClassesForAllResolution()),
+            $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
+            $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+            $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+            $strBuffer
+        );
+    }
+
+    protected function getGridStopHTMLMarkup(ContentModel $objElement, string $strBuffer): string
+    {
+        if (TL_MODE === 'BE') {
+            return sprintf(
+                '%s<div data-id="%s" data-type="%s">%s</div></div>',
+               !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup() : '',
+                $objElement->id,
+                $objElement->type,
+                $strBuffer
+            );
+        }
+
+        return sprintf(
+            '<div>%s</div></div>',
+            $strBuffer
+        );
+    }
+
+    protected function getGridElementHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
+    {
+        if (TL_MODE === 'BE') {
+            return sprintf(
+                '<div class="%s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
+                implode(' ', $openGrid->getItemClassesForAllResolution()),
+                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+                true === $openGrid->isSubGrid() ? 'be_subgrid_item' : '',
+                $objElement->id,
+                $objElement->type,
+                !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
+                $strBuffer
+            );
+        }
+
+        return sprintf(
+            '<div class="%s %s %s %s">%s</div>',
+            implode(' ', $openGrid->getItemClassesForAllResolution()),
+            $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
+            $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+            $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+            $strBuffer
+        );
     }
 }
