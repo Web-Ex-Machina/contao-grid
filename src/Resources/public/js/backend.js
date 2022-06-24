@@ -496,7 +496,7 @@ window.addEvent("domready", function () {
             updateGridElementsSelectNbColumnsVisibility(event.target.value);
             var input = document.querySelector('input[data-breakpoint="'+event.target.value+'"]');
             if(null != input){
-                input.dispatchEvent(new Event('keyup_auto'));
+                input.dispatchEvent(new Event('keyup'));
             }
         });
     }
