@@ -32,7 +32,7 @@ WEM.Grid  = WEM.Grid || {};
                     container.addEventListener('drop',self.drop);
                 }
                 // save the original number of columns
-                var breakpoints = ['all','xxs','xs','sm','md','lg','xl'];
+                var breakpoints = ['all','xl','lg','md','sm','xs','xxs'];
                 for(var index in breakpoints){
                     var breakpoint = breakpoints[index];
                     var breakpointModifier = 'all' == breakpoint ? '' : '-'+breakpoint;

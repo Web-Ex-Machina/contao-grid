@@ -225,12 +225,12 @@ class GridElementWizard extends Widget
     <div class="helpers d-grid cols-3">
         <div class="item-grid">
             <span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
+            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
         </div>
         <div class="item-grid">
             <button class="tl_submit grid_toggleHelpers">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['toggleHelpers'].'</button>
@@ -258,7 +258,7 @@ class GridElementWizard extends Widget
         $grid = $this->gridOpenedManager->getGridById($gridId);
 
         if (false !== $pos && !Input::get('grid_preview')) {
-            $breakpoints = ['all', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl'];
+            $breakpoints = ['all', 'xl', 'lg', 'md', 'sm', 'xs', 'xxs'];
             $selectsCols = [];
             $selectsRows = [];
             $cols = $grid->getCols();
