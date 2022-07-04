@@ -282,12 +282,13 @@ class GridElementWizard extends Widget
 
                 $selectsCols[] = sprintf('
                         <label for="ctrl_%1$s_%2$s_cols_%5$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols">%3$s</select>',
+                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols" data-previous-value="%6$s">%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
-                    $breakpoint
+                    $breakpoint,
+                    $v
                 );
 
                 $options = '<option value="">-</option>';
@@ -305,14 +306,15 @@ class GridElementWizard extends Widget
 
                 $selectsRows[] = sprintf('
                         <label for="ctrl_%1$s_%2$s_rows_%5$s" class="%6$s" data-force-hidden="%7$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %6$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s">%3$s</select>',
+                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %6$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s" data-previous-value="%8$s">%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
                     $this->User->isAdmin ? '' : 'hidden',
-                    !$this->User->isAdmin
+                    !$this->User->isAdmin,
+                    $v
                 );
             }
 
