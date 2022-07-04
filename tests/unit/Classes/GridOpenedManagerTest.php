@@ -42,6 +42,9 @@ class GridOpenedManagerTest extends ContaoTestCase
         $container->set('wem.grid.helper.grid_builder', new GridBuilder());
         \Contao\System::setContainer($container);
         $this->getTempDir();
+        if (!\defined('TL_MODE')) {
+            \define('TL_MODE', 'FE');
+        }
 
         $this->sut = GridOpenedManager::getInstance();
     }

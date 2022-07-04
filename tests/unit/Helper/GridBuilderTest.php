@@ -97,12 +97,6 @@ class GridBuilderTest extends ContaoTestCase
                     return [
                         'd-grid',
                         'cols-2',
-                        'cols-xxs-0',
-                        'cols-xs-0',
-                        'cols-sm-0',
-                        'cols-md-0',
-                        'cols-lg-0',
-                        'cols-xl-0',
                         'gap-1-rem',
                     ];
                 },

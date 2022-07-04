@@ -61,21 +61,21 @@ class GridStartManipulator
     ];
     public const DEFAULT_GRID_ITEM_COLS = [
         self::RESOLUTION_ALL => '',
-        self::RESOLUTION_XXS => '',
-        self::RESOLUTION_XS => '',
-        self::RESOLUTION_SM => '',
-        self::RESOLUTION_MD => '',
-        self::RESOLUTION_LG => '',
         self::RESOLUTION_XL => '',
+        self::RESOLUTION_LG => '',
+        self::RESOLUTION_MD => '',
+        self::RESOLUTION_SM => '',
+        self::RESOLUTION_XS => '',
+        self::RESOLUTION_XXS => '',
     ];
     public const DEFAULT_GRID_ITEM_ROWS = [
         self::RESOLUTION_ALL => '',
-        self::RESOLUTION_XXS => '',
-        self::RESOLUTION_XS => '',
-        self::RESOLUTION_SM => '',
-        self::RESOLUTION_MD => '',
-        self::RESOLUTION_LG => '',
         self::RESOLUTION_XL => '',
+        self::RESOLUTION_LG => '',
+        self::RESOLUTION_MD => '',
+        self::RESOLUTION_SM => '',
+        self::RESOLUTION_XS => '',
+        self::RESOLUTION_XXS => '',
     ];
     public const DEFAULT_GRID_CLASSES = '';
     public const DEFAULT_GRID_ITEMS = [self::PROPERTY_COLS => self::DEFAULT_GRID_ITEM_COLS, self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEM_ROWS, self::PROPERTY_CLASSES => self::DEFAULT_GRID_CLASSES];

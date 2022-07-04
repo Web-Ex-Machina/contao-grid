@@ -4,6 +4,7 @@ services:
     arguments:
       $translator: '@contao.translation.translator'
       $gridBuilder: '@wem.grid.helper.grid_builder'
+      $gridCssClassesInheritance: '@wem.grid.classes.grid_css_classes_inheritance'
     public: true
 
   wem.grid.classes.grid_start_manipulator:
@@ -14,6 +15,10 @@ services:
 
   wem.grid.classes.grid_elements_calculator:
     class: WEM\GridBundle\Classes\GridElementsCalculator
+    public: true
+
+  wem.grid.classes.grid_css_classes_inheritance:
+    class: WEM\GridBundle\Classes\GridCssClassesInheritance
     public: true
 
   wem.grid.helper.tl_content_callback:

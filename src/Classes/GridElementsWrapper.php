@@ -30,14 +30,18 @@ class GridElementsWrapper
     protected $translator;
     /** @var GridBuilder */
     protected $gridBuilder;
+    /** @var GridCssClassesInheritance */
+    protected $gridCssClassesInheritance;
     protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
 
     public function __construct(
         TranslatorInterface $translator,
-        GridBuilder $gridBuilder
+        GridBuilder $gridBuilder,
+        GridCssClassesInheritance $gridCssClassesInheritance
     ) {
         $this->translator = $translator;
         $this->gridBuilder = $gridBuilder;
+        $this->gridCssClassesInheritance = $gridCssClassesInheritance;
     }
 
     /**
@@ -208,8 +212,8 @@ class GridElementsWrapper
         return sprintf(
             '<div class="%s %s %s %s">%s',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-            $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
             $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
             $strBuffer
         );
@@ -253,8 +257,8 @@ class GridElementsWrapper
         return sprintf(
             '<div class="%s %s %s %s">%s</div>',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-            $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
             $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
             $strBuffer
         );
