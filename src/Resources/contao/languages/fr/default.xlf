@@ -29,11 +29,6 @@
         <source>An empty element for a grid</source>
         <target>Elément vide pour une grille</target>
       </trans-unit>
-
-      <trans-unit id="WEM.GRID.BE.previewLabel">
-        <source>Preview</source>
-        <target>Aperçu</target>
-      </trans-unit>
       <trans-unit id="WEM.GRID.BE.valuesLabel">
         <source>Values</source>
         <target>Valeurs</target>
@@ -69,14 +64,6 @@
       <trans-unit id="WEM.GRID.BE.nbRowsOptionLabel">
         <source>%s row(s)</source>
         <target>%s ligne(s)</target>
-      </trans-unit>
-      <trans-unit id="WEM.GRID.BE.toggleHelpers">
-        <source>Display/Hide visual help</source>
-        <target>Afficher/Cacher la grille d'aide</target>
-      </trans-unit>
-      <trans-unit id="WEM.GRID.BE.manualLabel">
-        <source>Here is a guide to understand how the grid works : %s</source>
-        <target>Vous trouverez ici un guide pour comprendre comment la grille fonctionne : %s</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.inputItemPlaceholder">
         <source>Add a class to this item's wrapper</source>

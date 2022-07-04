@@ -5,22 +5,6 @@
         <source>Grid settings</source>
         <target>Paramètres de la grille</target>
       </trans-unit>
-      <trans-unit id="tl_content.grid_preset.0">
-        <source>Preset</source>
-        <target>Preset</target>
-      </trans-unit>
-      <trans-unit id="tl_content.grid_preset.1">
-        <source>Select the grid preset</source>
-        <target>Sélectionner le format de grille</target>
-      </trans-unit>
-      <trans-unit id="tl_content.grid_preset.bs4">
-        <source>Bootstrap 4</source>
-        <target>Bootstrap 4</target>
-      </trans-unit>
-      <trans-unit id="tl_content.grid_preset.cssgrid">
-        <source>CSS Grid</source>
-        <target>CSS Grid</target>
-      </trans-unit>
       <trans-unit id="tl_content.grid_rows.0">
         <source>Rows</source>
         <target>Lignes</target>

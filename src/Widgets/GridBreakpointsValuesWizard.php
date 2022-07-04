@@ -31,13 +31,6 @@ class GridBreakpointsValuesWizard extends \Widget
     protected $strTemplate = 'be_widget';
 
     /**
-     * Grid preset.
-     *
-     * @var string
-     */
-    protected $strGridPreset = '';
-
-    /**
      * Grid breakpoints.
      *
      * @var array
@@ -94,7 +87,6 @@ class GridBreakpointsValuesWizard extends \Widget
      */
     public function generate()
     {
-        $this->strGridPreset = $this->activeRecord->grid_preset;
         $this->arrGridBreakpoints = [
             ['name' => 'all', 'label' => 'Général', 'required' => true, 'value' => 2],
             ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
@@ -117,7 +109,6 @@ class GridBreakpointsValuesWizard extends \Widget
 
         $objTemplate = new \FrontendTemplate('be_gridBreakpointsValuesWizard');
         $objTemplate->input = $this->strId;
-        $objTemplate->preset = $this->strGridPreset;
         $objTemplate->breakpoints = $this->arrGridBreakpoints;
 
         return $objTemplate->parse();

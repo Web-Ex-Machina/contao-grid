@@ -56,22 +56,6 @@ class GridBuilder
         if (!\is_array($cols)) {
             return [];
         }
-
-        // switch ($objElement->grid_preset) {
-        //     case 'bs3':
-        //         throw new \Exception(sprintf('Preset %s removed', $objElement->grid_preset));
-        //         break;
-
-        //     case 'bs4':
-        //         $arrClasses[] = $objElement->grid_row_class;
-
-        //         // In BS4, we need row class in the wrapper
-        //         if (!\in_array('row', $arrClasses, true)) {
-        //             $arrClasses[] = 'row';
-        //         }
-        //         break;
-
-        //     case 'cssgrid':
         $arrClasses[] = 'd-grid';
 
         foreach ($cols as $k => $col) {
@@ -109,11 +93,6 @@ class GridBuilder
         if (\is_array($gap)) {
             $arrClasses[] = sprintf('gap-%d%s', $gap['value'], '' !== $gap['unit'] ? sprintf('-%s', $gap['unit']) : '');
         }
-        // break;
-
-        //     default:
-        //         throw new \Exception(sprintf('Preset %s unknown', $objElement->grid_preset));
-        // }
 
         return $arrClasses;
     }
@@ -132,33 +111,7 @@ class GridBuilder
             $cols = \Contao\StringUtil::deserialize($objElement->grid_cols);
         }
 
-        // switch ($objElement->grid_preset) {
-        //     case 'bs3':
-        //         throw new \Exception(sprintf('Preset %s removed', $objElement->grid_preset));
-        //         break;
-
-        //     case 'bs4':
-        //         if (!$cols) {
-        //             $arrClasses = [];
-        //             break;
-        //         }
-
-        //         if (1 === \count($cols)) {
-        //             $arrClasses[] = sprintf('col-%d', 12 / $cols[0]['value']);
-        //         } else {
-        //             foreach ($cols as $k => $col) {
-        //                 $arrClasses[] = sprintf('col-%s-%d', $col['key'], 12 / $col['value']);
-        //             }
-        //         }
-        //         break;
-
-        //     case 'cssgrid':
         $arrClasses[] = 'item-grid';
-        //         break;
-
-        //     default:
-        //         throw new \Exception(sprintf('Preset %s unknown', $objElement->grid_preset));
-        // }
 
         // Setup special item rules
         $arrItemsClasses = [];

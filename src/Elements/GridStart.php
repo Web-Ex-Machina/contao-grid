@@ -43,7 +43,6 @@ class GridStart extends ContentElement
             $this->strTemplate = 'be_wildcard';
             $this->Template = new BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
-            $this->Template->wildcard = $GLOBALS['TL_LANG']['tl_content']['grid_preset'][$this->grid_preset];
 
             $this->arrGridBreakpoints = [
                 ['name' => 'all', 'label' => 'Général', 'required' => true],
@@ -74,7 +73,7 @@ class GridStart extends ContentElement
                     $breakpoints[] = $breakpoint['label'].': '.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
                 }
             }
-            $this->Template->wildcard .= ' | Config: '.implode(', ', $breakpoints);
+            $this->Template->wildcard = 'Config: '.implode(', ', $breakpoints);
         }
 
         // Check if the very next element is a grid-stop element

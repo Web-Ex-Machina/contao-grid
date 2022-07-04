@@ -206,9 +206,9 @@ class GridElementsWrapper
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
-                !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
+                $this->getBackendActionsForGridStartContentElement($objElement, $do, true),
                 $strBuffer,
-                !Input::get('grid_preview') ? $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId) : ''
+                $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId)
             );
         }
 
@@ -253,7 +253,7 @@ class GridElementsWrapper
                 'grid-item-empty' === $objElement->type ? 'be_grid_item_empty' : '',
                 $objElement->id,
                 $objElement->type,
-                !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
+                $this->getBackendActionsForContentElement($objElement, $do, true),
                 $strBuffer
             );
         }
