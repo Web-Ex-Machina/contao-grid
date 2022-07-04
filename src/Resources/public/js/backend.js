@@ -473,9 +473,10 @@ window.addEvent("domready", function () {
     });
 
     for(var i =0; i<= 6; i++){
-        var input = document.querySelector('[name="grid_cols['+i+'][value]"]');
-        if(null !== input){
-            input.addEventListener('keyup',function(event){
+        var select = document.querySelector('[name="grid_cols['+i+'][value]"]');
+        if(null !== select){
+            select.addEventListener('change',function(event){
+                
                 var nbColumns = parseInt(event.target.value);
                 if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
                     return;
@@ -494,9 +495,9 @@ window.addEvent("domready", function () {
     if(null != selectBreakpoints){
         selectBreakpoints.addEventListener('change',function(event){
             updateGridElementsSelectNbColumnsVisibility(event.target.value);
-            var input = document.querySelector('input[data-breakpoint="'+event.target.value+'"]');
-            if(null != input){
-                input.dispatchEvent(new Event('keyup'));
+            var select = document.querySelector('select[data-breakpoint="'+event.target.value+'"]');
+            if(null != select){
+                select.dispatchEvent(new Event('change'));
             }
         });
     }

@@ -22,7 +22,13 @@
 			</h3>
 			<?php foreach($this->breakpoints as $k => $b): ?>
 				<input type="hidden" name="<?= $this->input ?>[<?= $k ?>][key]" id="<?= $this->input ?>_key_<?= $k ?>" class="tl_text" value="<?= $b['name'] ?>">
-				<input type="text" name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_text hidden" value="<?= $b['value'] ?>"<?= $b['required'] ? ' required' : '' ?> data-breakpoint="<?= $b['name'] ?>">
+				<select  name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= $b['required'] ? 'required' : ''; ?>>
+					<?php for($i = 1; $i <= 12; $i++): ?>
+						<option value="<?php echo $i; ?>" <?php echo $i === (int) $b['value'] ? 'selected' : '' ?>>
+							<?php echo $i; ?>
+						</option>
+					<?php endfor; ?>
+				</select>
 			<?php endforeach; ?>
 		</div>
 		<div class="cols-span-4"></div>
@@ -30,8 +36,8 @@
 	<script type="text/javascript">
 		window.addEvent("domready", function () {
 			document.getElementById('ctrl_select_breakpoints_<?= $this->strId; ?>').addEventListener("change", function (e) {
-				document.querySelectorAll('input[data-breakpoint]').forEach(function(input){
-					input.classList.toggle('hidden',input.getAttribute('data-breakpoint') != e.target.value);
+				document.querySelectorAll('select[data-breakpoint]').forEach(function(select){
+					select.classList.toggle('hidden',select.getAttribute('data-breakpoint') != e.target.value);
 				});
 			});
 			document.getElementById('ctrl_select_breakpoints_<?= $this->strId; ?>').dispatchEvent(new Event('change'));
