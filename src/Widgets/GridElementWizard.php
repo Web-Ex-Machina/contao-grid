@@ -131,29 +131,29 @@ class GridElementWizard extends Widget
 
         $strGrid = sprintf('<div class="grid_preview %s" data-id="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id);
 
-        switch ($this->activeRecord->grid_preset) {
-            case 'cssgrid':
-                $strHelper = sprintf(
+        // switch ($this->activeRecord->grid_preset) {
+        //     case 'cssgrid':
+        $strHelper = sprintf(
                     '<a href="%s" title="%s" target="_blank">%s</a>',
                     'https://framway.webexmachina.fr/#framway__manuals-grid',
                     'Framway Grid Manual',
                     'Framway Grid Manual'
                 );
-                break;
+        //         break;
 
-            case 'bs4':
-                $strHelper = sprintf(
-                    '<a href="%s" title="%s" target="_blank">%s</a>',
-                    'https://getbootstrap.com/docs/4.0/layout/grid/',
-                    'BS4 Grid Manual',
-                    'BS4 Grid Manual'
-                );
-                break;
+        //     case 'bs4':
+        //         $strHelper = sprintf(
+        //             '<a href="%s" title="%s" target="_blank">%s</a>',
+        //             'https://getbootstrap.com/docs/4.0/layout/grid/',
+        //             'BS4 Grid Manual',
+        //             'BS4 Grid Manual'
+        //         );
+        //         break;
 
-            default:
-                $strHelper = '';
-                break;
-        }
+        //     default:
+        //         $strHelper = '';
+        //         break;
+        // }
 
         if ('' !== $strHelper) {
             $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
@@ -220,25 +220,36 @@ class GridElementWizard extends Widget
             $objResponse->send();
         }
 
+//         $strReturn =
+//         '<div class="gridelement">
+//     <div class="helpers d-grid cols-3">
+//         <div class="item-grid">
+//             <span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
+//             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
+//             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
+//             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
+//             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
+//             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
+//             <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
+//         </div>
+//         <div class="item-grid">
+//             <button class="tl_submit grid_toggleHelpers">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['toggleHelpers'].'</button>
+//         </div>
+//     </div>
+//     '.$strHelper.'
+//     '.$strGrid.'
+        // </div>';
+
         $strReturn =
         '<div class="gridelement">
-    <div class="helpers d-grid cols-3">
-        <div class="item-grid">
-            <span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
-        </div>
-        <div class="item-grid">
-            <button class="tl_submit grid_toggleHelpers">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['toggleHelpers'].'</button>
-        </div>
-    </div>
-    '.$strHelper.'
-    '.$strGrid.'
-</div>';
+            <div class="helpers d-grid cols-3">
+                <div class="item-grid">
+                    <button class="tl_submit grid_toggleHelpers">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['toggleHelpers'].'</button>
+                </div>
+            </div>
+            '.$strHelper.'
+            '.$strGrid.'
+        </div>';
 
         return $strReturn;
     }
