@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
-use Contao\BackendTemplate;
 use Contao\ContentModel;
 use Contao\Input;
 use Contao\Widget;
@@ -131,36 +130,7 @@ class GridElementWizard extends Widget
 
         $strGrid = sprintf('<div class="grid_preview %s" data-id="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id);
 
-        switch ($this->activeRecord->grid_preset) {
-            case 'cssgrid':
-                $strHelper = sprintf(
-                    '<a href="%s" title="%s" target="_blank">%s</a>',
-                    'https://framway.webexmachina.fr/#framway__manuals-grid',
-                    'Framway Grid Manual',
-                    'Framway Grid Manual'
-                );
-                break;
-
-            case 'bs4':
-                $strHelper = sprintf(
-                    '<a href="%s" title="%s" target="_blank">%s</a>',
-                    'https://getbootstrap.com/docs/4.0/layout/grid/',
-                    'BS4 Grid Manual',
-                    'BS4 Grid Manual'
-                );
-                break;
-
-            default:
-                $strHelper = '';
-                break;
-        }
-
-        if ('' !== $strHelper) {
-            $strHelper = '<div class="tl_info">'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['manualLabel'], $strHelper).'</div>';
-        }
-        if (!Input::get('grid_preview')) {
-            $strGrid .= $this->gridBuilder->fakeFirstGridElementMarkup((string) $this->activeRecord->id);
-        }
+        $strGrid .= $this->gridBuilder->fakeFirstGridElementMarkup((string) $this->activeRecord->id);
 
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
@@ -205,42 +175,13 @@ class GridElementWizard extends Widget
         // Add CSS & JS to the Wizard
         $this->addAssets();
 
-        if (!Input::get('grid_preview')) {
-            $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup();
-            $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup();
-        }
+        $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup();
+        $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup();
         $strGrid .= '</div>';
 
-        // If we want a preview modal, catch & break
-        if (Input::get('grid_preview')) {
-            $objTemplate = new BackendTemplate('be_grid_preview');
-            $objTemplate->grid = $strGrid;
-            $objTemplate->css = $GLOBALS['TL_CSS'];
-            $objResponse = new \Haste\Http\Response\HtmlResponse($objTemplate->parse());
-            $objResponse->send();
-        }
-
-        $strReturn =
-        '<div class="gridelement">
-    <div class="helpers d-grid cols-3">
-        <div class="item-grid">
-            <span class="label">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['previewLabel'].' :</span>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xxs">XXS</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xs">XS</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="sm">SM</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="md">MD</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="lg">LG</button>
-            <button class="tl_submit grid_toggleBreakPoint" data-breakpoint="xl">XL</button>
-        </div>
-        <div class="item-grid">
-            <button class="tl_submit grid_toggleHelpers">'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['toggleHelpers'].'</button>
-        </div>
-    </div>
-    '.$strHelper.'
-    '.$strGrid.'
-</div>';
-
-        return $strReturn;
+        return '<div class="gridelement">
+            '.$strGrid.'
+        </div>';
     }
 
     /**
@@ -257,8 +198,8 @@ class GridElementWizard extends Widget
         $pos = strrpos($strElement, $search);
         $grid = $this->gridOpenedManager->getGridById($gridId);
 
-        if (false !== $pos && !Input::get('grid_preview')) {
-            $breakpoints = ['all', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl'];
+        if (false !== $pos) {
+            $breakpoints = ['all', 'xl', 'lg', 'md', 'sm', 'xs', 'xxs'];
             $selectsCols = [];
             $selectsRows = [];
             $cols = $grid->getCols();
@@ -282,12 +223,13 @@ class GridElementWizard extends Widget
 
                 $selectsCols[] = sprintf('
                         <label for="ctrl_%1$s_%2$s_cols_%5$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols">%3$s</select>',
+                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols" data-previous-value="%6$s">%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
-                    $breakpoint
+                    $breakpoint,
+                    $v
                 );
 
                 $options = '<option value="">-</option>';
@@ -305,14 +247,15 @@ class GridElementWizard extends Widget
 
                 $selectsRows[] = sprintf('
                         <label for="ctrl_%1$s_%2$s_rows_%5$s" class="%6$s" data-force-hidden="%7$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %6$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s">%3$s</select>',
+                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %6$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s" data-previous-value="%8$s">%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
                     $this->User->isAdmin ? '' : 'hidden',
-                    !$this->User->isAdmin
+                    !$this->User->isAdmin,
+                    $v
                 );
             }
 

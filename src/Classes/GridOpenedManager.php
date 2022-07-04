@@ -55,7 +55,6 @@ class GridOpenedManager
         $grid = new GridOpened();
         $grid
             ->setId((string) $element->id)
-            ->setPreset($element->grid_preset)
             ->setCols(
                 null === $element->grid_cols
                 ? []

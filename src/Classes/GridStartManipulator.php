@@ -31,44 +31,51 @@ class GridStartManipulator
     public const RESOLUTION_LG = 'lg';
     public const RESOLUTION_XL = 'xl';
     public const PROPERTIES = [self::PROPERTY_COLS, self::PROPERTY_ROWS, self::PROPERTY_CLASSES];
-    public const RESOLUTIONS = [self::RESOLUTION_ALL, self::RESOLUTION_XXS, self::RESOLUTION_XS, self::RESOLUTION_SM, self::RESOLUTION_MD, self::RESOLUTION_LG, self::RESOLUTION_XL,
+    public const RESOLUTIONS = [
+        self::RESOLUTION_ALL,
+        self::RESOLUTION_XL,
+        self::RESOLUTION_LG,
+        self::RESOLUTION_MD,
+        self::RESOLUTION_SM,
+        self::RESOLUTION_XS,
+        self::RESOLUTION_XXS,
     ];
     /* warning : This format depends on the widget used to manage the grid_cols in tl_content DCA */
     public const DEFAULT_GRID_COLS = [
         ['key' => self::RESOLUTION_ALL, 'value' => ''],
-        ['key' => self::RESOLUTION_XXS, 'value' => ''],
-        ['key' => self::RESOLUTION_XS, 'value' => ''],
-        ['key' => self::RESOLUTION_SM, 'value' => ''],
-        ['key' => self::RESOLUTION_MD, 'value' => ''],
-        ['key' => self::RESOLUTION_LG, 'value' => ''],
         ['key' => self::RESOLUTION_XL, 'value' => ''],
+        ['key' => self::RESOLUTION_LG, 'value' => ''],
+        ['key' => self::RESOLUTION_MD, 'value' => ''],
+        ['key' => self::RESOLUTION_SM, 'value' => ''],
+        ['key' => self::RESOLUTION_XS, 'value' => ''],
+        ['key' => self::RESOLUTION_XXS, 'value' => ''],
     ];
     public const DEFAULT_GRID_ROWS = [
         ['key' => self::RESOLUTION_ALL, 'value' => ''],
-        ['key' => self::RESOLUTION_XXS, 'value' => ''],
-        ['key' => self::RESOLUTION_XS, 'value' => ''],
-        ['key' => self::RESOLUTION_SM, 'value' => ''],
-        ['key' => self::RESOLUTION_MD, 'value' => ''],
-        ['key' => self::RESOLUTION_LG, 'value' => ''],
         ['key' => self::RESOLUTION_XL, 'value' => ''],
+        ['key' => self::RESOLUTION_LG, 'value' => ''],
+        ['key' => self::RESOLUTION_MD, 'value' => ''],
+        ['key' => self::RESOLUTION_SM, 'value' => ''],
+        ['key' => self::RESOLUTION_XS, 'value' => ''],
+        ['key' => self::RESOLUTION_XXS, 'value' => ''],
     ];
     public const DEFAULT_GRID_ITEM_COLS = [
         self::RESOLUTION_ALL => '',
-        self::RESOLUTION_XXS => '',
-        self::RESOLUTION_XS => '',
-        self::RESOLUTION_SM => '',
-        self::RESOLUTION_MD => '',
-        self::RESOLUTION_LG => '',
         self::RESOLUTION_XL => '',
+        self::RESOLUTION_LG => '',
+        self::RESOLUTION_MD => '',
+        self::RESOLUTION_SM => '',
+        self::RESOLUTION_XS => '',
+        self::RESOLUTION_XXS => '',
     ];
     public const DEFAULT_GRID_ITEM_ROWS = [
         self::RESOLUTION_ALL => '',
-        self::RESOLUTION_XXS => '',
-        self::RESOLUTION_XS => '',
-        self::RESOLUTION_SM => '',
-        self::RESOLUTION_MD => '',
-        self::RESOLUTION_LG => '',
         self::RESOLUTION_XL => '',
+        self::RESOLUTION_LG => '',
+        self::RESOLUTION_MD => '',
+        self::RESOLUTION_SM => '',
+        self::RESOLUTION_XS => '',
+        self::RESOLUTION_XXS => '',
     ];
     public const DEFAULT_GRID_CLASSES = '';
     public const DEFAULT_GRID_ITEMS = [self::PROPERTY_COLS => self::DEFAULT_GRID_ITEM_COLS, self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEM_ROWS, self::PROPERTY_CLASSES => self::DEFAULT_GRID_CLASSES];
@@ -125,23 +132,23 @@ class GridStartManipulator
      * Allow to set the grid cols settings.
      *
      * @param int $all The settings for all resolutions
-     * @param int $xxs The settings for the XXS resolution
-     * @param int $xs  The settings for the XS resolution
-     * @param int $sm  The settings for the SM resolution
-     * @param int $md  The settings for the MD resolution
-     * @param int $lg  The settings for the LG resolution
      * @param int $xl  The settings for the XL resolution
+     * @param int $lg  The settings for the LG resolution
+     * @param int $md  The settings for the MD resolution
+     * @param int $sm  The settings for the SM resolution
+     * @param int $xs  The settings for the XS resolution
+     * @param int $xxs The settings for the XXS resolution
      */
-    public function setGridCols(?int $all, ?int $xxs, ?int $xs, ?int $sm, ?int $md, ?int $lg, ?int $xl): self
+    public function setGridCols(?int $all, ?int $xl, ?int $lg, ?int $md, ?int $sm, ?int $xs, ?int $xxs): self
     {
         return $this
             ->setGridColsAll($all)
-            ->setGridColsXxs($xxs)
-            ->setGridColsXs($xs)
-            ->setGridColsSm($sm)
-            ->setGridColsMd($md)
-            ->setGridColsLg($lg)
             ->setGridColsXl($xl)
+            ->setGridColsLg($lg)
+            ->setGridColsMd($md)
+            ->setGridColsSm($sm)
+            ->setGridColsXs($xs)
+            ->setGridColsXxs($xxs)
         ;
     }
 

@@ -21,10 +21,11 @@
         <source>End a Grid</source>
         <target>End a Grid</target>
       </trans-unit>
-
-      <trans-unit id="WEM.GRID.BE.previewLabel">
-        <source>Preview</source>
-        <target>Preview</target>
+      <trans-unit id="CTE.grid-item-empty.0">
+        <source>Grid | Empty item</source>
+      </trans-unit>
+      <trans-unit id="CTE.grid-item-empty.1">
+        <source>An empty element for a grid</source>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.valuesLabel">
         <source>Values</source>
@@ -41,14 +42,6 @@
       <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
         <source>%s column(s)</source>
         <target>%s column(s)</target>
-      </trans-unit>
-      <trans-unit id="WEM.GRID.BE.toggleHelpers">
-        <source>Display/Hide visual help</source>
-        <target>Display/Hide visual help</target>
-      </trans-unit>
-      <trans-unit id="WEM.GRID.BE.manualLabel">
-        <source>Here is a guide to understand how the grid works : %s</source>
-        <target>Here is a guide to understand how the grid works : %s</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.inputItemPlaceholder">
         <source>Add a class to this item's wrapper</source>

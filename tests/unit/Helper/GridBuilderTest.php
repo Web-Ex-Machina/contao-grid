@@ -76,7 +76,6 @@ class GridBuilderTest extends ContaoTestCase
             'cssgrid - set #1' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
-                    $grid->grid_preset = 'cssgrid';
                     $grid->grid_cols = serialize([
                         ['key' => 'all', 'value' => '2'],
                         ['key' => 'xxs', 'value' => ''],
@@ -97,12 +96,6 @@ class GridBuilderTest extends ContaoTestCase
                     return [
                         'd-grid',
                         'cols-2',
-                        'cols-xxs-0',
-                        'cols-xs-0',
-                        'cols-sm-0',
-                        'cols-md-0',
-                        'cols-lg-0',
-                        'cols-xl-0',
                         'gap-1-rem',
                     ];
                 },
@@ -110,7 +103,6 @@ class GridBuilderTest extends ContaoTestCase
             'cssgrid - set #2' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
-                    $grid->grid_preset = 'cssgrid';
                     $grid->grid_cols = serialize([
                         ['key' => 'all', 'value' => '2'],
                         ['key' => 'xxs', 'value' => '3'],
@@ -141,33 +133,6 @@ class GridBuilderTest extends ContaoTestCase
                     ];
                 },
             ],
-            'bs4 - set #1' => [
-                'gridGen' => function () {
-                    $grid = new Contao\ContentModel();
-                    $grid->grid_preset = 'bs4';
-                    $grid->grid_cols = serialize([
-                        ['key' => 'all', 'value' => '2'],
-                        ['key' => 'xxs', 'value' => ''],
-                        ['key' => 'xs', 'value' => ''],
-                        ['key' => 'sm', 'value' => ''],
-                        ['key' => 'md', 'value' => ''],
-                        ['key' => 'lg', 'value' => ''],
-                        ['key' => 'xl', 'value' => ''],
-                    ]);
-                    $grid->grid_gap = serialize([
-                        'value' => '1',
-                        'unit' => 'rem',
-                    ]);
-
-                    return $grid;
-                },
-                'expectedResultGen' => function () {
-                    return [
-                        null,
-                        'row',
-                    ];
-                },
-            ],
         ];
     }
 
@@ -177,7 +142,6 @@ class GridBuilderTest extends ContaoTestCase
             'cssgrid - set #1' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
-                    $grid->grid_preset = 'cssgrid';
                     $grid->grid_items = serialize([
                         '1_classes' => 'foo',
                         '1_cols' => [
@@ -216,7 +180,6 @@ class GridBuilderTest extends ContaoTestCase
             'cssgrid - set #2' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
-                    $grid->grid_preset = 'cssgrid';
                     $grid->grid_items = serialize([
                         '1_classes' => 'foo',
                         '1_cols' => [
@@ -263,67 +226,6 @@ class GridBuilderTest extends ContaoTestCase
                 'expectedResultGen' => function () {
                     return [
                         'all' => ['item-grid'],
-                        'items' => [
-                            '1_classes' => 'foo',
-                            '1_cols' => 'cols-span-2 cols-span-xl-3',
-                            '1_rows' => 'rows-span-2',
-                            '2_classes' => 'bar',
-                            '2_cols' => 'cols-span-xxs-2',
-                            '2_rows' => 'rows-span-sm-4',
-                        ],
-                    ];
-                },
-            ],
-            'bs4 - set #2' => [
-                'gridGen' => function () {
-                    $grid = new Contao\ContentModel();
-                    $grid->grid_preset = 'bs4';
-                    $grid->grid_items = serialize([
-                        '1_classes' => 'foo',
-                        '1_cols' => [
-                            'all' => 'cols-span-2',
-                            'xxs' => '',
-                            'xs' => '',
-                            'sm' => '',
-                            'md' => '',
-                            'lg' => '',
-                            'xl' => 'cols-span-xl-3',
-                        ],
-                        '1_rows' => [
-                            'all' => 'rows-span-2',
-                            'xxs' => '',
-                            'xs' => '',
-                            'sm' => '',
-                            'md' => '',
-                            'lg' => '',
-                            'xl' => '',
-                        ],
-                        '2_classes' => 'bar',
-                        '2_cols' => [
-                            'all' => '',
-                            'xxs' => 'cols-span-xxs-2',
-                            'xs' => '',
-                            'sm' => '',
-                            'md' => '',
-                            'lg' => '',
-                            'xl' => '',
-                        ],
-                        '2_rows' => [
-                            'all' => '',
-                            'xxs' => '',
-                            'xs' => '',
-                            'sm' => 'rows-span-sm-4',
-                            'md' => '',
-                            'lg' => '',
-                            'xl' => '',
-                        ],
-                    ]);
-
-                    return $grid;
-                },
-                'expectedResultGen' => function () {
-                    return [
-                        'all' => [],
                         'items' => [
                             '1_classes' => 'foo',
                             '1_cols' => 'cols-span-2 cols-span-xl-3',

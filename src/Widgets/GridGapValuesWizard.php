@@ -31,13 +31,6 @@ class GridGapValuesWizard extends \Widget
     protected $strTemplate = 'be_widget';
 
     /**
-     * Grid preset.
-     *
-     * @var string
-     */
-    protected $strGridPreset = '';
-
-    /**
      * Grid breakpoints.
      *
      * @var array

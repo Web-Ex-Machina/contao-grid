@@ -18,8 +18,6 @@ class GridOpened
 {
     /** @var string */
     protected $id;
-    /** @var string */
-    protected $preset;
     /** @var array */
     protected $cols;
     /** @var array */
@@ -102,18 +100,6 @@ class GridOpened
     public function setId(string $id): self
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getPreset(): ?string
-    {
-        return $this->preset;
-    }
-
-    public function setPreset(string $preset): self
-    {
-        $this->preset = $preset;
 
         return $this;
     }

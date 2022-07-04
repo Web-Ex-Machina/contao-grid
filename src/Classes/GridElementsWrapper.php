@@ -30,14 +30,18 @@ class GridElementsWrapper
     protected $translator;
     /** @var GridBuilder */
     protected $gridBuilder;
+    /** @var GridCssClassesInheritance */
+    protected $gridCssClassesInheritance;
     protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
 
     public function __construct(
         TranslatorInterface $translator,
-        GridBuilder $gridBuilder
+        GridBuilder $gridBuilder,
+        GridCssClassesInheritance $gridCssClassesInheritance
     ) {
         $this->translator = $translator;
         $this->gridBuilder = $gridBuilder;
+        $this->gridCssClassesInheritance = $gridCssClassesInheritance;
     }
 
     /**
@@ -100,14 +104,17 @@ class GridElementsWrapper
             $titleDrag = $this->translator->trans('DCA.drag', [$objElement->id], 'contao_default');
             $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $this->translator->trans('MSC.deleteConfirm', [$objElement->id], 'contao_default') : null;
 
-            $buttons = sprintf('
+            $buttons = '';
+
+            if ('grid-item-empty' !== $objElement->type) {
+                $buttons .= sprintf('
                 <a
                 href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s"
                 title="%s"
                 onclick="Backend.openModalIframe({\'title\':\'%s\',\'url\':this.href});return false">
                 %s
                 </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
-
+            }
             $buttons .= sprintf('
                 <a class="item-copy"
                 href="#"
@@ -137,7 +144,7 @@ class GridElementsWrapper
                 </a>', StringUtil::specialchars($titleDrag), Image::getHtml('drag.svg', $titleDrag));
         }
 
-        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
+        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $GLOBALS['TL_LANG']['CTE'][$objElement->type][0], $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
     }
 
     /**
@@ -199,17 +206,17 @@ class GridElementsWrapper
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
-                !Input::get('grid_preview') ? $this->getBackendActionsForGridStartContentElement($objElement, $do, true) : '',
+                $this->getBackendActionsForGridStartContentElement($objElement, $do, true),
                 $strBuffer,
-                !Input::get('grid_preview') ? $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId) : ''
+                $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId)
             );
         }
 
         return sprintf(
             '<div class="%s %s %s %s">%s',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-            $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
             $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
             $strBuffer
         );
@@ -237,15 +244,16 @@ class GridElementsWrapper
     {
         if (TL_MODE === 'BE') {
             return sprintf(
-                '<div class="%s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
+                '<div class="%s %s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
                 $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
                 $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
                 $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
                 true === $openGrid->isSubGrid() ? 'be_subgrid_item' : '',
+                'grid-item-empty' === $objElement->type ? 'be_grid_item_empty' : '',
                 $objElement->id,
                 $objElement->type,
-                !Input::get('grid_preview') ? $this->getBackendActionsForContentElement($objElement, $do, true) : '',
+                $this->getBackendActionsForContentElement($objElement, $do, true),
                 $strBuffer
             );
         }
@@ -253,8 +261,8 @@ class GridElementsWrapper
         return sprintf(
             '<div class="%s %s %s %s">%s</div>',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-            $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
             $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
             $strBuffer
         );

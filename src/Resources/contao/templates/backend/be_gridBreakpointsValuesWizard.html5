@@ -22,19 +22,57 @@
 			</h3>
 			<?php foreach($this->breakpoints as $k => $b): ?>
 				<input type="hidden" name="<?= $this->input ?>[<?= $k ?>][key]" id="<?= $this->input ?>_key_<?= $k ?>" class="tl_text" value="<?= $b['name'] ?>">
-				<input type="text" name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_text hidden" value="<?= $b['value'] ?>"<?= $b['required'] ? ' required' : '' ?> data-breakpoint="<?= $b['name'] ?>">
+				<select name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= $b['required'] ? 'required' : ''; ?> data-previous-value="<?php echo $b['value']; ?>">
+					<?php for($i = 1; $i <= 12; $i++): ?>
+						<option value="<?php echo $i; ?>" <?php echo $i === (int) $b['value'] ? 'selected' : '' ?>>
+							<?php echo $i; ?>
+						</option>
+					<?php endfor; ?>
+				</select>
 			<?php endforeach; ?>
 		</div>
 		<div class="cols-span-4"></div>
 	</div>
 	<script type="text/javascript">
 		window.addEvent("domready", function () {
+			var breakpoints = ['all','xl','lg','md','sm','xs','xxs'];
 			document.getElementById('ctrl_select_breakpoints_<?= $this->strId; ?>').addEventListener("change", function (e) {
-				document.querySelectorAll('input[data-breakpoint]').forEach(function(input){
-					input.classList.toggle('hidden',input.getAttribute('data-breakpoint') != e.target.value);
+				document.querySelectorAll('select[data-breakpoint]').forEach(function(select){
+					select.classList.toggle('hidden',select.getAttribute('data-breakpoint') != e.target.value);
+				});
+			});
+			document.querySelectorAll('select[data-breakpoint]').forEach(function(select){
+				select.addEventListener('change',function(e){
+					var previousValue = e.target.getAttribute('data-previous-value');
+					var value = e.target.value;
+					changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), value, previousValue);
+					e.target.setAttribute('data-previous-value',value);
 				});
 			});
 			document.getElementById('ctrl_select_breakpoints_<?= $this->strId; ?>').dispatchEvent(new Event('change'));
+
+			function changeLowerResolutionValues(breakpoint, value, previousValue){
+				let resolutions = getLowerResolutions(breakpoint);
+				resolutions.forEach(function(resolution){
+					var select = getSelectForBreakpoint(resolution);
+					if(select.value === previousValue){ // inherited value
+						select.value = value;
+						select.setAttribute('data-previous-value',value);
+					}else{
+						return; // we stop at the first different value
+					}
+				});
+			}
+
+			function getLowerResolutions(breakpoint){
+				var indexOfResolution = breakpoints.indexOf(breakpoint);
+
+				return breakpoints.slice(indexOfResolution);
+			}
+
+			function getSelectForBreakpoint(breakpoint){
+				return document.querySelector('select[data-breakpoint="'+breakpoint+'"]');
+			}
 		});
 	</script>
 </div>

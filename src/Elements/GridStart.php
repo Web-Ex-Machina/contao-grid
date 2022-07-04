@@ -43,16 +43,15 @@ class GridStart extends ContentElement
             $this->strTemplate = 'be_wildcard';
             $this->Template = new BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
-            $this->Template->wildcard = $GLOBALS['TL_LANG']['tl_content']['grid_preset'][$this->grid_preset];
 
             $this->arrGridBreakpoints = [
                 ['name' => 'all', 'label' => 'Général', 'required' => true],
-                ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'],
-                ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'],
-                ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'],
-                ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'],
-                ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'],
                 ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
+                ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'],
+                ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'],
+                ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'],
+                ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'],
+                ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'],
             ]; /** @todo - make it generic per grid */
             $breakpoints = [];
             // $arrGridValues = GridBuilder::getWrapperClasses($this);
@@ -74,7 +73,7 @@ class GridStart extends ContentElement
                     $breakpoints[] = $breakpoint['label'].': '.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
                 }
             }
-            $this->Template->wildcard .= ' | Config: '.implode(', ', $breakpoints);
+            $this->Template->wildcard = 'Config: '.implode(', ', $breakpoints);
         }
 
         // Check if the very next element is a grid-stop element
