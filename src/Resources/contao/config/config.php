@@ -18,7 +18,9 @@ array_insert(
     \count($GLOBALS['TL_CTE']) + 1,
     [
         'grid' => [
-            'grid-start' => 'WEM\GridBundle\Elements\GridStart', 'grid-stop' => 'WEM\GridBundle\Elements\GridStop',
+            'grid-start' => 'WEM\GridBundle\Elements\GridStart',
+            'grid-stop' => 'WEM\GridBundle\Elements\GridStop',
+            'grid-item-empty' => 'WEM\GridBundle\Elements\GridItemEmpty',
         ],
     ]
 );

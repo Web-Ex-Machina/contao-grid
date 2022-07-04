@@ -21,6 +21,14 @@
         <source>End a Grid</source>
         <target>Fin d'une grille CSS</target>
       </trans-unit>
+      <trans-unit id="CTE.grid-item-empty.0">
+        <source>Grid | Empty item</source>
+        <target>Grille | Elément vide</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-item-empty.1">
+        <source>An empty element for a grid</source>
+        <target>Elément vide pour une grille</target>
+      </trans-unit>
 
       <trans-unit id="WEM.GRID.BE.previewLabel">
         <source>Preview</source>
@@ -52,7 +60,7 @@
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.additionalClassesLabel">
         <source>Additional classes:</source>
-        <target>Additional classes:</target>
+        <target>Classes additionnelles:</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
         <source>%s column(s)</source>

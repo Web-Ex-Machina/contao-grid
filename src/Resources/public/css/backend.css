@@ -16,6 +16,7 @@
 .gridelement .be_item_grid.helper .item-classes{display:block;}
 .gridelement .be_item_grid.helper .item-actions{display:block;}
 .gridelement .be_item_grid.fake-helper .item-new{display:block;}
+.gridelement .be_grid_item_empty{background-color: lightgray;}
 
 .gridelement .be_item_grid.fake-helper.drag-start{opacity: 75%;}
 .gridelement .be_item_grid.helper.drag-start{opacity: 75%;}

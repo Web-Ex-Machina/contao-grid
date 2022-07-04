@@ -21,6 +21,12 @@
         <source>End a Grid</source>
         <target>End a Grid</target>
       </trans-unit>
+      <trans-unit id="CTE.grid-item-empty.0">
+        <source>Grid | Empty item</source>
+      </trans-unit>
+      <trans-unit id="CTE.grid-item-empty.1">
+        <source>An empty element for a grid</source>
+      </trans-unit>
 
       <trans-unit id="WEM.GRID.BE.previewLabel">
         <source>Preview</source>
