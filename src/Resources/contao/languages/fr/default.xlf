@@ -39,16 +39,16 @@
         <target>Nombre de colonnes</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.gapValueLabel">
-        <source>Gap space between elemnts</source>
+        <source>Gap space between elements</source>
         <target>Espace inter-éléments</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbColsSelectLabel">
-        <source>Nb of cols for this item:</source>
-        <target>Nb de colonnes pour cet élément :</target>
+        <source>Nb of cols :</source>
+        <target>Nb de colonnes :</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbRowsSelectLabel">
-        <source>Nb of rows for this item:</source>
-        <target>Nb de lignes pour cet élément :</target>
+        <source>Nb of rows :</source>
+        <target>Nb de lignes :</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.additionalClassesLabel">
         <source>Additional classes:</source>
