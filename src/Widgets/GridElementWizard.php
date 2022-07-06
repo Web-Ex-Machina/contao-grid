@@ -325,6 +325,13 @@ class GridElementWizard extends Widget
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 10).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 11).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 12).'");
+            WEM.Grid.Translations.breakpoints.all = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointAll'].'";
+            WEM.Grid.Translations.breakpoints.xl = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXl'].'";
+            WEM.Grid.Translations.breakpoints.lg = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointLg'].'";
+            WEM.Grid.Translations.breakpoints.md = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointMd'].'";
+            WEM.Grid.Translations.breakpoints.sm = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointSm'].'";
+            WEM.Grid.Translations.breakpoints.xs = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXs'].'";
+            WEM.Grid.Translations.breakpoints.xxs = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXxs'].'";
         </script>';
     }
 }

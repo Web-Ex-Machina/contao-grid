@@ -5,7 +5,16 @@ WEM.Grid  = WEM.Grid || {};
     	new:'',
         inheritedColumns:'',
         inheritedRows:'',
-    	columns:[]
+    	columns:[],
+        breakpoints:{
+            all:'',
+            xl:'',
+            lg:'',
+            md:'',
+            sm:'',
+            xs:'',
+            xxs:'',
+        }
     }
     var self = WEM.Grid.Translations;
 })();

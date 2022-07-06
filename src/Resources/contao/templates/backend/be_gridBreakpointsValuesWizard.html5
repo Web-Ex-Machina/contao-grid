@@ -45,6 +45,15 @@
 		    WEM.Grid.BreakpointValueWizard = WEM.Grid.BreakpointValueWizard || {
 		    	breakpoints: ['all','xl','lg','md','sm','xs','xxs']
 		    	,inheritedColumnsText:'<?php echo $this->trans("WEM.GRID.BE.inheritedColumns",[],"contao_default"); ?>'
+		    	,breakpointsLabels:{
+		    		all:'<?php echo $this->trans("WEM.GRID.BE.breakpointAll",[],"contao_default"); ?>',
+		            xl:'<?php echo $this->trans("WEM.GRID.BE.breakpointXl",[],"contao_default"); ?>',
+		            lg:'<?php echo $this->trans("WEM.GRID.BE.breakpointLg",[],"contao_default"); ?>',
+		            md:'<?php echo $this->trans("WEM.GRID.BE.breakpointMd",[],"contao_default"); ?>',
+		            sm:'<?php echo $this->trans("WEM.GRID.BE.breakpointSm",[],"contao_default"); ?>',
+		            xs:'<?php echo $this->trans("WEM.GRID.BE.breakpointXs",[],"contao_default"); ?>',
+		            xxs:'<?php echo $this->trans("WEM.GRID.BE.breakpointXxs",[],"contao_default"); ?>',
+		    	}
 		    	,selectors:{
 		    		wizardContainer:'.grid_breakpoints_values_wizard'
 		    		,breakpointSelect:'ctrl_select_breakpoints_<?= $this->strId; ?>'
@@ -87,7 +96,7 @@
 				}
 
 				,buildInheritedOptionText:function(breakpoint, value){
-					return self.inheritedColumnsText.replace('%s', value).replace('%s', breakpoint.toUpperCase());
+					return self.inheritedColumnsText.replace('%s', value).replace('%s', self.breakpointsLabels[breakpoint.toLowerCase()]);
 				}
 
 				,getClosestHigherResolutionDefined:function(breakpoint){

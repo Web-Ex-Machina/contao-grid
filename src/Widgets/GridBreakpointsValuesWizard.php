@@ -88,13 +88,13 @@ class GridBreakpointsValuesWizard extends \Widget
     public function generate()
     {
         $this->arrGridBreakpoints = [
-            ['name' => 'all', 'label' => 'Général', 'required' => true, 'value' => 2],
-            ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
-            ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'],
-            ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'],
-            ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'],
-            ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'],
-            ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'],
+            ['name' => 'all', 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointAll'], 'required' => true, 'value' => 2],
+            ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXl']],
+            ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointLg']],
+            ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointMd']],
+            ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointSm']],
+            ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXs']],
+            ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXxs']],
         ];
 
         if ($this->varValue) {

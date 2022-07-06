@@ -85,6 +85,34 @@
         <source>%s row(s) (Inherited from %s)</source>
         <target>%s ligne(s) (Hérité de %s)</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointAll">
+        <source>Desktop</source>
+        <target>Général</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXl">
+        <source>XL</source>
+        <target>XL</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointLg">
+        <source>LG</source>
+        <target>LG</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointMd">
+        <source>MD</source>
+        <target>MD</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointSm">
+        <source>SM</source>
+        <target>SM</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXs">
+        <source>XS</source>
+        <target>XS</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXxs">
+        <source>XXS</source>
+        <target>XXS</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

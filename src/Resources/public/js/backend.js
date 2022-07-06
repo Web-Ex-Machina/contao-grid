@@ -400,9 +400,9 @@ WEM.Grid  = WEM.Grid || {};
         },
         buildInheritedOptionTextForTypeAndBreakpoint:function(type, breakpoint, value){
             if('cols' == type){
-                return WEM.Grid.Translations.inheritedColumns.replace('%s',value).replace('%s',breakpoint.toUpperCase());
+                return WEM.Grid.Translations.inheritedColumns.replace('%s',value).replace('%s',WEM.Grid.Translations.breakpoints[breakpoint.toLowerCase()]);
             }else if('rows' == type){
-                return WEM.Grid.Translations.inheritedRows.replace('%s',value).replace('%s',breakpoint.toUpperCase());
+                return WEM.Grid.Translations.inheritedRows.replace('%s',value).replace('%s',WEM.Grid.Translations.breakpoints[breakpoint.toLowerCase()]);
             }else{
                 return 'Error : type unknown';
             }
