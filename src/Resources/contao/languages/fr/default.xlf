@@ -79,11 +79,11 @@
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.inheritedColumns">
         <source>%s column(s) (Inherited from %s)</source>
-        <target>%s colonne(s) (Héritée de %s)</target>
+        <target>%s colonne(s) (Hérité de %s)</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.inheritedRows">
         <source>%s row(s) (Inherited from %s)</source>
-        <target>%s ligne(s) (Héritée de %s)</target>
+        <target>%s ligne(s) (Hérité de %s)</target>
       </trans-unit>
     </body>
   </file>
