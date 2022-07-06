@@ -25,7 +25,7 @@
 				<select name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= $b['required'] ? 'required' : ''; ?>>
 					<?php if('all' != $b['name']): ?>
 						<option value="">
-							heritée
+							-
 						</option>
 					<?php endif; ?>
 					<?php for($i = 1; $i <= 12; $i++): ?>
@@ -76,7 +76,6 @@
 								var resolution = self.getClosestHigherResolutionDefined(e.target.getAttribute('data-breakpoint'));
 								var select = self.getSelectForBreakpoint(resolution);
 								// e.target.options[0].innerHTML = self.buildInheritedOptionText(resolution, select.value); 
-								e.target.options[0].innerHTML = select.value; 
 								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), resolution, select.value);
 							}else{
 								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'),e.target.getAttribute('data-breakpoint'), value);
@@ -92,7 +91,6 @@
 					let resolutions = self.getLowerResolutions(breakpointStart);
 					resolutions.forEach(function(resolution){
 						var select = self.getSelectForBreakpoint(resolution);
-						select.options[0].innerHTML = value; 
 						// select.options[0].innerHTML = self.buildInheritedOptionText(closestHigherResolutionDefined, value); 
 					});
 				}
