@@ -300,6 +300,8 @@ class GridElementWizard extends Widget
         $GLOBALS['TL_JAVASCRIPT']['wemgrid_translations'] = 'bundles/wemgrid/js/wem_grid_translations.js';
         $GLOBALS['TL_MOOTOOLS']['wemgrid'] = '<script>
             WEM.Grid.Translations.new = "'.$GLOBALS['TL_LANG']['DCA']['new'][1].'";
+            WEM.Grid.Translations.inheritedColumns = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inheritedColumns'].'";
+            WEM.Grid.Translations.inheritedRows = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inheritedRows'].'";
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 1).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 2).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 3).'");

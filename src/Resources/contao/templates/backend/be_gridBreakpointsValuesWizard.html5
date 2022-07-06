@@ -14,7 +14,7 @@
 			<?php endforeach; ?>
 			</select>
 		</div>
-		<div>
+		<div class="cols-span-2">
 			<h3>
 				<label>
 					<?= $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsLabel'] ?>
@@ -23,6 +23,11 @@
 			<?php foreach($this->breakpoints as $k => $b): ?>
 				<input type="hidden" name="<?= $this->input ?>[<?= $k ?>][key]" id="<?= $this->input ?>_key_<?= $k ?>" class="tl_text" value="<?= $b['name'] ?>">
 				<select name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= $b['required'] ? 'required' : ''; ?> data-previous-value="<?php echo $b['value']; ?>">
+					<?php if('all' != $b['name']): ?>
+						<option value="">
+							heritée
+						</option>
+					<?php endif; ?>
 					<?php for($i = 1; $i <= 12; $i++): ?>
 						<option value="<?php echo $i; ?>" <?php echo $i === (int) $b['value'] ? 'selected' : '' ?>>
 							<?php echo $i; ?>
@@ -31,11 +36,12 @@
 				</select>
 			<?php endforeach; ?>
 		</div>
-		<div class="cols-span-4"></div>
+		<div class="cols-span-3"></div>
 	</div>
 	<script type="text/javascript">
 		window.addEvent("domready", function () {
 			var breakpoints = ['all','xl','lg','md','sm','xs','xxs'];
+			var inheritedColumnsText = '<?php echo $this->trans("WEM.GRID.BE.inheritedColumns",[],"contao_default"); ?>';
 			document.getElementById('ctrl_select_breakpoints_<?= $this->strId; ?>').addEventListener("change", function (e) {
 				document.querySelectorAll('select[data-breakpoint]').forEach(function(select){
 					select.classList.toggle('hidden',select.getAttribute('data-breakpoint') != e.target.value);
@@ -45,6 +51,12 @@
 				select.addEventListener('change',function(e){
 					var previousValue = e.target.getAttribute('data-previous-value');
 					var value = e.target.value;
+					if('' == value){
+						// get first higher resolution set
+						var resolution = getClosestHigherResolutionDefined(e.target.getAttribute('data-breakpoint'));
+						var select = getSelectForBreakpoint(resolution);
+						e.target.options[0].innerHTML = buildInheritedOptionText(resolution, select.value); 
+					}
 					changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), value, previousValue);
 					e.target.setAttribute('data-previous-value',value);
 				});
@@ -55,19 +67,43 @@
 				let resolutions = getLowerResolutions(breakpoint);
 				resolutions.forEach(function(resolution){
 					var select = getSelectForBreakpoint(resolution);
-					if(select.value === previousValue){ // inherited value
-						select.value = value;
-						select.setAttribute('data-previous-value',value);
-					}else{
-						return; // we stop at the first different value
+					if(select.value === ''){ // inherited value
+						select.options[0].innerHTML = buildInheritedOptionText(breakpoint, value); 
 					}
 				});
+			}
+
+			function buildInheritedOptionText(breakpoint, value){
+				return inheritedColumnsText.replace('%s', breakpoint.toUpperCase()) .replace('%s', value);
+			}
+
+			function getClosestHigherResolutionDefined(breakpoint){
+				var resolutions = getHigherResolutions(breakpoint);
+				var selectedResolution = 'all'; //fallback
+				var found = false;
+				resolutions.forEach(function(resolution){
+					if(resolution != breakpoint){
+						var select = getSelectForBreakpoint(resolution);
+						if(!found && select.value !== ''){
+							selectedResolution = resolution;
+							found = true;
+						}
+					}
+				});
+				return selectedResolution;
 			}
 
 			function getLowerResolutions(breakpoint){
 				var indexOfResolution = breakpoints.indexOf(breakpoint);
 
-				return breakpoints.slice(indexOfResolution);
+				return breakpoints.slice(indexOfResolution+1);
+			}
+
+			function getHigherResolutions(breakpoint){
+				var indexOfResolution = breakpoints.reverse().indexOf(breakpoint);
+				var higherResolutions = breakpoints.slice(indexOfResolution+1);
+				breakpoints.reverse(); // put it back in the right order
+				return higherResolutions;
 			}
 
 			function getSelectForBreakpoint(breakpoint){

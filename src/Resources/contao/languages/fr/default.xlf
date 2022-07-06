@@ -77,6 +77,14 @@
         <source>Drag and drop the element here to place it at the grid's end</source>
         <target>Glissez l'élement de contenu ici pour le placer à la fin de la grille</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inheritedColumns">
+        <source>Inherited (%s - %s column(s))</source>
+        <target>Héritée (%s - %s colonne(s))</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inheritedRows">
+        <source>Inherited (%s - %s row(s))</source>
+        <target>Héritée (%s - %s ligne(s))</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
