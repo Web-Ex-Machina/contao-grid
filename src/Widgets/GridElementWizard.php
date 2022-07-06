@@ -269,16 +269,27 @@ class GridElementWizard extends Widget
                 $this->User->isAdmin ? '' : 'hidden'
             );
 
+            // $itemSettings = sprintf(
+            //     '<div class="item-classes">
+            //         <div class="d-grid cols-1">
+            //             <div>
+            //             %s
+            //             </div>
+            //             <div>
+            //             %s
+            //             </div>
+            //         </div>
+            //         %s
+            //     </div>',
+            //     implode('', $selectsCols),
+            //     implode('', $selectsRows),
+            //     $inputClasses
+            // );
+
             $itemSettings = sprintf(
                 '<div class="item-classes">
-                    <div class="d-grid cols-2">
-                        <div>
-                        %s
-                        </div>
-                        <div>
-                        %s
-                        </div>
-                    </div>
+                    %s
+                    %s
                     %s
                 </div>',
                 implode('', $selectsCols),

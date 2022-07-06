@@ -89,12 +89,12 @@ class GridBreakpointsValuesWizard extends \Widget
     {
         $this->arrGridBreakpoints = [
             ['name' => 'all', 'label' => 'Général', 'required' => true, 'value' => 2],
-            ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'], // 'value' => 2],
-            ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'], // 'value' => 2],
-            ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'], // 'value' => 2],
-            ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'], // 'value' => 2],
-            ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'], // 'value' => 2],
-            ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'], // 'value' => 2],
+            ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => 'XL'],
+            ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => 'LG'],
+            ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => 'MD'],
+            ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => 'SM'],
+            ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => 'XS'],
+            ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => 'XXS'],
         ];
 
         if ($this->varValue) {

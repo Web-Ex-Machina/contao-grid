@@ -295,7 +295,9 @@ WEM.Grid  = WEM.Grid || {};
                     select.remove(0);
                 }
                 // recreate options
-                select.add(new Option(self.buildInheritedOptionTextForTypeAndBreakpoint('cols',inheritedResolution,inheritedValue),'',false,"" == valueBeforeReconstruct ? true : false));
+                if('all' != breakpoint){
+                    select.add(new Option(self.buildInheritedOptionTextForTypeAndBreakpoint('cols',inheritedResolution,inheritedValue),'',false,"" == valueBeforeReconstruct ? true : false));
+                }
                 for(var i = 1; i <= nbColumns; i++){
                     select.add(new Option(WEM.Grid.Translations.columns[i-1],classNameBase+i,false,parseInt(valueBeforeReconstruct) == i ? true : false));
                 }
@@ -306,17 +308,19 @@ WEM.Grid  = WEM.Grid || {};
                     }
                 }
                 
-                if("" != valueBeforeReconstruct){
+                
+                if(0 >= selectedIndexBeforeReconstruct){
+                    if('all' == breakpoint){
+                        select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,1);
+                    }else{
+                        select.value = '';
+                    }
+                }else if("" != valueBeforeReconstruct){
                     if(parseInt(valueBeforeReconstruct) <= nbColumns){
                         select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,valueBeforeReconstruct);
                     }else{
                         select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,nbColumns);
                     }
-                }else{
-                    select.value = valueBeforeReconstruct;
-                }
-                if(0 >= selectedIndexBeforeReconstruct){
-                    select.value = '';
                 }
                 
                 select.dispatchEvent(new Event('change_auto'));
@@ -376,7 +380,7 @@ WEM.Grid  = WEM.Grid || {};
             return higherResolutions;
         },
 
-         getSelectForItemIdAndTypeAndBreakpoint:function(itemId, type, breakpoint){
+        getSelectForItemIdAndTypeAndBreakpoint:function(itemId, type, breakpoint){
             return document.querySelector('[data-item-id="'+itemId+'"][data-type="'+type+'"][data-breakpoint="'+breakpoint+'"]');
         },
         getClosestHigherResolutionDefinedForGrid:function(breakpoint){
@@ -395,11 +399,10 @@ WEM.Grid  = WEM.Grid || {};
             return selectedResolution;
         },
         buildInheritedOptionTextForTypeAndBreakpoint:function(type, breakpoint, value){
-            // return  'Héritée ('+breakpoint.toUpperCase()+' - ' + value + ' colonne(s))';
             if('cols' == type){
-                return WEM.Grid.Translations.inheritedColumns.replace('%s',breakpoint.toUpperCase()).replace('%s',value);
+                return WEM.Grid.Translations.inheritedColumns.replace('%s',value).replace('%s',breakpoint.toUpperCase());
             }else if('rows' == type){
-                return WEM.Grid.Translations.inheritedRows.replace('%s',breakpoint.toUpperCase()).replace('%s',value);
+                return WEM.Grid.Translations.inheritedRows.replace('%s',value).replace('%s',breakpoint.toUpperCase());
             }else{
                 return 'Error : type unknown';
             }
@@ -437,45 +440,46 @@ window.addEvent("domready", function () {
 
     document.querySelectorAll('.gridelement select[data-type="cols"]').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
-            saveItemCols(this.parentNode.parentNode.parentNode.parentNode.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
-            // update lower resolution values
-            changeLowerResolutionValues('change',
-                i.getAttribute('data-item-id'),
-                i.getAttribute('data-type'),
-                i.getAttribute('data-breakpoint'),
-                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(i.value),
-                true
-            );
-        });
-        i.addEventListener("change_auto", function (e) {
-            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
+            var itemGrid = getParentGridItemElement(this);
+            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
+            saveItemCols(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             changeLowerResolutionValues(
                 i.getAttribute('data-item-id'),
                 i.getAttribute('data-type'),
                 i.getAttribute('data-breakpoint'),
-                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(i.value),
-                false
+                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(i.value)
+            );
+        });
+        i.addEventListener("change_auto", function (e) {
+            var itemGrid = getParentGridItemElement(this);
+            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
+            // update lower resolution values
+            changeLowerResolutionValues(
+                i.getAttribute('data-item-id'),
+                i.getAttribute('data-type'),
+                i.getAttribute('data-breakpoint'),
+                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(i.value)
             );
         });
     });
 
     document.querySelectorAll('.gridelement select[data-type="rows"]').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
-            saveItemRows(this.parentNode.parentNode.parentNode.parentNode.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
+            var itemGrid = getParentGridItemElement(this);
+            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
+            saveItemRows(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             changeLowerResolutionValues(
                 i.getAttribute('data-item-id'),
                 i.getAttribute('data-type'),
                 i.getAttribute('data-breakpoint'),
-                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(i.value),
-                true
+                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(i.value)
             );
         });
         i.addEventListener("change_auto", function (e) {
-            updateItemDataClass(this.parentNode.parentNode.parentNode.parentNode,i.getAttribute('data-breakpoint'));
+            var itemGrid = getParentGridItemElement(this);
+            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             var select = WEM.Grid.Drag.getSelectForItemIdAndTypeAndBreakpoint(
                 i.getAttribute('data-item-id'),
@@ -487,19 +491,27 @@ window.addEvent("domready", function () {
                 select.getAttribute('data-item-id'),
                 select.getAttribute('data-type'),
                 select.getAttribute('data-breakpoint'),
-                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(select.value),
-                false
+                WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(select.value)
             );
         });
     });
 
+    function getParentGridItemElement(element){
+        if(!element.classList.contains('be_item_grid')){
+            return getParentGridItemElement(element.parentNode);
+        }
+        return element;
+    }
+
     document.querySelectorAll('.gridelement input').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            updateItemDataClass(this.parentNode.parentNode,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+this.parentNode.parentNode.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
-            saveItemClass(this.parentNode.parentNode.getAttribute('data-id'),i.value);
+            var itemGrid = getParentGridItemElement(this);
+            updateItemDataClass(itemGrid,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemGrid.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
+            saveItemClass(itemGrid.getAttribute('data-id'),i.value);
         });
         i.addEventListener("keyup_auto", function (e) {
-            updateItemDataClass(this.parentNode.parentNode,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+this.parentNode.parentNode.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
+            var itemGrid = getParentGridItemElement(this);
+            updateItemDataClass(itemGrid,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemGrid.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
         });
     });
 
@@ -648,20 +660,11 @@ window.addEvent("domready", function () {
                 if(null == select){
                     console.log(itemId, type, resolution);
                 }else{
-                    var selectValue = WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(select.value);
-                    select.options[0].innerHTML = WEM.Grid.Drag.buildInheritedOptionTextForTypeAndBreakpoint(type, resolution, selectValue);
-                    if("" === select.value){ // inherited value
-                        // save item cols & rows here
-                        if(triggerSave){
-                            if('cols' == type){
-                                saveItemCols(itemId, select.value, resolution);
-                            }else if('rows' == type){
-                                saveItemRows(itemId, select.value, resolution);
-                            }
-                        }
-                    }else{
-                        return; // we stop at the first different value
-                    }
+                    var higherDefinedRes = WEM.Grid.Drag.getClosestHigherResolutionDefinedForItemIdAndTypeAndBreakpoint(itemId, type, resolution);
+                    var selectValue = WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(
+                        WEM.Grid.Drag.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(itemId, type, resolution)
+                    );
+                    select.options[0].innerHTML = WEM.Grid.Drag.buildInheritedOptionTextForTypeAndBreakpoint(type, higherDefinedRes, selectValue);
                 }
             }
         });
