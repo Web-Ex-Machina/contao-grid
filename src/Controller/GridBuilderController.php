@@ -181,12 +181,6 @@ class GridBuilderController extends \Contao\Controller
         $grid = $gsm->getGridStart();
         $grid->save();
 
-        // $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
-
-        // $grid = $gsm->getGridStart();
-
-        // $grid->save();
-
         return $response;
     }
 

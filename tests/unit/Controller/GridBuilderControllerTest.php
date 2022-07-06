@@ -92,6 +92,20 @@ class GridBuilderControllerTest extends ContaoTestCase
         $response = $this->sut->__invoke();
         $this->assertSame(json_decode($response->getContent(), true)['status'], 'success');
 
+        Input::setGet('property', 'grid_cols');
+        Input::setGet('grid', 2);
+        Input::setGet('value', '4');
+        Input::setGet('breakpoint', 'xl');
+        $response = $this->sut->__invoke();
+        $this->assertSame(json_decode($response->getContent(), true)['status'], 'success');
+
+        Input::setGet('property', 'grid_cols');
+        Input::setGet('grid', 2);
+        Input::setGet('value', '');
+        Input::setGet('breakpoint', 'xs');
+        $response = $this->sut->__invoke();
+        $this->assertSame(json_decode($response->getContent(), true)['status'], 'success');
+
         Input::setGet('property', 'foo');
         Input::setGet('id', 1);
         Input::setGet('grid', 2);
@@ -254,13 +268,55 @@ class GridBuilderControllerTest extends ContaoTestCase
         }
     }
 
-    public function testValidateMandatoryParameters(): void
+    public function testSaveGridCols(): void
+    {
+        Input::setGet('grid', 2);
+        Input::setGet('breakpoint', 'all');
+        Input::setGet('value', '2');
+        $response = $this->sut->saveGridCols();
+        $this->assertSame($response['status'], 'success');
+
+        try {
+            Input::setGet('grid', null);
+            Input::setGet('breakpoint', 'all');
+            Input::setGet('value', '2');
+            $this->sut->saveGridCols();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No grid ID provided');
+        }
+
+        try {
+            Input::setGet('grid', 2);
+            Input::setGet('breakpoint', null);
+            Input::setGet('value', '2');
+            $this->sut->saveGridCols();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No breakpoint provided');
+        }
+
+        try {
+            Input::setGet('grid', 2);
+            Input::setGet('breakpoint', 'all');
+            Input::setGet('value', null);
+            $this->sut->saveGridCols();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No value provided');
+        }
+    }
+
+    public function testValidateMandatoryGridItemParameters(): void
     {
         try {
             Input::setGet('id', 1);
             Input::setGet('grid', 2);
             Input::setGet('value', 'col-span-2');
-            $this->sut->validateMandatoryParameters();
+            $this->sut->validateMandatoryGridItemParameters();
         } catch (Exception $e) {
             $this->assertTrue(false, 'We should never reach this test');
         }
@@ -269,7 +325,7 @@ class GridBuilderControllerTest extends ContaoTestCase
             Input::setGet('id', null);
             Input::setGet('grid', 2);
             Input::setGet('value', 'col-span-2');
-            $this->sut->validateMandatoryParameters();
+            $this->sut->validateMandatoryGridItemParameters();
             $this->assertTrue(false, 'We should never reach this test');
         } catch (Exception $e) {
             $this->assertSame(\get_class($e), Exception::class);
@@ -280,7 +336,7 @@ class GridBuilderControllerTest extends ContaoTestCase
             Input::setGet('id', 1);
             Input::setGet('grid', null);
             Input::setGet('value', 'col-span-2');
-            $this->sut->validateMandatoryParameters();
+            $this->sut->validateMandatoryGridItemParameters();
             $this->assertTrue(false, 'We should never reach this test');
         } catch (Exception $e) {
             $this->assertSame(\get_class($e), Exception::class);
@@ -291,7 +347,46 @@ class GridBuilderControllerTest extends ContaoTestCase
             Input::setGet('id', 1);
             Input::setGet('grid', 2);
             Input::setGet('value', null);
-            $this->sut->validateMandatoryParameters();
+            $this->sut->validateMandatoryGridItemParameters();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No value provided');
+        }
+    }
+
+    public function testValidateMandatoryGridParameters(): void
+    {
+        try {
+            Input::setGet('grid', 2);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->validateMandatoryGridParameters();
+        } catch (Exception $e) {
+            $this->assertTrue(false, 'We should never reach this test');
+        }
+
+        try {
+            Input::setGet('grid', 2);
+            Input::setGet('value', '');
+            $this->sut->validateMandatoryGridParameters();
+        } catch (Exception $e) {
+            $this->assertTrue(false, 'We should never reach this test');
+        }
+
+        try {
+            Input::setGet('grid', null);
+            Input::setGet('value', 'col-span-2');
+            $this->sut->validateMandatoryGridParameters();
+            $this->assertTrue(false, 'We should never reach this test');
+        } catch (Exception $e) {
+            $this->assertSame(\get_class($e), Exception::class);
+            $this->assertSame($e->getMessage(), 'No grid ID provided');
+        }
+
+        try {
+            Input::setGet('grid', 2);
+            Input::setGet('value', null);
+            $this->sut->validateMandatoryGridParameters();
             $this->assertTrue(false, 'We should never reach this test');
         } catch (Exception $e) {
             $this->assertSame(\get_class($e), Exception::class);
