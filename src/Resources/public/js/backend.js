@@ -414,7 +414,51 @@ WEM.Grid  = WEM.Grid || {};
     }
     var self = WEM.Grid.Drag;
 })();
+var WEM = WEM || {};
+WEM.Grid  = WEM.Grid || {};
+(function() {
+    WEM.Grid.Saver = WEM.Grid.Saver || {
+        saveItemCols:function(itemId, value, breakpoint){
+            return self.save({id: itemId, property: 'cols', value: value, breakpoint: breakpoint});
+        }
+        ,saveItemRows:function(itemId, value, breakpoint){
+            return self.save({id: itemId, property: 'rows', value: value, breakpoint: breakpoint});
+        }
+        ,saveItemClass:function(itemId, value){
+            return self.save({id: itemId, property: 'classes', value: value});
+        }
+        ,save:function(params){
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            var url = 'contao/grid-builder?grid='+id;
+            for(var property in params){
+                url+="&"+property+"="+params[property];
+            }
 
+            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+
+            fetch(url,{
+                method:'get',
+                redirect:'manual'
+            })
+            .then(response => {
+                if(!response.ok){
+                    response.json().then(function(json) {
+                        alert(json.message);
+                    });
+                }
+                AjaxRequest.hideBox();
+            })
+            .catch(error => {
+                alert(error.message);
+                AjaxRequest.hideBox();
+            });
+
+            return false;
+        }
+    }
+    var self = WEM.Grid.Saver;
+})();
 window.addEvent("domready", function () {
     WEM.Grid.Drag.init();
     const regexpBreakpoints = /(-xxs|-xs|-sm|-md|-lg|-xl)/;
@@ -442,7 +486,7 @@ window.addEvent("domready", function () {
         i.addEventListener("change", function (e) {
             var itemGrid = getParentGridItemElement(this);
             updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
-            saveItemCols(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
+            WEM.Grid.Saver.saveItemCols(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             changeLowerResolutionValues(
                 i.getAttribute('data-item-id'),
@@ -468,7 +512,7 @@ window.addEvent("domready", function () {
         i.addEventListener("change", function (e) {
             var itemGrid = getParentGridItemElement(this);
             updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
-            saveItemRows(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
+            WEM.Grid.Saver.saveItemRows(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             changeLowerResolutionValues(
                 i.getAttribute('data-item-id'),
@@ -507,7 +551,7 @@ window.addEvent("domready", function () {
         i.addEventListener("change", function (e) {
             var itemGrid = getParentGridItemElement(this);
             updateItemDataClass(itemGrid,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemGrid.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
-            saveItemClass(itemGrid.getAttribute('data-id'),i.value);
+            WEM.Grid.Saver.saveItemClass(itemGrid.getAttribute('data-id'),i.value);
         });
         i.addEventListener("keyup_auto", function (e) {
             var itemGrid = getParentGridItemElement(this);
@@ -733,45 +777,6 @@ window.addEvent("domready", function () {
         + ' ' 
         + colsClass;
         itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass.replace('hidden','wem_hidden'));
-    }
-
-    function saveItemCols(itemId, value, breakpoint){
-        return save({id: itemId, property: 'cols', value: value, breakpoint: breakpoint});
-    }
-    function saveItemRows(itemId, value, breakpoint){
-        return save({id: itemId, property: 'rows', value: value, breakpoint: breakpoint});
-    }
-    function saveItemClass(itemId, value){
-        return save({id: itemId, property: 'classes', value: value});
-    }
-    function save(params){
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        var url = 'contao/grid-builder?grid='+id;
-        for(var property in params){
-            url+="&"+property+"="+params[property];
-        }
-
-        AjaxRequest.displayBox(Contao.lang.loading + ' …');
-
-        fetch(url,{
-            method:'get',
-            redirect:'manual'
-        })
-        .then(response => {
-            if(!response.ok){
-                response.json().then(function(json) {
-                    alert(json.message);
-                });
-            }
-                AjaxRequest.hideBox();
-        })
-        .catch(error => {
-            alert(error.message);
-            AjaxRequest.hideBox();
-        });
-
-        return false;
     }
 
     /**

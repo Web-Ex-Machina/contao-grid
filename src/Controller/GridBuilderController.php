@@ -64,6 +64,9 @@ class GridBuilderController extends \Contao\Controller
                 case 'classes':
                     $response = $this->saveClasses();
                 break;
+                case 'grid_cols':
+                    $response = $this->saveGridCols();
+                break;
                 default:
                     throw new Exception('Unknown property');
             }
@@ -80,7 +83,7 @@ class GridBuilderController extends \Contao\Controller
     public function saveCols(): array
     {
         $response = ['status' => 'success', 'message' => ''];
-        $this->validateMandatoryParameters();
+        $this->validateMandatoryGridItemParameters();
         if (null === Input::get('breakpoint')) {
             throw new Exception('No breakpoint provided');
         }
@@ -101,7 +104,7 @@ class GridBuilderController extends \Contao\Controller
     public function saveRows(): array
     {
         $response = ['status' => 'success', 'message' => ''];
-        $this->validateMandatoryParameters();
+        $this->validateMandatoryGridItemParameters();
         if (null === Input::get('breakpoint')) {
             throw new Exception('No breakpoint provided');
         }
@@ -122,7 +125,7 @@ class GridBuilderController extends \Contao\Controller
     public function saveClasses(): array
     {
         $response = ['status' => 'success', 'message' => ''];
-        $this->validateMandatoryParameters();
+        $this->validateMandatoryGridItemParameters();
         $grid = $this->getGridStart((int) Input::get('grid'));
         $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
@@ -136,11 +139,67 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
-    public function validateMandatoryParameters(): void
+    public function saveGridCols(): array
     {
+        $response = ['status' => 'success', 'message' => ''];
+
+        $this->validateMandatoryGridParameters();
+        if (null === Input::get('breakpoint')) {
+            throw new Exception('No breakpoint provided');
+        }
+        $value = Input::get('value');
+        $value = empty($value) ? null : (int) $value;
+
+        $grid = $this->getGridStart((int) Input::get('grid'));
+        $gsm = $this->gridStartManipulator->setGridStart($grid);
+
+        $gsm->setGridStart($grid);
+        switch (strtolower(Input::get('breakpoint'))) {
+            case 'all':
+                $gsm->setGridColsAll($value);
+            break;
+            case 'xl':
+                $gsm->setGridColsXl($value);
+            break;
+            case 'lg':
+                $gsm->setGridColsLg($value);
+            break;
+            case 'md':
+                $gsm->setGridColsMd($value);
+            break;
+            case 'sm':
+                $gsm->setGridColsSm($value);
+            break;
+            case 'xs':
+                $gsm->setGridColsXs($value);
+            break;
+            case 'xxs':
+                $gsm->setGridColsXxs($value);
+            break;
+        }
+
+        $grid = $gsm->getGridStart();
+        $grid->save();
+
+        // $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
+
+        // $grid = $gsm->getGridStart();
+
+        // $grid->save();
+
+        return $response;
+    }
+
+    public function validateMandatoryGridItemParameters(): void
+    {
+        $this->validateMandatoryGridParameters();
         if (null === Input::get('id')) {
             throw new Exception('No element ID provided');
         }
+    }
+
+    public function validateMandatoryGridParameters(): void
+    {
         if (null === Input::get('grid')) {
             throw new Exception('No grid ID provided');
         }

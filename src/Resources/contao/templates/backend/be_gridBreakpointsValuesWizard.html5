@@ -71,8 +71,12 @@
 							}else{
 								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'),e.target.getAttribute('data-breakpoint'), value);
 							}
+							self.saveBreakpointColumns(e.target.getAttribute('data-breakpoint'), value);
 						});
 					});
+		    	}
+		    	,saveBreakpointColumns:function(breakpoint, columns){
+		    		return WEM.Grid.Saver.save({property: 'grid_cols', breakpoint: breakpoint, value: columns});
 		    	}
 		    	,changeLowerResolutionValues:function(breakpointStart, closestHigherResolutionDefined, value){
 					let resolutions = self.getLowerResolutions(breakpointStart);
