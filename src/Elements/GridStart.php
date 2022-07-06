@@ -98,6 +98,8 @@ class GridStart extends ContentElement
         } else {
             $this->objModel->classes = $arrGrid->getWrapperClasses();
         }
+        $gridCssClassesInheritance = new \WEM\GridBundle\Classes\GridCssClassesInheritance();
+        $this->objModel->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
 
         // Send the grid_id to template
         $this->Template->grid_id = $this->id;

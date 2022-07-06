@@ -269,16 +269,27 @@ class GridElementWizard extends Widget
                 $this->User->isAdmin ? '' : 'hidden'
             );
 
+            // $itemSettings = sprintf(
+            //     '<div class="item-classes">
+            //         <div class="d-grid cols-1">
+            //             <div>
+            //             %s
+            //             </div>
+            //             <div>
+            //             %s
+            //             </div>
+            //         </div>
+            //         %s
+            //     </div>',
+            //     implode('', $selectsCols),
+            //     implode('', $selectsRows),
+            //     $inputClasses
+            // );
+
             $itemSettings = sprintf(
                 '<div class="item-classes">
-                    <div class="d-grid cols-2">
-                        <div>
-                        %s
-                        </div>
-                        <div>
-                        %s
-                        </div>
-                    </div>
+                    %s
+                    %s
                     %s
                 </div>',
                 implode('', $selectsCols),
@@ -300,6 +311,8 @@ class GridElementWizard extends Widget
         $GLOBALS['TL_JAVASCRIPT']['wemgrid_translations'] = 'bundles/wemgrid/js/wem_grid_translations.js';
         $GLOBALS['TL_MOOTOOLS']['wemgrid'] = '<script>
             WEM.Grid.Translations.new = "'.$GLOBALS['TL_LANG']['DCA']['new'][1].'";
+            WEM.Grid.Translations.inheritedColumns = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inheritedColumns'].'";
+            WEM.Grid.Translations.inheritedRows = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['inheritedRows'].'";
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 1).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 2).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 3).'");
@@ -312,6 +325,13 @@ class GridElementWizard extends Widget
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 10).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 11).'");
             WEM.Grid.Translations.columns.push("'.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], 12).'");
+            WEM.Grid.Translations.breakpoints.all = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointAll'].'";
+            WEM.Grid.Translations.breakpoints.xl = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXl'].'";
+            WEM.Grid.Translations.breakpoints.lg = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointLg'].'";
+            WEM.Grid.Translations.breakpoints.md = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointMd'].'";
+            WEM.Grid.Translations.breakpoints.sm = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointSm'].'";
+            WEM.Grid.Translations.breakpoints.xs = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXs'].'";
+            WEM.Grid.Translations.breakpoints.xxs = "'.$GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXxs'].'";
         </script>';
     }
 }

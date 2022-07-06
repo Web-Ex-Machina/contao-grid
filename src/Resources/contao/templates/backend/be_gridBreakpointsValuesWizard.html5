@@ -14,7 +14,7 @@
 			<?php endforeach; ?>
 			</select>
 		</div>
-		<div>
+		<div class="cols-span-2">
 			<h3>
 				<label>
 					<?= $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsLabel'] ?>
@@ -22,7 +22,12 @@
 			</h3>
 			<?php foreach($this->breakpoints as $k => $b): ?>
 				<input type="hidden" name="<?= $this->input ?>[<?= $k ?>][key]" id="<?= $this->input ?>_key_<?= $k ?>" class="tl_text" value="<?= $b['name'] ?>">
-				<select name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= $b['required'] ? 'required' : ''; ?> data-previous-value="<?php echo $b['value']; ?>">
+				<select name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= $b['required'] ? 'required' : ''; ?>>
+					<?php if('all' != $b['name']): ?>
+						<option value="">
+							heritée
+						</option>
+					<?php endif; ?>
 					<?php for($i = 1; $i <= 12; $i++): ?>
 						<option value="<?php echo $i; ?>" <?php echo $i === (int) $b['value'] ? 'selected' : '' ?>>
 							<?php echo $i; ?>
@@ -31,48 +36,106 @@
 				</select>
 			<?php endforeach; ?>
 		</div>
-		<div class="cols-span-4"></div>
+		<div class="cols-span-3"></div>
 	</div>
 	<script type="text/javascript">
+		var WEM = WEM || {};
+		WEM.Grid  = WEM.Grid || {};
+		(function() {
+		    WEM.Grid.BreakpointValueWizard = WEM.Grid.BreakpointValueWizard || {
+		    	breakpoints: ['all','xl','lg','md','sm','xs','xxs']
+		    	,inheritedColumnsText:'<?php echo $this->trans("WEM.GRID.BE.inheritedColumns",[],"contao_default"); ?>'
+		    	,breakpointsLabels:{
+		    		all:'<?php echo $this->trans("WEM.GRID.BE.breakpointAll",[],"contao_default"); ?>',
+		            xl:'<?php echo $this->trans("WEM.GRID.BE.breakpointXl",[],"contao_default"); ?>',
+		            lg:'<?php echo $this->trans("WEM.GRID.BE.breakpointLg",[],"contao_default"); ?>',
+		            md:'<?php echo $this->trans("WEM.GRID.BE.breakpointMd",[],"contao_default"); ?>',
+		            sm:'<?php echo $this->trans("WEM.GRID.BE.breakpointSm",[],"contao_default"); ?>',
+		            xs:'<?php echo $this->trans("WEM.GRID.BE.breakpointXs",[],"contao_default"); ?>',
+		            xxs:'<?php echo $this->trans("WEM.GRID.BE.breakpointXxs",[],"contao_default"); ?>',
+		    	}
+		    	,selectors:{
+		    		wizardContainer:'.grid_breakpoints_values_wizard'
+		    		,breakpointSelect:'ctrl_select_breakpoints_<?= $this->strId; ?>'
+		    	}
+		    	,init:function(){
+		    		self.addListeners();
+					document.getElementById(self.selectors.breakpointSelect).dispatchEvent(new Event('change'));
+		    	}
+		    	,addListeners:function(){
+		    		document.getElementById(self.selectors.breakpointSelect).addEventListener("change", function (e) {
+						document.querySelectorAll(self.selectors.wizardContainer + ' select[data-breakpoint]').forEach(function(select){
+							select.classList.toggle('hidden',select.getAttribute('data-breakpoint') != e.target.value);
+						});
+					});
+					document.querySelectorAll(self.selectors.wizardContainer + ' select[data-breakpoint]').forEach(function(select){
+						select.addEventListener('change',function(e){
+							var value = e.target.value;
+							if('' == value){
+								// get first higher resolution set
+								var resolution = self.getClosestHigherResolutionDefined(e.target.getAttribute('data-breakpoint'));
+								var select = self.getSelectForBreakpoint(resolution);
+								e.target.options[0].innerHTML = self.buildInheritedOptionText(resolution, select.value); 
+								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), resolution, select.value);
+							}else{
+								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'),e.target.getAttribute('data-breakpoint'), value);
+							}
+							self.saveBreakpointColumns(e.target.getAttribute('data-breakpoint'), value);
+						});
+					});
+		    	}
+		    	,saveBreakpointColumns:function(breakpoint, columns){
+		    		return WEM.Grid.Saver.save({property: 'grid_cols', breakpoint: breakpoint, value: columns});
+		    	}
+		    	,changeLowerResolutionValues:function(breakpointStart, closestHigherResolutionDefined, value){
+					let resolutions = self.getLowerResolutions(breakpointStart);
+					resolutions.forEach(function(resolution){
+						var select = self.getSelectForBreakpoint(resolution);
+						select.options[0].innerHTML = self.buildInheritedOptionText(closestHigherResolutionDefined, value); 
+					});
+				}
+
+				,buildInheritedOptionText:function(breakpoint, value){
+					return self.inheritedColumnsText.replace('%s', value).replace('%s', self.breakpointsLabels[breakpoint.toLowerCase()]);
+				}
+
+				,getClosestHigherResolutionDefined:function(breakpoint){
+					var resolutions = self.getHigherResolutions(breakpoint);
+					var selectedResolution = 'all'; //fallback
+					var found = false;
+					resolutions.forEach(function(resolution){
+						if(resolution != breakpoint){
+							var select = self.getSelectForBreakpoint(resolution);
+							if(!found && select.value !== ''){
+								selectedResolution = resolution;
+								found = true;
+							}
+						}
+					});
+					return selectedResolution;
+				}
+
+				,getLowerResolutions:function(breakpoint){
+					var indexOfResolution = self.breakpoints.indexOf(breakpoint);
+
+					return self.breakpoints.slice(indexOfResolution+1);
+				}
+
+				,getHigherResolutions:function(breakpoint){
+					var invertedBreakpoints = self.breakpoints.slice();
+					var indexOfResolution = invertedBreakpoints.reverse().indexOf(breakpoint);
+					var higherResolutions = invertedBreakpoints.slice(indexOfResolution+1);
+					return higherResolutions;
+				}
+
+				,getSelectForBreakpoint:function(breakpoint){
+					return document.querySelector('.grid_breakpoints_values_wizard select[data-breakpoint="'+breakpoint+'"]');
+				}
+		    }
+		    var self = WEM.Grid.BreakpointValueWizard;
+		})();
 		window.addEvent("domready", function () {
-			var breakpoints = ['all','xl','lg','md','sm','xs','xxs'];
-			document.getElementById('ctrl_select_breakpoints_<?= $this->strId; ?>').addEventListener("change", function (e) {
-				document.querySelectorAll('select[data-breakpoint]').forEach(function(select){
-					select.classList.toggle('hidden',select.getAttribute('data-breakpoint') != e.target.value);
-				});
-			});
-			document.querySelectorAll('select[data-breakpoint]').forEach(function(select){
-				select.addEventListener('change',function(e){
-					var previousValue = e.target.getAttribute('data-previous-value');
-					var value = e.target.value;
-					changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), value, previousValue);
-					e.target.setAttribute('data-previous-value',value);
-				});
-			});
-			document.getElementById('ctrl_select_breakpoints_<?= $this->strId; ?>').dispatchEvent(new Event('change'));
-
-			function changeLowerResolutionValues(breakpoint, value, previousValue){
-				let resolutions = getLowerResolutions(breakpoint);
-				resolutions.forEach(function(resolution){
-					var select = getSelectForBreakpoint(resolution);
-					if(select.value === previousValue){ // inherited value
-						select.value = value;
-						select.setAttribute('data-previous-value',value);
-					}else{
-						return; // we stop at the first different value
-					}
-				});
-			}
-
-			function getLowerResolutions(breakpoint){
-				var indexOfResolution = breakpoints.indexOf(breakpoint);
-
-				return breakpoints.slice(indexOfResolution);
-			}
-
-			function getSelectForBreakpoint(breakpoint){
-				return document.querySelector('select[data-breakpoint="'+breakpoint+'"]');
-			}
+			WEM.Grid.BreakpointValueWizard.init();
 		});
 	</script>
 </div>
