@@ -67,20 +67,18 @@
 								var resolution = self.getClosestHigherResolutionDefined(e.target.getAttribute('data-breakpoint'));
 								var select = self.getSelectForBreakpoint(resolution);
 								e.target.options[0].innerHTML = self.buildInheritedOptionText(resolution, select.value); 
-								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), value, select.value);
+								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), resolution, select.value);
 							}else{
-								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), value, value);
+								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'),e.target.getAttribute('data-breakpoint'), value);
 							}
 						});
 					});
 		    	}
-		    	,changeLowerResolutionValues:function(breakpoint, value, previousValue){
-					let resolutions = self.getLowerResolutions(breakpoint);
+		    	,changeLowerResolutionValues:function(breakpointStart, closestHigherResolutionDefined, value){
+					let resolutions = self.getLowerResolutions(breakpointStart);
 					resolutions.forEach(function(resolution){
 						var select = self.getSelectForBreakpoint(resolution);
-						if(select.value === ''){ // inherited value
-							select.options[0].innerHTML = self.buildInheritedOptionText(breakpoint, value); 
-						}
+						select.options[0].innerHTML = self.buildInheritedOptionText(closestHigherResolutionDefined, value); 
 					});
 				}
 
@@ -111,9 +109,9 @@
 				}
 
 				,getHigherResolutions:function(breakpoint){
-					var indexOfResolution = self.breakpoints.reverse().indexOf(breakpoint);
-					var higherResolutions = self.breakpoints.slice(indexOfResolution+1);
-					self.breakpoints.reverse(); // put it back in the right order
+					var invertedBreakpoints = self.breakpoints.slice();
+					var indexOfResolution = invertedBreakpoints.reverse().indexOf(breakpoint);
+					var higherResolutions = invertedBreakpoints.slice(indexOfResolution+1);
 					return higherResolutions;
 				}
 
