@@ -1,6 +1,6 @@
 <div class="grid_breakpoints_values_wizard" id="ctrl_<?= $this->strId; ?>">
 	<div class="d-grid cols-6">
-		<div>
+		<div class="<?php echo $this->expertMode ? '' : 'hidden'; ?>">
 			<h3>
 				<label for="ctrl_select_breakpoints_<?= $this->strId; ?>">
 					<?= $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['resolutionLabel'] ?>
@@ -36,7 +36,7 @@
 				</select>
 			<?php endforeach; ?>
 		</div>
-		<div class="cols-span-3"></div>
+		<div class="cols-span-<?php echo $this->expertMode ? '4' : '3'; ?>"></div>
 	</div>
 	<script type="text/javascript">
 		var WEM = WEM || {};
@@ -75,7 +75,8 @@
 								// get first higher resolution set
 								var resolution = self.getClosestHigherResolutionDefined(e.target.getAttribute('data-breakpoint'));
 								var select = self.getSelectForBreakpoint(resolution);
-								e.target.options[0].innerHTML = self.buildInheritedOptionText(resolution, select.value); 
+								// e.target.options[0].innerHTML = self.buildInheritedOptionText(resolution, select.value); 
+								e.target.options[0].innerHTML = select.value; 
 								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'), resolution, select.value);
 							}else{
 								self.changeLowerResolutionValues(e.target.getAttribute('data-breakpoint'),e.target.getAttribute('data-breakpoint'), value);
@@ -91,7 +92,8 @@
 					let resolutions = self.getLowerResolutions(breakpointStart);
 					resolutions.forEach(function(resolution){
 						var select = self.getSelectForBreakpoint(resolution);
-						select.options[0].innerHTML = self.buildInheritedOptionText(closestHigherResolutionDefined, value); 
+						select.options[0].innerHTML = value; 
+						// select.options[0].innerHTML = self.buildInheritedOptionText(closestHigherResolutionDefined, value); 
 					});
 				}
 
