@@ -399,6 +399,9 @@ WEM.Grid  = WEM.Grid || {};
             return selectedResolution;
         },
         buildInheritedOptionTextForTypeAndBreakpoint:function(type, breakpoint, value){
+            if("" == value){
+                value = 1;
+            }
             if('cols' == type){
                 return WEM.Grid.Translations.inheritedColumns.replace('%s',value).replace('%s',WEM.Grid.Translations.breakpoints[breakpoint.toLowerCase()]);
             }else if('rows' == type){
