@@ -87,6 +87,7 @@ class GridBreakpointsValuesWizard extends \Widget
      */
     public function generate()
     {
+        $this->import(\Contao\BackendUser::class, 'User');
         $this->arrGridBreakpoints = [
             ['name' => 'all', 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointAll'], 'required' => true, 'value' => 2],
             ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXl']],
@@ -110,6 +111,7 @@ class GridBreakpointsValuesWizard extends \Widget
         $objTemplate = new \FrontendTemplate('be_gridBreakpointsValuesWizard');
         $objTemplate->input = $this->strId;
         $objTemplate->breakpoints = $this->arrGridBreakpoints;
+        $objTemplate->expertMode = $this->User->isAdmin;
 
         return $objTemplate->parse();
     }
