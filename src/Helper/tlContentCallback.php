@@ -19,7 +19,6 @@ use Contao\CoreBundle\Exception\AjaxRedirectResponseException;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\Input;
 use Doctrine\DBAL\Connection;
 use Exception;
 use WEM\GridBundle\Classes\GridElementsCalculator;
@@ -162,8 +161,6 @@ class tlContentCallback
             return;
         }
 
-        // trick the system tomake the DC_Driver believes it is workling on the grid-stop
-        $oldId = $dc->id;
         $dc2 = new DC_Table('tl_undo');
         $dc2->id = $objGridStopUndo['id'];
         try {
@@ -173,7 +170,6 @@ class tlContentCallback
         } catch (RedirectResponseException $e) {
             // do not redirect here
         }
-        $dc2->id = $oldId;
     }
 
     public function deleteClosestGridStopFromGridStart(ContentModel $gridStart): void
@@ -182,13 +178,9 @@ class tlContentCallback
         if (!$gridStop) {
             return;
         }
-        // trick the system tomake the DC_Driver believes it is workling on the grid-stop
-        $oldId = Input::get('id');
         $dc = new DC_Table('tl_content');
-        Input::setGet('id', $gridStop->id);
+        $dc->id = $gridStop->id;
         $dc->delete(true);
-        // set the $_GET['id'] value to its previous value
-        Input::setGet('id', $oldId);
         $gridStop->delete();
     }
 }
