@@ -19,6 +19,7 @@ use Contao\CoreBundle\Exception\AjaxRedirectResponseException;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Contao\System;
 use Doctrine\DBAL\Connection;
 use Exception;
 use WEM\GridBundle\Classes\GridElementsCalculator;
@@ -101,18 +102,40 @@ class tlContentCallback
             return;
         }
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
-        if ('grid-start' === $objItem->type) {
-            $this->deleteClosestGridStopFromGridStart($objItem);
+
+        $sessionKey = 'WEMGRID_ondeleteCallback';
+        $session = System::getContainer()->get('session');
+        if ($session->has($sessionKey)) {
+            return;
         }
+        $session->set($sessionKey, 1);
+
+        if ('grid-start' === $objItem->type) {
+            $this->deleteCorrespondingGridStopFromGridStart($objItem);
+        } elseif ('grid-stop' === $objItem->type) {
+            $this->deleteCorrespondingGridStartFromGridStart($objItem);
+        }
+
         $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+        $session->remove($sessionKey);
     }
 
     public function onundoCallback(string $table, array $data, DataContainer $dc): void
     {
+        $sessionKey = 'WEMGRID_onundoCallback';
+        $session = System::getContainer()->get('session');
+        if ($session->has($sessionKey)) {
+            return;
+        }
+
         if ('tl_content' === $table && 'grid-start' === $data['type']) {
             // restore the grid-stop
             $this->restoreClosestGridStopFromGridStart($data['id'], $dc);
+        } elseif ('tl_content' === $table && 'grid-stop' === $data['type']) {
+            // restore the grid-start
+            $this->restoreClosestGridStartFromGridStop($data['id'], $dc);
         }
+        $session->remove($sessionKey);
     }
 
     public function restoreClosestGridStopFromGridStart($gridStartUndoId, DataContainer $dc): void
@@ -130,8 +153,8 @@ class tlContentCallback
 
         $startId = $dc->id;
         do {
-            $objRecordsGridStopUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id>:id AND tstamp >=:tstamp AND pid=:pid AND fromTable=:fromTable ORDER BY id LIMIT 1')
-                ->executeQuery(['id' => $startId, 'tstamp' => $objRecordsGridStartUndo['tstamp'], 'pid' => $objRecordsGridStartUndo['pid'], 'fromTable' => $objRecordsGridStartUndo['fromTable']])
+            $objRecordsGridStopUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id>:id AND tstamp BETWEEN :tstamp1 AND :tstamp2 AND pid=:pid AND fromTable=:fromTable ORDER BY id ASC LIMIT 1')
+                ->executeQuery(['id' => $startId, 'tstamp1' => (int) $objRecordsGridStartUndo['tstamp'] - 5, 'tstamp2' => (int) $objRecordsGridStartUndo['tstamp'] + 5, 'pid' => $objRecordsGridStartUndo['pid'], 'fromTable' => $objRecordsGridStartUndo['fromTable']])
             ;
             try {
                 if (0 === $objRecordsGridStopUndo->rowCount()) {
@@ -172,9 +195,71 @@ class tlContentCallback
         }
     }
 
-    public function deleteClosestGridStopFromGridStart(ContentModel $gridStart): void
+    public function restoreClosestGridStartFromGridStop($gridStartUndoId, DataContainer $dc): void
     {
-        $gridStop = ContentModel::findBy(['pid = ?', 'ptable = ?', 'type = ?', 'sorting > ?'], [$gridStart->pid, $gridStart->ptable, 'grid-stop', $gridStart->sorting], ['limit' => 1, 'order' => 'sorting ASC']);
+        $objGridStartUndo = null;
+
+        $objRecordsGridStopUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
+            ->executeQuery(['id' => $dc->id])
+        ;
+        try {
+            $objRecordsGridStopUndo = $objRecordsGridStopUndo->fetchAssociative();
+        } catch (Exception $e) {
+            return;
+        }
+
+        $startId = $dc->id;
+        do {
+            $objRecordsGridStartUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id>:id AND tstamp BETWEEN :tstamp1 AND :tstamp2 AND pid=:pid AND fromTable=:fromTable ORDER BY id ASC LIMIT 1')
+                ->executeQuery(['id' => $startId, 'tstamp1' => (int) $objRecordsGridStopUndo['tstamp'] - 5, 'tstamp2' => (int) $objRecordsGridStopUndo['tstamp'] + 5, 'pid' => $objRecordsGridStopUndo['pid'], 'fromTable' => $objRecordsGridStopUndo['fromTable']])
+            ;
+            try {
+                if (0 === $objRecordsGridStartUndo->rowCount()) {
+                    return;
+                }
+                $objGridStartUndo = $objRecordsGridStartUndo->fetchAssociative();
+            } catch (Exception $e) {
+                return;
+            }
+
+            if ($objGridStartUndo) {
+                $data = unserialize($objGridStartUndo['data']);
+                if (\array_key_exists('tl_content', $data)
+                && \array_key_exists(0, $data['tl_content'])
+                && \array_key_exists('type', $data['tl_content'][0])
+                && 'grid-start' === $data['tl_content'][0]['type']
+                ) {
+                    // everything is OK
+                } else {
+                    $startId = $objGridStartUndo['id'];
+                    $objGridStartUndo = null;
+                }
+            }
+        } while (null === $objGridStartUndo && 0 !== $objRecordsGridStartUndo->rowCount());
+        if (!$objGridStartUndo) {
+            // we did not find the grid-start
+            return;
+        }
+
+        $dc2 = new DC_Table('tl_undo');
+        $dc2->id = $objGridStartUndo['id'];
+        try {
+            $dc2->undo();
+        } catch (AjaxRedirectResponseException $e) {
+            // do not redirect here
+        } catch (RedirectResponseException $e) {
+            // do not redirect here
+        }
+    }
+
+    public function deleteCorrespondingGridStopFromGridStart(ContentModel $gridStart): void
+    {
+        $gridStartPos = $this->getGridStartPositionInParent((int) $gridStart->id);
+        if (!$gridStartPos) {
+            return;
+        }
+        $gridStop = $this->getGridStopCorrespondingToGridStartPosition((int) $gridStart->pid, $gridStart->ptable, $gridStartPos);
+        // $gridStop = ContentModel::findBy(['pid = ?', 'ptable = ?', 'type = ?', 'sorting > ?'], [$gridStart->pid, $gridStart->ptable, 'grid-stop', $gridStart->sorting], ['limit' => 1, 'order' => 'sorting ASC']);
         if (!$gridStop) {
             return;
         }
@@ -182,5 +267,98 @@ class tlContentCallback
         $dc->id = $gridStop->id;
         $dc->delete(true);
         $gridStop->delete();
+    }
+
+    public function deleteCorrespondingGridStartFromGridStart(ContentModel $gridStop): void
+    {
+        $gridStopPos = $this->getGridStopPositionInParent((int) $gridStop->id);
+        if (!$gridStopPos) {
+            return;
+        }
+        $gridStart = $this->getGridStartCorrespondingToGridStopPosition((int) $gridStop->pid, $gridStop->ptable, $gridStopPos);
+
+        if (!$gridStart) {
+            return;
+        }
+        $dc = new DC_Table('tl_content');
+        $dc->id = $gridStart->id;
+        $dc->delete(true);
+        $gridStart->delete();
+    }
+
+    public function getGridStartPositionInParent(int $gridStartId): ?int
+    {
+        $objGridStart = ContentModel::findByPk($gridStartId);
+        if (!$objGridStart) {
+            return null;
+        }
+        $objContents = ContentModel::findBy(['pid=?', 'ptable=?', 'type=?'], [$objGridStart->pid, $objGridStart->ptable, $objGridStart->type], ['order' => 'sorting ASC']);
+        if (!$objContents) {
+            return null;
+        }
+        $index = 0;
+        while ($objContents->next()) {
+            ++$index;
+            if ((int) $objContents->id === $gridStartId) {
+                return $index;
+            }
+        }
+
+        return null;
+    }
+
+    public function getGridStopPositionInParent(int $gridStopId): ?int
+    {
+        $objGridStop = ContentModel::findByPk($gridStopId);
+        if (!$objGridStop) {
+            return null;
+        }
+        $objContents = ContentModel::findBy(['pid=?', 'ptable=?', 'type=?'], [$objGridStop->pid, $objGridStop->ptable, $objGridStop->type], ['order' => 'sorting DESC']);
+        if (!$objContents) {
+            return null;
+        }
+        $index = 0;
+        while ($objContents->next()) {
+            ++$index;
+            if ((int) $objContents->id === $gridStopId) {
+                return $index;
+            }
+        }
+
+        return null;
+    }
+
+    public function getGridStartCorrespondingToGridStopPosition(int $pid, string $ptable, int $gridStopPosition): ?ContentModel
+    {
+        $objContents = ContentModel::findBy(['pid=?', 'ptable=?', 'type=?'], [$pid, $ptable, 'grid-start'], ['order' => 'sorting ASC']);
+        if (!$objContents) {
+            return null;
+        }
+        $index = 0;
+        while ($objContents->next()) {
+            ++$index;
+            if ($index === $gridStopPosition) {
+                return $objContents->current();
+            }
+        }
+
+        return null;
+    }
+
+    public function getGridStopCorrespondingToGridStartPosition(int $pid, string $ptable, int $gridStartPosition): ?ContentModel
+    {
+        $objContents = ContentModel::findBy(['pid=?', 'ptable=?', 'type=?'], [$pid, $ptable, 'grid-stop'], ['order' => 'sorting DESC']);
+        if (!$objContents) {
+            return null;
+        }
+        $index = 0;
+        while ($objContents->next()) {
+            ++$index;
+            if ($index === $gridStartPosition) {
+                return $objContents->current();
+            }
+        }
+
+        return null;
     }
 }
