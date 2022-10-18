@@ -15,16 +15,27 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Helper;
 
 use Contao\ContentModel;
+use Contao\CoreBundle\Exception\AjaxRedirectResponseException;
+use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\DataContainer;
+use Contao\DC_Table;
+use Contao\Input;
+use Doctrine\DBAL\Connection;
+use Exception;
 use WEM\GridBundle\Classes\GridElementsCalculator;
 
 class tlContentCallback
 {
+    /** @var Connection */
+    protected $connection;
     /** @var GridElementsCalculator */
     private $gridElementsCalculator;
 
-    public function __construct(GridElementsCalculator $gridElementsCalculator)
-    {
+    public function __construct(
+        Connection $connection,
+        GridElementsCalculator $gridElementsCalculator
+    ) {
+        $this->connection = $connection;
         $this->gridElementsCalculator = $gridElementsCalculator;
     }
 
@@ -97,11 +108,87 @@ class tlContentCallback
         $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
+    public function onundoCallback(string $table, array $data, DataContainer $dc): void
+    {
+        if ('tl_content' === $table && 'grid-start' === $data['type']) {
+            // restore the grid-stop
+            $this->restoreClosestGridStopFromGridStart($data['id'], $dc);
+        }
+    }
+
+    public function restoreClosestGridStopFromGridStart($gridStartUndoId, DataContainer $dc): void
+    {
+        $objGridStopUndo = null;
+
+        $objRecordsGridStartUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
+            ->executeQuery(['id' => $dc->id])
+        ;
+        try {
+            $objRecordsGridStartUndo = $objRecordsGridStartUndo->fetchAssociative();
+        } catch (Exception $e) {
+            return;
+        }
+
+        $startId = $dc->id;
+        do {
+            $objRecordsGridStopUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id>:id AND tstamp >=:tstamp AND pid=:pid AND fromTable=:fromTable ORDER BY id LIMIT 1')
+                ->executeQuery(['id' => $startId, 'tstamp' => $objRecordsGridStartUndo['tstamp'], 'pid' => $objRecordsGridStartUndo['pid'], 'fromTable' => $objRecordsGridStartUndo['fromTable']])
+            ;
+            try {
+                if (0 === $objRecordsGridStopUndo->rowCount()) {
+                    return;
+                }
+                $objGridStopUndo = $objRecordsGridStopUndo->fetchAssociative();
+            } catch (Exception $e) {
+                return;
+            }
+
+            if ($objGridStopUndo) {
+                $data = unserialize($objGridStopUndo['data']);
+                if (\array_key_exists('tl_content', $data)
+                && \array_key_exists(0, $data['tl_content'])
+                && \array_key_exists('type', $data['tl_content'][0])
+                && 'grid-stop' === $data['tl_content'][0]['type']
+                ) {
+                    // everything is OK
+                } else {
+                    $startId = $objGridStopUndo['id'];
+                    $objGridStopUndo = null;
+                }
+            }
+        } while (null === $objGridStopUndo && 0 !== $objRecordsGridStopUndo->rowCount());
+        if (!$objGridStopUndo) {
+            // we did not find the grid-stop
+            return;
+        }
+
+        // trick the system tomake the DC_Driver believes it is workling on the grid-stop
+        $oldId = $dc->id;
+        $dc2 = new DC_Table('tl_undo');
+        $dc2->id = $objGridStopUndo['id'];
+        try {
+            $dc2->undo();
+        } catch (AjaxRedirectResponseException $e) {
+            // do not redirect here
+        } catch (RedirectResponseException $e) {
+            // do not redirect here
+        }
+        $dc2->id = $oldId;
+    }
+
     public function deleteClosestGridStopFromGridStart(ContentModel $gridStart): void
     {
         $gridStop = ContentModel::findBy(['pid = ?', 'ptable = ?', 'type = ?', 'sorting > ?'], [$gridStart->pid, $gridStart->ptable, 'grid-stop', $gridStart->sorting], ['limit' => 1, 'order' => 'sorting ASC']);
-        if ($gridStop) {
-            $gridStop->delete();
+        if (!$gridStop) {
+            return;
         }
+        // trick the system tomake the DC_Driver believes it is workling on the grid-stop
+        $oldId = Input::get('id');
+        $dc = new DC_Table('tl_content');
+        Input::setGet('id', $gridStop->id);
+        $dc->delete(true);
+        // set the $_GET['id'] value to its previous value
+        Input::setGet('id', $oldId);
+        $gridStop->delete();
     }
 }

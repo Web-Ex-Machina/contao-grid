@@ -18,6 +18,7 @@ $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = ['wem.grid.hel
 $GLOBALS['TL_DCA']['tl_content']['config']['oncut_callback'][] = ['wem.grid.helper.tl_content_callback', 'oncutCallback'];
 $GLOBALS['TL_DCA']['tl_content']['config']['oncopy_callback'][] = ['wem.grid.helper.tl_content_callback', 'oncopyCallback'];
 $GLOBALS['TL_DCA']['tl_content']['config']['ondelete_callback'][] = ['wem.grid.helper.tl_content_callback', 'ondeleteCallback'];
+$GLOBALS['TL_DCA']['tl_content']['config']['onundo_callback'][] = ['wem.grid.helper.tl_content_callback', 'onundoCallback'];
 
 // Update grid content elements palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-start'] = '{type_legend},type;{grid_legend},grid_cols,grid_gap,grid_items;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
