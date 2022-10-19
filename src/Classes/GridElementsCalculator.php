@@ -47,6 +47,62 @@ class GridElementsCalculator
     }
 
     /**
+     * Returns the grid-start element corresponding to the grid-stop in paramter, if it exists.
+     *
+     * @param ContentModel $gridStop The "grid-stop" content element
+     *
+     * @return ContentModel|null The ContentModel if found, null otherwise
+     */
+    public function getGridStartCorrespondingToGridStop(ContentModel $gridStop): ?ContentModel
+    {
+        $objContents = ContentModel::findBy(['pid=?', 'ptable=?', 'sorting<?'], [$gridStop->pid, $gridStop->ptable, $gridStop->sorting], ['order' => 'sorting DESC']);
+        if (!$objContents) {
+            return null;
+        }
+        $nbGridOpened = 0;
+        while ($objContents->next()) {
+            if ('grid-stop' === $objContents->type) {
+                ++$nbGridOpened;
+            } elseif ('grid-start' === $objContents->type) {
+                if (0 === $nbGridOpened) {
+                    return $objContents->current();
+                }
+                --$nbGridOpened;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the grid-stop element corresponding to the grid-start in paramter, if it exists.
+     *
+     * @param ContentModel $gridSart The "grid-start" content element
+     *
+     * @return ContentModel|null The ContentModel if found, null otherwise
+     */
+    public function getGridStopCorrespondingToGridStart(ContentModel $gridSart): ?ContentModel
+    {
+        $objContents = ContentModel::findBy(['pid=?', 'ptable=?', 'sorting>?'], [$gridSart->pid, $gridSart->ptable, $gridSart->sorting], ['order' => 'sorting ASC']);
+        if (!$objContents) {
+            return null;
+        }
+        $nbGridOpened = 0;
+        while ($objContents->next()) {
+            if ('grid-start' === $objContents->type) {
+                ++$nbGridOpened;
+            } elseif ('grid-stop' === $objContents->type) {
+                if (0 === $nbGridOpened) {
+                    return $objContents->current();
+                }
+                --$nbGridOpened;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Recalculate elements inside a grid.
      *
      * @param ContentModel             $gridStart         The "grid-start" content element
