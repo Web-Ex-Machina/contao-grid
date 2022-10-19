@@ -124,61 +124,11 @@ class tlContentCallback
      */
     public function restoreClosestGridStopFromGridStart(array $gridStartUndoData, DataContainer $dc): void
     {
-        // $objGridStopUndo = null;
-
-        $objRecordsGridStartUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
-            ->executeQuery(['id' => $dc->id])
-        ;
-        try {
-            $objRecordsGridStartUndo = $objRecordsGridStartUndo->fetchAssociative();
-        } catch (Exception $e) {
+        $arrRecordGridStartUndo = $this->getUndoElementAsArray($dc->id);
+        if (!\is_array($arrRecordGridStartUndo)) {
             return;
         }
-
-        // $startId = $dc->id;
-        // do {
-        //     $objRecordsGridStopUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id>:id AND tstamp BETWEEN :tstamp1 AND :tstamp2 AND pid=:pid AND fromTable=:fromTable ORDER BY id ASC LIMIT 1')
-        //         ->executeQuery(['id' => $startId, 'tstamp1' => (int) $objRecordsGridStartUndo['tstamp'] - 5, 'tstamp2' => (int) $objRecordsGridStartUndo['tstamp'] + 5, 'pid' => $objRecordsGridStartUndo['pid'], 'fromTable' => $objRecordsGridStartUndo['fromTable']])
-        //     ;
-        //     try {
-        //         if (0 === $objRecordsGridStopUndo->rowCount()) {
-        //             return;
-        //         }
-        //         $objGridStopUndo = $objRecordsGridStopUndo->fetchAssociative();
-        //     } catch (Exception $e) {
-        //         return;
-        //     }
-
-        //     if ($objGridStopUndo) {
-        //         $data = unserialize($objGridStopUndo['data']);
-        //         if (\array_key_exists(ContentModel::getTable(), $data)
-        //         && \array_key_exists(0, $data[ContentModel::getTable()])
-        //         && \array_key_exists('type', $data[ContentModel::getTable()][0])
-        //         && 'grid-stop' === $data[ContentModel::getTable()][0]['type']
-        //         // need to also check sorting to be sure
-        //         ) {
-        //             // everything is OK
-        //         } else {
-        //             $startId = $objGridStopUndo['id'];
-        //             $objGridStopUndo = null;
-        //         }
-        //     }
-        // } while (null === $objGridStopUndo && 0 !== $objRecordsGridStopUndo->rowCount());
-        // if (!$objGridStopUndo) {
-        //     // we did not find the grid-stop
-        //     return;
-        // }
-
-        // $dc2 = new DC_Table('tl_undo');
-        // $dc2->id = $objGridStopUndo['id'];
-        // try {
-        //     $dc2->undo();
-        // } catch (AjaxRedirectResponseException $e) {
-        //     // do not redirect here
-        // } catch (RedirectResponseException $e) {
-        //     // do not redirect here
-        // }
-        $results = $this->getDeletedElementsOnSameEntity($objRecordsGridStartUndo);
+        $results = $this->getDeletedElementsOnSameEntity($arrRecordGridStartUndo);
         $arrData = $this->buildUseableArrayOfDataForDeletedElementsOnSameEntity($results);
 
         $gridStopUndoId = null;
@@ -223,61 +173,11 @@ class tlContentCallback
      */
     public function restoreClosestGridStartFromGridStop(array $gridStopUndoData, DataContainer $dc): void
     {
-        // $objGridStartUndo = null;
-
-        $objRecordsGridStopUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
-            ->executeQuery(['id' => $dc->id])
-        ;
-        try {
-            $objRecordsGridStopUndo = $objRecordsGridStopUndo->fetchAssociative();
-        } catch (Exception $e) {
+        $arrRecordGridStopUndo = $this->getUndoElementAsArray($dc->id);
+        if (!\is_array($arrRecordGridStopUndo)) {
             return;
         }
-
-        // $startId = $dc->id;
-        // do {
-        //     $objRecordsGridStartUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id>:id AND tstamp BETWEEN :tstamp1 AND :tstamp2 AND pid=:pid AND fromTable=:fromTable ORDER BY id ASC LIMIT 1')
-        //         ->executeQuery(['id' => $startId, 'tstamp1' => (int) $objRecordsGridStopUndo['tstamp'] - 5, 'tstamp2' => (int) $objRecordsGridStopUndo['tstamp'] + 5, 'pid' => $objRecordsGridStopUndo['pid'], 'fromTable' => $objRecordsGridStopUndo['fromTable']])
-        //     ;
-        //     try {
-        //         if (0 === $objRecordsGridStartUndo->rowCount()) {
-        //             return;
-        //         }
-        //         $objGridStartUndo = $objRecordsGridStartUndo->fetchAssociative();
-        //     } catch (Exception $e) {
-        //         return;
-        //     }
-
-        //     if ($objGridStartUndo) {
-        //         $data = unserialize($objGridStartUndo['data']);
-        //         if (\array_key_exists(ContentModel::getTable(), $data)
-        //         && \array_key_exists(0, $data[ContentModel::getTable()])
-        //         && \array_key_exists('type', $data[ContentModel::getTable()][0])
-        //         && 'grid-start' === $data[ContentModel::getTable()][0]['type']
-        //         // need to also check sorting to be sure
-        //         ) {
-        //             // everything is OK
-        //         } else {
-        //             $startId = $objGridStartUndo['id'];
-        //             $objGridStartUndo = null;
-        //         }
-        //     }
-        // } while (null === $objGridStartUndo && 0 !== $objRecordsGridStartUndo->rowCount());
-        // if (!$objGridStartUndo) {
-        //     // we did not find the grid-start
-        //     return;
-        // }
-
-        // $dc2 = new DC_Table('tl_undo');
-        // $dc2->id = $objGridStartUndo['id'];
-        // try {
-        //     $dc2->undo();
-        // } catch (AjaxRedirectResponseException $e) {
-        //     // do not redirect here
-        // } catch (RedirectResponseException $e) {
-        //     // do not redirect here
-        // }
-        $results = $this->getDeletedElementsOnSameEntity($objRecordsGridStopUndo);
+        $results = $this->getDeletedElementsOnSameEntity($arrRecordGridStopUndo);
         $arrData = $this->buildUseableArrayOfDataForDeletedElementsOnSameEntity($results);
 
         $gridStartUndoId = null;
@@ -455,5 +355,28 @@ class tlContentCallback
                 $objElement->save();
             }
         }
+    }
+
+    /**
+     * Returns a `tl_undo` as an associative array.
+     *
+     * @param int|string $id The record's id
+     *
+     * @return array|null The record as an associative array if foudn, null otherwise
+     */
+    protected function getUndoElementAsArray($id): ?array
+    {
+        $objRecordUndo = null;
+
+        $objRecordsUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
+            ->executeQuery(['id' => $id])
+        ;
+        try {
+            $objRecordUndo = $objRecordsUndo->fetchAssociative();
+        } catch (Exception $e) {
+            return $objRecordUndo;
+        }
+
+        return $objRecordUndo;
     }
 }
