@@ -24,6 +24,7 @@ services:
   wem.grid.helper.tl_content_callback:
     class: WEM\GridBundle\Helper\tlContentCallback
     arguments:
+      $connection: '@database_connection'
       $gridElementsCalculator: '@wem.grid.classes.grid_elements_calculator'
     public: true
 
