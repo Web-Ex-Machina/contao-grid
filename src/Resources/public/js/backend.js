@@ -610,7 +610,7 @@ window.addEvent("domready", function () {
             e.preventDefault();
             WEM.Grid.Utils.openModalIframe({
                 title:WEM.Grid.Translations.new
-                ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nb=1'
+                ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nc=1'
                 ,onHide:function(){
                     window.location.reload();
                 }
