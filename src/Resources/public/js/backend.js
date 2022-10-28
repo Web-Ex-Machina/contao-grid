@@ -460,6 +460,47 @@ WEM.Grid  = WEM.Grid || {};
     }
     var self = WEM.Grid.Saver;
 })();
+var WEM = WEM || {};
+WEM.Grid  = WEM.Grid || {};
+(function() {
+    WEM.Grid.Utils = WEM.Grid.Utils || {
+        modal : null,
+        /**
+         * Override of Backend.openModalIframe to allow onShow & onHide callbacks
+         * Open an iframe in a modal window
+         *
+         * @param {object} options An optional options object
+         */
+         openModalIframe:function(options) {
+            var opt = options || {},
+                maxWidth = (window.getSize().x - 20).toInt(),
+                maxHeight = (window.getSize().y - 137).toInt();
+            if (!opt.width || opt.width > maxWidth) opt.width = Math.min(maxWidth, 900);
+            if (!opt.height || opt.height > maxHeight) opt.height = maxHeight;
+            self.modal = new SimpleModal({
+                'width': opt.width,
+                'hideFooter': true,
+                'draggable': false,
+                'overlayOpacity': .7,
+                'onShow': function() { document.body.setStyle('overflow', 'hidden');if("undefined" != typeof opt.onShow){opt.onShow();} },
+                'onHide': function() { document.body.setStyle('overflow', 'auto');if("undefined" != typeof opt.onHide){opt.onHide();} }
+            });
+            self.modal.show({
+                'title': opt.title,
+                'contents': '<iframe src="' + opt.url + '" width="100%" onload="WEM.Grid.Utils.closeIfNotEdit(this);" height="' + opt.height + '" frameborder="0"></iframe>',
+                'model': 'modal'
+            });
+        },
+        closeIfNotEdit:function(iframe){
+            if(-1 == iframe.contentWindow.location.search.indexOf('act=edit')){
+                // close the modal ...
+                self.modal.hide();
+                self.modal = null;
+            }
+        }
+    }
+    var self = WEM.Grid.Utils;
+})();
 window.addEvent("domready", function () {
     WEM.Grid.Drag.init();
     const regexpBreakpoints = /(-xxs|-xs|-sm|-md|-lg|-xl)/;
@@ -567,7 +608,7 @@ window.addEvent("domready", function () {
         }
         container.addEventListener("click", function (e) {
             e.preventDefault();
-            openModalIframe({
+            WEM.Grid.Utils.openModalIframe({
                 title:WEM.Grid.Translations.new
                 ,url:window.location.href.replace('act=edit','act=create').replace(/\&id=([0-9]+)/,'&pid='+lastElement.getAttribute('data-id'))+'&popup=1&nb=1'
                 ,onHide:function(){
@@ -778,32 +819,5 @@ window.addEvent("domready", function () {
         + ' ' 
         + colsClass;
         itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass.replace('hidden','wem_hidden'));
-    }
-
-    /**
-     * Override of Backend.openModalIframe to allow onShow & onHide callbacks
-     * Open an iframe in a modal window
-     *
-     * @param {object} options An optional options object
-     */
-    function openModalIframe(options) {
-        var opt = options || {},
-            maxWidth = (window.getSize().x - 20).toInt(),
-            maxHeight = (window.getSize().y - 137).toInt();
-        if (!opt.width || opt.width > maxWidth) opt.width = Math.min(maxWidth, 900);
-        if (!opt.height || opt.height > maxHeight) opt.height = maxHeight;
-        var M = new SimpleModal({
-            'width': opt.width,
-            'hideFooter': true,
-            'draggable': false,
-            'overlayOpacity': .7,
-            'onShow': function() { document.body.setStyle('overflow', 'hidden');if("undefined" != typeof opt.onShow){opt.onShow();} },
-            'onHide': function() { document.body.setStyle('overflow', 'auto');if("undefined" != typeof opt.onHide){opt.onHide();} }
-        });
-        M.show({
-            'title': opt.title,
-            'contents': '<iframe src="' + opt.url + '" width="100%" height="' + opt.height + '" frameborder="0"></iframe>',
-            'model': 'modal'
-        });
     }
 });
