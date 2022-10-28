@@ -109,12 +109,13 @@ class GridElementsWrapper
             if ('grid-item-empty' !== $objElement->type) {
                 $buttons .= sprintf('
                 <a
-                href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nb=1&amp;rt=%s"
+                href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1&amp;rt=%s"
                 title="%s"
-                onclick="Backend.openModalIframe({\'title\':\'%s\',\'url\':this.href});return false">
+                onclick="WEM.Grid.Utils.openModalIframe({\'title\':\'%s\',\'url\':this.href,\'onHide\':function(){window.location.reload();}});return false">
                 %s
                 </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
             }
+
             $buttons .= sprintf('
                 <a class="item-copy"
                 href="#"
