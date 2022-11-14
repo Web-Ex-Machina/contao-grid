@@ -52,6 +52,10 @@ class GridOpenedManager
     {
         $this->validateElementAsAGridStart($element);
 
+        if (\array_key_exists((string) $element->id, $GLOBALS['WEM']['GRID'])) {
+            return $GLOBALS['WEM']['GRID'][(string) $element->id];
+        }
+
         $grid = new GridOpened();
         $grid
             ->setId((string) $element->id)
