@@ -1,6 +1,24 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+1.0.1 - 2023-01-13
+---
+- REMOVED : reference to an unexisting CSS file
+
+1.0.0 - 2022-12-14
+---
+- Fix : do not reopen a grid if it is already opened
+
+1.0.0-rc11 - 2022-11-14
+---
+- UPDATED : if a grid is already marked as open, do not reopen it.
+
+1.0.0-rc10 - 2022-10-28
+---
+- UPDATED : BE - edit content modal now features the "Save & close" button
+- UPDATED : BE - edit content modal now reload the grid after the modal is closed
+- UPDATED : BE - new content modal now features the "Save & close" button
+
 1.0.0-rc9 - 2022-10-19
 ---
 - UPDATED : Adding a `grid-start` content element to an article will now trigger the creation of the corresponding `grid-stop` content element (and vice-versa)
