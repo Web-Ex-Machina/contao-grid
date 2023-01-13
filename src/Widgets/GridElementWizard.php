@@ -306,7 +306,6 @@ class GridElementWizard extends Widget
     protected function addAssets(): void
     {
         $GLOBALS['TL_CSS']['wemgrid'] = 'bundles/wemgrid/css/backend.css';
-        $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid_translations'] = 'bundles/wemgrid/js/wem_grid_translations.js';
         $GLOBALS['TL_MOOTOOLS']['wemgrid'] = '<script>
