@@ -68,6 +68,7 @@ class GridOpenedManager
             ->setItemClasses($this->gridBuilder->getItemClasses($element))
             ->setItemClassesForm($this->gridBuilder->getItemClasses($element, true))
             ->setLevel($this->level)
+            ->setMode($element->grid_mode)
         ;
         if ('BE' === TL_MODE) {
             $grid->addItemClassesForAllResolution('be_item_grid helper');

@@ -21,9 +21,11 @@ $GLOBALS['TL_DCA']['tl_content']['config']['ondelete_callback'][] = ['wem.grid.h
 $GLOBALS['TL_DCA']['tl_content']['config']['onundo_callback'][] = ['wem.grid.helper.tl_content_callback', 'onundoCallback'];
 
 // Update grid content elements palettes
+$GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'grid_mode';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-start'] = '{type_legend},type;{grid_legend},grid_mode,grid_gap,grid_items;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['grid-stop'] = '{type_legend},type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
+// update grid content elements subpalettes
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_mode_'.\WEM\GridBundle\Elements\GridStart::MODE_CUSTOM] = 'grid_cols';
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_mode_'.\WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC] = '';
 

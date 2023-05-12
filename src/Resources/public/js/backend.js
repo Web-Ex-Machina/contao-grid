@@ -9,8 +9,13 @@ WEM.Grid  = WEM.Grid || {};
             breakpointSelector:'select[name="ctrl_select_breakpoints_"]',
             gridGapValue:'select[name="grid_gap[value]"]',
             gridGapUnit:'select[name="grid_gap[unit]"]',
+            gridMode:'select[name="grid_mode"]',
         },
         breakpoints:['all','xl','lg','md','sm','xs','xxs'],
+        gridMode:{
+            automatic:'automatic',
+            custom:'custom',
+        },
         init:function(){
             self.applyListeners();
         }
@@ -174,10 +179,11 @@ WEM.Grid  = WEM.Grid || {};
 
             }
 
+            var currentGridMode = document.querySelector(self.selectors.gridMode).value;
             var currentBreakpoint = document.querySelector(self.selectors.breakpointSelector).value;
             var inputNbCols = self.getInputNumberOfColumnsForBreakpoint(currentBreakpoint);
 
-            self.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), inputNbCols.getAttribute('data-breakpoint'), inputNbCols.value);
+            self.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), currentGridMode, inputNbCols.getAttribute('data-breakpoint'), inputNbCols.value);
         }
         ,getInputNumberOfColumnsForBreakpoint(breakpoint){
             for(var i = 0; i<=6;i++){
@@ -265,60 +271,67 @@ WEM.Grid  = WEM.Grid || {};
                 AjaxRequest.hideBox();
             });
         }
-        ,updateGridElementsAvailableColumns:function(grid, breakpoint, nbColumns){
+        ,updateGridElementsAvailableColumns:function(grid, gridMode, breakpoint, nbColumns){
+
             nbColumns = parseInt(nbColumns);
-            if(isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns){
+            if(self.gridMode.custom === gridMode && (isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns)){
                 return;
             }
             // Update the items' available size options
             grid.querySelectorAll(':scope > .be_item_grid').forEach(function(item){
                 if("grid-start" === item.getAttribute('data-type')){
-                    self.updateGridElementsAvailableColumns(item.querySelector('.ce_grid-start'), breakpoint, item.getAttribute('data-nb-cols'));
-                }
-                var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+'_cols]['+breakpoint+']"]');
-                var dataAttributeName='data-cols-span'+('all' == breakpoint ? '' : '-'+breakpoint);
-                // var dataAttributeName='data-cols-span';
-                var classNameBase='cols-span'+('all' == breakpoint ? '' : '-'+breakpoint)+'-';
-
-                if(null === select){
-                    return;
-                }
-                var inheritedResolution = self.getClosestHigherResolutionDefinedForItemIdAndTypeAndBreakpoint(select.getAttribute('data-item-id'),'cols',breakpoint);
-                var inheritedValue = self.getNbColumnsOrRowsFromCssClass(
-                    self.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(select.getAttribute('data-item-id'),'cols',breakpoint)
-                );
-                var valueBeforeReconstruct = self.getNbColumnsOrRowsFromCssClass(select.value);
-                var selectedIndexBeforeReconstruct = select.options.selectedIndex;
-                // remove all options
-                var length = select.options.length;
-                for(i = 0; i <= length; i++){
-                    select.remove(0);
-                }
-                // recreate options
-                // if('all' != breakpoint){
-                //     select.add(new Option(self.buildInheritedOptionTextForTypeAndBreakpoint('cols',inheritedResolution,inheritedValue),'',false,"" == valueBeforeReconstruct ? true : false));
-                // }else{
-                    select.add(new Option('-','',false,"" == valueBeforeReconstruct ? true : false));
-                // }
-                for(var i = 1; i <= nbColumns; i++){
-                    select.add(new Option(WEM.Grid.Translations.columns[i-1],classNameBase+i,false,parseInt(valueBeforeReconstruct) == i ? true : false));
+                    //@todo : get subgrid mode
+                    self.updateGridElementsAvailableColumns(item.querySelector('.ce_grid-start'), item.getAttribute('data-grid-mode'), breakpoint, item.getAttribute('data-nb-cols'));
                 }
 
-                for(i = 1; i <= 12; i++){
-                    if(-1 < item.className.indexOf(classNameBase+i) && i > nbColumns){
-                        item.classList.toggle(classNameBase+i,true);
+                if(self.gridMode.automatic === gridMode){
+
+                }else if(self.gridMode.custom === gridMode){
+                    var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+'_cols]['+breakpoint+']"]');
+                    var dataAttributeName='data-cols-span'+('all' == breakpoint ? '' : '-'+breakpoint);
+                    // var dataAttributeName='data-cols-span';
+                    var classNameBase='cols-span'+('all' == breakpoint ? '' : '-'+breakpoint)+'-';
+
+                    if(null === select){
+                        return;
                     }
-                }
-                
-                
-                if(0 >= selectedIndexBeforeReconstruct){
-                    select.value = '';
-                }else if("" != valueBeforeReconstruct){
-                    if(parseInt(valueBeforeReconstruct) <= nbColumns){
-                        select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,valueBeforeReconstruct);
-                    }else{
-                        select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,nbColumns);
+                    var inheritedResolution = self.getClosestHigherResolutionDefinedForItemIdAndTypeAndBreakpoint(select.getAttribute('data-item-id'),'cols',breakpoint);
+                    var inheritedValue = self.getNbColumnsOrRowsFromCssClass(
+                        self.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(select.getAttribute('data-item-id'),'cols',breakpoint)
+                    );
+                    var valueBeforeReconstruct = self.getNbColumnsOrRowsFromCssClass(select.value);
+                    var selectedIndexBeforeReconstruct = select.options.selectedIndex;
+                    // remove all options
+                    var length = select.options.length;
+                    for(i = 0; i <= length; i++){
+                        select.remove(0);
                     }
+                    // recreate options
+                    // if('all' != breakpoint){
+                    //     select.add(new Option(self.buildInheritedOptionTextForTypeAndBreakpoint('cols',inheritedResolution,inheritedValue),'',false,"" == valueBeforeReconstruct ? true : false));
+                    // }else{
+                        select.add(new Option('-','',false,"" == valueBeforeReconstruct ? true : false));
+                    // }
+                    for(var i = 1; i <= nbColumns; i++){
+                        select.add(new Option(WEM.Grid.Translations.columns[i-1],classNameBase+i,false,parseInt(valueBeforeReconstruct) == i ? true : false));
+                    }
+
+                    for(i = 1; i <= 12; i++){
+                        if(-1 < item.className.indexOf(classNameBase+i) && i > nbColumns){
+                            item.classList.toggle(classNameBase+i,true);
+                        }
+                    }
+                    
+                    if(0 >= selectedIndexBeforeReconstruct){
+                        select.value = '';
+                    }else if("" != valueBeforeReconstruct){
+                        if(parseInt(valueBeforeReconstruct) <= nbColumns){
+                            select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,valueBeforeReconstruct);
+                        }else{
+                            select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,nbColumns);
+                        }
+                    }
+
                 }
                 
                 select.dispatchEvent(new Event('change_auto'));

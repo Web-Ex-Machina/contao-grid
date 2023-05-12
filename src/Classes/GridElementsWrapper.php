@@ -199,7 +199,7 @@ class GridElementsWrapper
     {
         if (TL_MODE === 'BE') {
             return sprintf(
-                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
+                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s" data-grid-mode="%s">%s%s%s',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
                 $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
                 $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
@@ -207,6 +207,7 @@ class GridElementsWrapper
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
+                $objElement->grid_mode,
                 $this->getBackendActionsForGridStartContentElement($objElement, $do, true),
                 $strBuffer,
                 $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId)
