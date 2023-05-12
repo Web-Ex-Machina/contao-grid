@@ -73,7 +73,7 @@ class GridBuilderTest extends ContaoTestCase
     public function dpForTestGetWrapperClasses(): array
     {
         return [
-            'cssgrid - set #1' => [
+            'cssgrid - custom - set #1' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
                     $grid->grid_cols = serialize([
@@ -89,6 +89,7 @@ class GridBuilderTest extends ContaoTestCase
                         'value' => '1',
                         'unit' => 'rem',
                     ]);
+                    $grid->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $grid;
                 },
@@ -100,7 +101,7 @@ class GridBuilderTest extends ContaoTestCase
                     ];
                 },
             ],
-            'cssgrid - set #2' => [
+            'cssgrid - custom - set #2' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
                     $grid->grid_cols = serialize([
@@ -116,6 +117,7 @@ class GridBuilderTest extends ContaoTestCase
                         'value' => '3',
                         'unit' => 'em',
                     ]);
+                    $grid->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $grid;
                 },
@@ -133,13 +135,41 @@ class GridBuilderTest extends ContaoTestCase
                     ];
                 },
             ],
+            'cssgrid - automatic - set #1' => [
+                'gridGen' => function () {
+                    $grid = new Contao\ContentModel();
+                    $grid->grid_cols = serialize([
+                        ['key' => 'all', 'value' => '2'],
+                        ['key' => 'xxs', 'value' => ''],
+                        ['key' => 'xs', 'value' => ''],
+                        ['key' => 'sm', 'value' => ''],
+                        ['key' => 'md', 'value' => ''],
+                        ['key' => 'lg', 'value' => ''],
+                        ['key' => 'xl', 'value' => ''],
+                    ]);
+                    $grid->grid_gap = serialize([
+                        'value' => '1',
+                        'unit' => 'rem',
+                    ]);
+                    $grid->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC;
+
+                    return $grid;
+                },
+                'expectedResultGen' => function () {
+                    return [
+                        'd-grid',
+                        'cols-autofit',
+                        'gap-1-rem',
+                    ];
+                },
+            ],
         ];
     }
 
     public function dpForTestGetItemClasses(): array
     {
         return [
-            'cssgrid - set #1' => [
+            'cssgrid - custom - set #1' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
                     $grid->grid_items = serialize([
@@ -163,6 +193,7 @@ class GridBuilderTest extends ContaoTestCase
                             'xl' => '',
                         ],
                     ]);
+                    $grid->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $grid;
                 },
@@ -177,7 +208,7 @@ class GridBuilderTest extends ContaoTestCase
                     ];
                 },
             ],
-            'cssgrid - set #2' => [
+            'cssgrid - custom - set #2' => [
                 'gridGen' => function () {
                     $grid = new Contao\ContentModel();
                     $grid->grid_items = serialize([
@@ -220,6 +251,7 @@ class GridBuilderTest extends ContaoTestCase
                             'xl' => '',
                         ],
                     ]);
+                    $grid->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $grid;
                 },
@@ -233,6 +265,45 @@ class GridBuilderTest extends ContaoTestCase
                             '2_classes' => 'bar',
                             '2_cols' => 'cols-span-xxs-2',
                             '2_rows' => 'rows-span-sm-4',
+                        ],
+                    ];
+                },
+            ],
+            'cssgrid - automatic - set #1' => [
+                'gridGen' => function () {
+                    $grid = new Contao\ContentModel();
+                    $grid->grid_items = serialize([
+                        '1_classes' => 'foo',
+                        '1_cols' => [
+                            'all' => 'cols-span-2',
+                            'xxs' => '',
+                            'xs' => '',
+                            'sm' => '',
+                            'md' => '',
+                            'lg' => '',
+                            'xl' => 'cols-span-xl-3',
+                        ],
+                        '1_rows' => [
+                            'all' => 'rows-span-2',
+                            'xxs' => '',
+                            'xs' => '',
+                            'sm' => '',
+                            'md' => '',
+                            'lg' => '',
+                            'xl' => '',
+                        ],
+                    ]);
+                    $grid->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC;
+
+                    return $grid;
+                },
+                'expectedResultGen' => function () {
+                    return [
+                        'all' => ['item-grid'],
+                        'items' => [
+                            '1_classes' => 'foo',
+                            '1_cols' => 'cols-span-2 cols-span-xl-3',
+                            '1_rows' => 'rows-span-2',
                         ],
                     ];
                 },
