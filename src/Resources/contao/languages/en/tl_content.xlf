@@ -29,7 +29,22 @@
         <source>Container</source>
         <target>Container</target>
       </trans-unit>
-
+      <trans-unit id="tl_content.grid_mode.0">
+        <source>Mode</source>
+        <target>Mode</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.1">
+        <source>Select the grid mode</source>
+        <target>Select the grid mode</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.custom">
+        <source>Custom</source>
+        <target>Custom</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.automatic">
+        <source>Automatic</source>
+        <target>Automatic</target>
+      </trans-unit>
       <trans-unit id="tl_content.grid_cols.0">
         <source>Columns</source>
         <target>Columns</target>
@@ -38,7 +53,14 @@
         <source>Enter the number of columns</source>
         <target>Enter the number of columns</target>
       </trans-unit>
-
+      <trans-unit id="tl_content.grid_gap.0">
+        <source>Gap</source>
+        <target>Gap</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_gap.1">
+        <source>Enter the gap between elements</source>
+        <target>Enter the gap between elements</target>
+      </trans-unit>
       <trans-unit id="tl_content.grid_items.0">
         <source>Items</source>
         <target>Items</target>
