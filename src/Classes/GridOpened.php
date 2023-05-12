@@ -28,6 +28,8 @@ class GridOpened
     protected $item_classes_form;
     /** @var int */
     protected $level;
+    /** @var string */
+    protected $mode;
 
     public function __construct()
     {
@@ -160,6 +162,18 @@ class GridOpened
     public function setLevel(int $level): self
     {
         $this->level = $level;
+
+        return $this;
+    }
+
+    public function getMode(): string
+    {
+        return $this->mode;
+    }
+
+    public function setMode(string $mode): self
+    {
+        $this->mode = $mode;
 
         return $this;
     }

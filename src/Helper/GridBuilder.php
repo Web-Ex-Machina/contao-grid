@@ -58,33 +58,37 @@ class GridBuilder
         }
         $arrClasses[] = 'd-grid';
 
-        foreach ($cols as $k => $col) {
-            // Quickfix : we need the first col to be generic, no matter what is the breakpoint
-            if (0 === $k) {
-                $arrClasses[] = sprintf('cols-%d', $col['value']);
-            } else {
-                if ('FE' === TL_MODE) {
-                    if (0 !== (int) $col['value']) {
-                        $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
-                    }
-                } else {
-                    $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
-                }
-            }
-        }
-
-        if (\is_array($rows)) {
-            foreach ($rows as $k => $row) {
+        if (\WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $objElement->grid_mode) {
+            $arrClasses[] = 'cols-autofit';
+        } elseif (\WEM\GridBundle\Elements\GridStart::MODE_CUSTOM === $objElement->grid_mode) {
+            foreach ($cols as $k => $col) {
                 // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                 if (0 === $k) {
-                    $arrClasses[] = sprintf('rows-%d', $row['value']);
+                    $arrClasses[] = sprintf('cols-%d', $col['value']);
                 } else {
                     if ('FE' === TL_MODE) {
-                        if (0 !== (int) $row['value']) {
-                            $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                        if (0 !== (int) $col['value']) {
+                            $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
                         }
                     } else {
-                        $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                        $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
+                    }
+                }
+            }
+
+            if (\is_array($rows)) {
+                foreach ($rows as $k => $row) {
+                    // Quickfix : we need the first col to be generic, no matter what is the breakpoint
+                    if (0 === $k) {
+                        $arrClasses[] = sprintf('rows-%d', $row['value']);
+                    } else {
+                        if ('FE' === TL_MODE) {
+                            if (0 !== (int) $row['value']) {
+                                $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                            }
+                        } else {
+                            $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                        }
                     }
                 }
             }
@@ -146,22 +150,38 @@ class GridBuilder
     {
         $gop = GridOpenedManager::getInstance();
 
-        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', str_replace('cols-', 'cols-span-', implode(' ', $gop->getGridById($gridId)->getWrapperClasses())), $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
+        $grid = $gop->getGridById($gridId);
+
+        $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperClasses()));
+
+        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
     }
 
     /**
      * Returns a "fake" grid element to allow element to be placed at the end of the grid.
      */
-    public function fakeLastGridElementMarkup(): string
+    public function fakeLastGridElementMarkup(string $gridId): string
     {
-        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake" dropable="true" draggable="false" data-type="fake-last-element">%s</div>', $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
+        $gop = GridOpenedManager::getInstance();
+
+        $grid = $gop->getGridById($gridId);
+
+        $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : '';
+
+        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-last-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
     }
 
     /**
      * Returns a "fake" grid element to allow new elements to be added at the end of the grid.
      */
-    public function fakeNewGridElementMarkup(): string
+    public function fakeNewGridElementMarkup(string $gridId): string
     {
-        return '<div class="item-grid be_item_grid fake-helper be_item_grid_fake" dropable="false" draggable="false"><div class="item-new"></div></div>';
+        $gop = GridOpenedManager::getInstance();
+
+        $grid = $gop->getGridById($gridId);
+
+        $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : '';
+
+        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="false" draggable="false"><div class="item-new"></div></div>', $additionnalCssClasses);
     }
 }

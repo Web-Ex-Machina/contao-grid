@@ -64,9 +64,12 @@ class GridElementsWrapper
         $openGrid = $gop->getLastOpenedGrid();
         $currentGridId = $gop->getLastOpenedGridId();
 
-        // We won't need this grid anymore so we pop the global grid array
-        if ('grid-stop' === $objElement->type) {
-            $gop->closeLastOpenedGrid();
+        // Yep, same code in FE/BE, but FE here if we want it to work /shrug
+        if (TL_MODE === 'FE') {
+            // We won't need this grid anymore so we pop the global grid array
+            if ('grid-stop' === $objElement->type) {
+                $gop->closeLastOpenedGrid();
+            }
         }
 
         // If we used grids elements, we had to adjust the behaviour
@@ -78,9 +81,19 @@ class GridElementsWrapper
 
             return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }
+
         if ('grid-stop' === $objElement->type && true === $openGrid->isSubGrid()) {
-            return $this->getGridStopHTMLMarkup($objElement, $strBuffer);
+            $str = $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
+
+            // Yep, same code in FE/BE, but BE here if we want it to work /shrug
+            if (TL_MODE === 'BE') {
+                // We won't need this grid anymore so we pop the global grid array
+                $gop->closeLastOpenedGrid();
+            }
+
+            return $str;
         }
+
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }
@@ -199,7 +212,7 @@ class GridElementsWrapper
     {
         if (TL_MODE === 'BE') {
             return sprintf(
-                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s">%s%s%s',
+                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s" data-grid-mode="%s">%s%s%s',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
                 $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
                 $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
@@ -207,6 +220,7 @@ class GridElementsWrapper
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
+                $objElement->grid_mode,
                 $this->getBackendActionsForGridStartContentElement($objElement, $do, true),
                 $strBuffer,
                 $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId)
@@ -223,12 +237,12 @@ class GridElementsWrapper
         );
     }
 
-    protected function getGridStopHTMLMarkup(ContentModel $objElement, string $strBuffer): string
+    protected function getGridStopHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $strBuffer): string
     {
         if (TL_MODE === 'BE') {
             return sprintf(
                 '%s<div data-id="%s" data-type="%s">%s</div></div>',
-               !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup() : '',
+               !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup((string) $openGrid->getId()) : '',
                 $objElement->id,
                 $objElement->type,
                 $strBuffer
@@ -247,8 +261,8 @@ class GridElementsWrapper
             return sprintf(
                 '<div class="%s %s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
-                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
+                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
+                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
                 $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
                 true === $openGrid->isSubGrid() ? 'be_subgrid_item' : '',
                 'grid-item-empty' === $objElement->type ? 'be_grid_item_empty' : '',
@@ -262,8 +276,8 @@ class GridElementsWrapper
         return sprintf(
             '<div class="%s %s %s %s">%s</div>',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
+            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: '')),
+            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: '')),
             $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
             $strBuffer
         );

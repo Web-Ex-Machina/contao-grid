@@ -128,7 +128,7 @@ class GridElementWizard extends Widget
         $this->gridOpenedManager->openGrid($this->activeRecord);
         $openedGrid = $this->gridOpenedManager->getLastOpenedGrid();
 
-        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id);
+        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s" data-grid-mode="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id, $this->activeRecord->grid_mode);
 
         $strGrid .= $this->gridBuilder->fakeFirstGridElementMarkup((string) $this->activeRecord->id);
 
@@ -175,8 +175,8 @@ class GridElementWizard extends Widget
         // Add CSS & JS to the Wizard
         $this->addAssets();
 
-        $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup();
-        $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup();
+        $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup((string) $this->activeRecord->id);
+        $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup((string) $this->activeRecord->id);
         $strGrid .= '</div>';
 
         return '<div class="gridelement">
@@ -222,14 +222,16 @@ class GridElementWizard extends Widget
                 }
 
                 $selectsCols[] = sprintf('
-                        <label for="ctrl_%1$s_%2$s_cols_%5$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols" data-previous-value="%6$s">%3$s</select>',
+                        <label for="ctrl_%1$s_%2$s_cols_%5$s" class="%8$s">%4$s</label>
+                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select %8$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols" data-previous-value="%6$s" %7$s>%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                     $breakpoint,
-                    $v
+                    $v,
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'data-force-hidden="1"' : '',
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
                 );
 
                 $options = '<option value="">-</option>';
@@ -253,8 +255,8 @@ class GridElementWizard extends Widget
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
-                    $this->User->isAdmin ? '' : 'hidden',
-                    !$this->User->isAdmin,
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden'),
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '1' : !$this->User->isAdmin,
                     $v
                 );
             }

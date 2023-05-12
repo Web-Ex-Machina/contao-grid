@@ -52,7 +52,10 @@ class GridOpenedManager
     {
         $this->validateElementAsAGridStart($element);
 
-        if (\array_key_exists((string) $element->id, $GLOBALS['WEM']['GRID'])) {
+        if (\array_key_exists('WEM', $GLOBALS)
+        && \array_key_exists('GRID', $GLOBALS['WEM'])
+        && \array_key_exists((string) $element->id, $GLOBALS['WEM']['GRID'])
+        ) {
             return $GLOBALS['WEM']['GRID'][(string) $element->id];
         }
 
@@ -68,6 +71,7 @@ class GridOpenedManager
             ->setItemClasses($this->gridBuilder->getItemClasses($element))
             ->setItemClassesForm($this->gridBuilder->getItemClasses($element, true))
             ->setLevel($this->level)
+            ->setMode($element->grid_mode)
         ;
         if ('BE' === TL_MODE) {
             $grid->addItemClassesForAllResolution('be_item_grid helper');

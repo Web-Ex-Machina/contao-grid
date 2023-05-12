@@ -351,6 +351,7 @@ class tlContentCallback
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
                 $objElement->type = 'grid-start';
+                $objElement->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC;
                 $objElement->sorting = $dc->activeRecord->sorting - 1;
                 $objElement->save();
             }
