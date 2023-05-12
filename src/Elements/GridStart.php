@@ -92,10 +92,16 @@ class GridStart extends ContentElement
 
         $gop = GridOpenedManager::getInstance();
         try {
+            \WEM\SmartgearBundle\Classes\Util::log('On essaie de choper la grid');
             $arrGrid = $gop->getGridById((string) $this->id);
+            \WEM\SmartgearBundle\Classes\Util::log('On a la grid');
         } catch (\Exception $e) {
+            \WEM\SmartgearBundle\Classes\Util::log('On a PAS la grid');
+            \WEM\SmartgearBundle\Classes\Util::log('On ajoute la grid');
             $gop->openGrid($this);
+            \WEM\SmartgearBundle\Classes\Util::log('On essaie de choper la grid (maintenant que c\'est ouvert)');
             $arrGrid = $gop->getGridById((string) $this->id);
+            \WEM\SmartgearBundle\Classes\Util::log('On a la grid  (maintenant que c\'est ouvert)');
         }
 
         // Add the classes to the Model so the main class can use it correct
