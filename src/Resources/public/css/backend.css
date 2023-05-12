@@ -41,3 +41,5 @@
 .grid_breakpoints_values_wizard .tl_table_wizard th{border-bottom:1px solid #888;padding:10px 0;text-align:center;}
 .grid_breakpoints_values_wizard .tl_table_wizard td{text-align:center;padding:5px;}
 .grid_breakpoints_values_wizard .tl_table_wizard td.type{font-weight:bold;}
+
+.cols-span-all{grid-column: 1/-1;}
