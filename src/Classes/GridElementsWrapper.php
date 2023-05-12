@@ -64,9 +64,12 @@ class GridElementsWrapper
         $openGrid = $gop->getLastOpenedGrid();
         $currentGridId = $gop->getLastOpenedGridId();
 
-        // We won't need this grid anymore so we pop the global grid array
-        if ('grid-stop' === $objElement->type) {
-            $gop->closeLastOpenedGrid();
+        // Yep, same code in FE/BE, but FE here if we want it to work /shrug
+        if (TL_MODE === 'FE') {
+            // We won't need this grid anymore so we pop the global grid array
+            if ('grid-stop' === $objElement->type) {
+                $gop->closeLastOpenedGrid();
+            }
         }
 
         // If we used grids elements, we had to adjust the behaviour
@@ -78,9 +81,19 @@ class GridElementsWrapper
 
             return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }
+
         if ('grid-stop' === $objElement->type && true === $openGrid->isSubGrid()) {
-            return $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
+            $str = $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
+
+            // Yep, same code in FE/BE, but BE here if we want it to work /shrug
+            if (TL_MODE === 'BE') {
+                // We won't need this grid anymore so we pop the global grid array
+                $gop->closeLastOpenedGrid();
+            }
+
+            return $str;
         }
+
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }

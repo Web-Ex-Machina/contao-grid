@@ -128,7 +128,7 @@ class GridElementWizard extends Widget
         $this->gridOpenedManager->openGrid($this->activeRecord);
         $openedGrid = $this->gridOpenedManager->getLastOpenedGrid();
 
-        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id);
+        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s" data-grid-mode="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id, $this->activeRecord->grid_mode);
 
         $strGrid .= $this->gridBuilder->fakeFirstGridElementMarkup((string) $this->activeRecord->id);
 
@@ -230,7 +230,7 @@ class GridElementWizard extends Widget
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                     $breakpoint,
                     $v,
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'data-force-hidden="true"' : '',
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'data-force-hidden="1"' : '',
                     \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
                 );
 
@@ -256,7 +256,7 @@ class GridElementWizard extends Widget
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
                     \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden'),
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? true : !$this->User->isAdmin,
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '1' : !$this->User->isAdmin,
                     $v
                 );
             }

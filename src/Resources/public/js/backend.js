@@ -4,6 +4,7 @@ WEM.Grid  = WEM.Grid || {};
     WEM.Grid.Drag = WEM.Grid.Drag || {
         selectors:{
             grid:'.grid_preview',
+            gridItem:'.be_item_grid',
             firstLevelElements:'.grid_preview > .be_item_grid',
             allLevelElements:'.grid_preview .be_item_grid',
             breakpointSelector:'select[name="ctrl_select_breakpoints_"]',
@@ -179,16 +180,18 @@ WEM.Grid  = WEM.Grid || {};
 
             }
 
+            var selectBreakpoints = document.querySelector(self.selectors.breakpointSelector);
+
             var currentGridMode = document.querySelector(self.selectors.gridMode).value;
-            var currentBreakpoint = document.querySelector(self.selectors.breakpointSelector).value;
+            var currentBreakpoint = null !== selectBreakpoints ? selectBreakpoints.value : 'all';
             var inputNbCols = self.getInputNumberOfColumnsForBreakpoint(currentBreakpoint);
 
-            self.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), currentGridMode, inputNbCols.getAttribute('data-breakpoint'), inputNbCols.value);
+            self.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), currentGridMode, inputNbCols ? inputNbCols.getAttribute('data-breakpoint') : 'all', inputNbCols ? inputNbCols.value : 12);
         }
         ,getInputNumberOfColumnsForBreakpoint(breakpoint){
             for(var i = 0; i<=6;i++){
                 var input = document.querySelector('[name="grid_cols['+i+'][value]"]');
-                if(breakpoint == input.getAttribute('data-breakpoint')){
+                if(input && breakpoint == input.getAttribute('data-breakpoint')){
                     return input;
                 }
             }
@@ -272,7 +275,6 @@ WEM.Grid  = WEM.Grid || {};
             });
         }
         ,updateGridElementsAvailableColumns:function(grid, gridMode, breakpoint, nbColumns){
-
             nbColumns = parseInt(nbColumns);
             if(self.gridMode.custom === gridMode && (isNaN(nbColumns) || 12 < nbColumns || 0 >= nbColumns)){
                 return;
@@ -280,7 +282,6 @@ WEM.Grid  = WEM.Grid || {};
             // Update the items' available size options
             grid.querySelectorAll(':scope > .be_item_grid').forEach(function(item){
                 if("grid-start" === item.getAttribute('data-type')){
-                    //@todo : get subgrid mode
                     self.updateGridElementsAvailableColumns(item.querySelector('.ce_grid-start'), item.getAttribute('data-grid-mode'), breakpoint, item.getAttribute('data-nb-cols'));
                 }
 
@@ -331,10 +332,9 @@ WEM.Grid  = WEM.Grid || {};
                             select.value = self.buildCssClassFromTypeAndBreakpointAndNb('cols',breakpoint,nbColumns);
                         }
                     }
-
+                    select.dispatchEvent(new Event('change_auto'));
                 }
                 
-                select.dispatchEvent(new Event('change_auto'));
             });
         },
         getNbColumnsOrRowsFromCssClass:function(cssClass){
@@ -602,6 +602,13 @@ window.addEvent("domready", function () {
         return element;
     }
 
+    function getParentGridElement(element){
+        if(!element.classList.contains('be_subgrid') && !element.classList.contains('grid_preview')){
+            return getParentGridItemElement(element.parentNode);
+        }
+        return element;
+    }
+
     document.querySelectorAll('.gridelement input').forEach(function (i) {
         i.addEventListener("change", function (e) {
             var itemGrid = getParentGridItemElement(this);
@@ -715,9 +722,12 @@ window.addEvent("domready", function () {
                 // Update the fake elements size
                 updateMainGridFakeElementsNbOfColumns(nbColumns);
 
-                WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), event.target.getAttribute('data-breakpoint'), nbColumns);
+                WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), document.querySelector(WEM.Grid.Drag.selectors.gridMode).value, event.target.getAttribute('data-breakpoint'), nbColumns);
             });
         }
+    }
+    if(WEM.Grid.Drag.gridMode.automatic === document.querySelector(WEM.Grid.Drag.selectors.gridMode).value){
+        WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), document.querySelector(WEM.Grid.Drag.selectors.gridMode).value, 'all', '12'); // last 2 parameters do not matter
     }
 
     var selectBreakpoints = document.querySelector(WEM.Grid.Drag.selectors.breakpointSelector);
@@ -729,6 +739,10 @@ window.addEvent("domready", function () {
                 select.dispatchEvent(new Event('change'));
             }
         });
+    }else{
+        if(WEM.Grid.Drag.gridMode.automatic === document.querySelector(WEM.Grid.Drag.selectors.gridMode).value){
+            updateGridElementsSelectNbColumnsVisibility('all');
+        }
     }
 
     var selectGridGapValue = document.querySelector(WEM.Grid.Drag.selectors.gridGapValue);
@@ -803,6 +817,7 @@ window.addEvent("domready", function () {
     }
 
     function updateItemDataClass(itemgrid, breakpoint){
+        var parentGrid = getParentGridElement(itemgrid);
         var rowsSelect= itemgrid.querySelector('select[data-type="rows"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
         var colsSelect = itemgrid.querySelector('select[data-type="cols"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
         
@@ -826,11 +841,13 @@ window.addEvent("domready", function () {
         }
         colsClass = colsClass.replace(regexpBreakpoints,'');
 
-        var strClass = itemgrid.querySelector('input[data-item-id="'+itemgrid.getAttribute('data-id')+'"]').value 
-        + ' ' 
-        + rowsClass
-        + ' ' 
-        + colsClass;
+        var strClass = itemgrid.querySelector('input[data-item-id="'+itemgrid.getAttribute('data-id')+'"]').value;
+        if(WEM.Grid.Drag.gridMode.custom === parentGrid.getAttribute('data-grid-mode')){
+            strClass+=' '
+            + rowsClass
+            + ' ' 
+            + colsClass;
+        }
         itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass.replace('hidden','wem_hidden'));
     }
 });
