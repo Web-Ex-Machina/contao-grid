@@ -1,6 +1,10 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+1.0.2 - 2023-05-12
+---
+- ADDED : automatic configuration mode for grid
+
 1.0.1 - 2023-01-13
 ---
 - REMOVED : reference to an unexisting CSS file
