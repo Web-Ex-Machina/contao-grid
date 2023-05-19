@@ -10,6 +10,7 @@
 .gridelement img, .grid_preview img{max-width:100%;height:auto;}
 
 .gridelement .grid_preview{margin-top:10px;}
+.gridelement .be_item_grid{overflow: hidden;}
 /*.gridelement .be_item_grid .item-classes{margin-top:10px;display:block;position:absolute;bottom:0;width:100%;left:0;padding:10px 15px;background:#eee;border-top:2px dashed #0f1c26;display:none;}*/
 .gridelement .be_item_grid .item-classes{margin-top:10px;display:block;position:absolute;bottom:0;left:0;right:0;padding:10px 15px;background:#eee;border-top:2px dashed #0f1c26;display:none;}
 .gridelement .be_item_grid .item-actions{display:inline-block;padding:10px 15px;text-align: right;background:#eee;display:none;margin-bottom: 5px;}
@@ -43,3 +44,9 @@
 .grid_breakpoints_values_wizard .tl_table_wizard td.type{font-weight:bold;}
 
 .cols-span-all{grid-column: 1/-1;}
+
+/*preview elements design*/
+.gridelement .be_item_grid .sliderFW__rail{display: grid;gap: 1rem;grid-gap: 1rem;max-width:100%;grid-template-columns: Repeat(auto-fit, minmax(35ch, 1fr));}
+.gridelement .be_item_grid .sliderFW__container{height: auto !important;}
+.gridelement .be_item_grid .sliderFW__item__bg { aspect-ratio: 4/3;}
+.gridelement .be_item_grid .sliderFW__item__bg img{height: 100%; width: 100%; object-fit: contain; background: #eee;}
