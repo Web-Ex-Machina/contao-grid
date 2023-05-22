@@ -230,7 +230,6 @@ class GridElementWizard extends Widget
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                     $breakpoint,
                     $v,
-                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
                     '0', // we never force hidden here, JS will handle showing/hiding those elements, plus no restrictions about if user is admin or not (contrary to cols)
                     \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
                 );
@@ -257,7 +256,6 @@ class GridElementWizard extends Widget
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
                     $v,
-                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
                     !$this->User->isAdmin, // we only force hidden if user isn't admin
                     \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden')
                 );
