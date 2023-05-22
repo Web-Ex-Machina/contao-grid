@@ -222,7 +222,7 @@ class GridElementWizard extends Widget
                 }
 
                 $selectsCols[] = sprintf('
-                        <label for="ctrl_%1$s_%2$s_cols_%5$s" class="%8$s">%4$s</label>
+                        <label for="ctrl_%1$s_%2$s_cols_%5$s" class="%8$s" data-force-hidden="%7$s">%4$s</label>
                         <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select %8$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols" data-previous-value="%6$s" %7$s>%3$s</select>',
                     $this->strId,
                     $objItemId,
@@ -230,7 +230,8 @@ class GridElementWizard extends Widget
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                     $breakpoint,
                     $v,
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'data-force-hidden="1"' : '',
+                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'data-force-hidden="1"' : '',
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
                     \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
                 );
 
@@ -256,7 +257,8 @@ class GridElementWizard extends Widget
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
                     \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden'),
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '1' : !$this->User->isAdmin,
+                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '1' : !$this->User->isAdmin,
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
                     $v
                 );
             }
