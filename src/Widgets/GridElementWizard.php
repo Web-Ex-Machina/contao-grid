@@ -175,8 +175,8 @@ class GridElementWizard extends Widget
         // Add CSS & JS to the Wizard
         $this->addAssets();
 
-        $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup((string) $this->activeRecord->id);
         $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup((string) $this->activeRecord->id);
+        $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup((string) $this->activeRecord->id);
         $strGrid .= '</div>';
 
         return '<div class="gridelement">

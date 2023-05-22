@@ -82,7 +82,6 @@ WEM.Grid  = WEM.Grid || {};
             event.target.classList.toggle('drag-enter',false);
         }
         ,drop:function(event){
-            console.clear();
             event.preventDefault();
         
             var dropzone = event.target;
@@ -174,7 +173,12 @@ WEM.Grid  = WEM.Grid || {};
             // once done, exchange both element places in display
             gridSource.removeChild(draggableElement);
             if('before' === position){
-                gridDest.insertBefore(draggableElement,dropzone);
+                if('fake-last-element' == dropzone.getAttribute('data-type') && self.isGridFirstLevel(gridDest)){
+                    // gridDest.insertAfter(draggableElement,self.getGridLastRealElement(dropzone));
+                    self.getGridLastRealElement(dropzone).after(draggableElement);
+                }else{
+                    gridDest.insertBefore(draggableElement,dropzone);
+                }
             }else{
                 gridDest.insertBefore(draggableElement,dropzone.nextSibling);
 
@@ -212,15 +216,18 @@ WEM.Grid  = WEM.Grid || {};
             return -1 < element.getAttribute('data-type').indexOf('fake-') ? null : element;
         }
         ,getGridLastRealElement:function(fromElement){
+            // console.log('getGridLastRealElement','|',fromElement);
             var grid = self.getGridFromElement(fromElement);
 
             var elements = grid.querySelectorAll('div[data-type]');
 
             var elementIndex = elements.length-1;
             var element = elements[elementIndex];
+            // console.log('getGridLastRealElement','|','last element','|',element);
             while(-1 < element.getAttribute('data-type').indexOf('fake-') && elementIndex > 0){
                 elementIndex--;
                 element = elements[elementIndex];
+            // console.log('getGridLastRealElement','|','last element','|',element);
             }
             if('grid-start' == element.getAttribute('data-type')){
                 // if we drag over a grid, place the element after the corresponding grid-stop
@@ -599,12 +606,14 @@ window.addEvent("domready", function () {
         if(!element.classList.contains('be_item_grid')){
             return getParentGridItemElement(element.parentNode);
         }
+
         return element;
     }
 
     function getParentGridElement(element){
         if(!element.classList.contains('be_subgrid') && !element.classList.contains('grid_preview')){
-            return getParentGridItemElement(element.parentNode);
+            // return getParentGridItemElement(element.parentNode);
+            return getParentGridElement(element.parentNode);
         }
         return element;
     }
