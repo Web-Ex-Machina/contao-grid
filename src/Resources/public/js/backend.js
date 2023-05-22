@@ -526,7 +526,8 @@ WEM.Grid  = WEM.Grid || {};
         updateGridElementsSelectNbColumnsVisibility:function(breakpoint){
             document.querySelectorAll(WEM.Grid.Drag.selectors.grid + ' select').forEach(function(item){
                 if(null != item.getAttribute('data-breakpoint')){
-                    var shouldBeHidden = breakpoint != item.getAttribute('data-breakpoint') || "1" == item.getAttribute('data-force-hidden');
+                    var grid = self.getGridFromElement(item);
+                    var shouldBeHidden = breakpoint != item.getAttribute('data-breakpoint') || "1" == item.getAttribute('data-force-hidden') || self.gridMode.automatic === grid.getAttribute('data-grid-mode');
                     item.classList.toggle('hidden', shouldBeHidden);
                     document.querySelector('label[for="'+item.id+'"]').classList.toggle('hidden', shouldBeHidden);
                     if(breakpoint == item.getAttribute('data-breakpoint')){

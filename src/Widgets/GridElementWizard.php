@@ -223,15 +223,15 @@ class GridElementWizard extends Widget
 
                 $selectsCols[] = sprintf('
                         <label for="ctrl_%1$s_%2$s_cols_%5$s" class="%8$s" data-force-hidden="%7$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select %8$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols" data-previous-value="%6$s" %7$s>%3$s</select>',
+                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select %8$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols"  data-force-hidden="%7$s" data-previous-value="%6$s" %7$s>%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                     $breakpoint,
                     $v,
-                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'data-force-hidden="1"' : '',
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
+                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
+                    '0', // we never force hidden here, JS will handle showing/hiding those elements, plus no restrictions about if user is admin or not (contrary to cols)
                     \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
                 );
 
@@ -249,17 +249,17 @@ class GridElementWizard extends Widget
                 }
 
                 $selectsRows[] = sprintf('
-                        <label for="ctrl_%1$s_%2$s_rows_%5$s" class="%6$s" data-force-hidden="%7$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %6$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s" data-previous-value="%8$s">%3$s</select>',
+                        <label for="ctrl_%1$s_%2$s_rows_%5$s" class="%8$s" data-force-hidden="%7$s">%4$s</label>
+                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %8$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s" data-previous-value="%6$s">%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden'),
-                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '1' : !$this->User->isAdmin,
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
-                    $v
+                    $v,
+                    // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '0' : !$this->User->isAdmin,
+                    !$this->User->isAdmin, // we only force hidden if user isn't admin
+                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden')
                 );
             }
 
