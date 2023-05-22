@@ -17,6 +17,7 @@ WEM.Grid  = WEM.Grid || {};
             automatic:'automatic',
             custom:'custom',
         },
+        regexpBreakpoints:/(-xxs|-xs|-sm|-md|-lg|-xl)/,
         init:function(){
             self.applyListeners();
         }
@@ -82,7 +83,6 @@ WEM.Grid  = WEM.Grid || {};
             event.target.classList.toggle('drag-enter',false);
         }
         ,drop:function(event){
-            console.clear();
             event.preventDefault();
         
             var dropzone = event.target;
@@ -174,7 +174,11 @@ WEM.Grid  = WEM.Grid || {};
             // once done, exchange both element places in display
             gridSource.removeChild(draggableElement);
             if('before' === position){
-                gridDest.insertBefore(draggableElement,dropzone);
+                if('fake-last-element' == dropzone.getAttribute('data-type') && self.isGridFirstLevel(gridDest)){ //because the 'add element' is inside the grid, right before the fake last element
+                    self.getGridLastRealElement(dropzone).after(draggableElement);
+                }else{
+                    gridDest.insertBefore(draggableElement,dropzone);
+                }
             }else{
                 gridDest.insertBefore(draggableElement,dropzone.nextSibling);
 
@@ -187,6 +191,11 @@ WEM.Grid  = WEM.Grid || {};
             var inputNbCols = self.getInputNumberOfColumnsForBreakpoint(currentBreakpoint);
 
             self.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), currentGridMode, inputNbCols ? inputNbCols.getAttribute('data-breakpoint') : 'all', inputNbCols ? inputNbCols.value : 12);
+            // things to do :
+            // - hide (or not) selects for cols/rows
+            // - adapt item classes (if moving from a "custom" to "automatic" grid, or vice-versa)
+            self.updateGridElementsSelectNbColumnsVisibility(self.gridMode.automatic === gridDest.getAttribute('data-grid-mode') ? '' : currentBreakpoint);
+            self.updateItemDataClass(draggableElement,self.gridMode.automatic === gridDest.getAttribute('data-grid-mode') ? '' : currentBreakpoint);
         }
         ,getInputNumberOfColumnsForBreakpoint(breakpoint){
             for(var i = 0; i<=6;i++){
@@ -223,7 +232,6 @@ WEM.Grid  = WEM.Grid || {};
                 element = elements[elementIndex];
             }
             if('grid-start' == element.getAttribute('data-type')){
-                // if we drag over a grid, place the element after the corresponding grid-stop
                 var gridStops = element.querySelectorAll('[data-type="grid-stop"]');
                 element = gridStops[gridStops.length-1];
             }
@@ -424,6 +432,109 @@ WEM.Grid  = WEM.Grid || {};
         getSelectForBreakpointForGrid:function(breakpoint){
             var i = WEM.Grid.Drag.breakpoints.indexOf(breakpoint);
             return document.querySelector('[name="grid_cols['+i+'][value]"]');
+        },
+        updateItemDataClass:function(itemgrid, breakpoint){
+            var parentGrid = self.getParentGridElement(itemgrid);
+            var rowsSelect= itemgrid.querySelector('select[data-type="rows"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
+            var colsSelect = itemgrid.querySelector('select[data-type="cols"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
+            
+            var rowsClass = '';
+            if(null !== rowsSelect){
+                rowsClass = rowsSelect.value;
+
+                if('' == rowsSelect.value){
+                    rowsClass = self.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(
+                        rowsSelect.getAttribute('data-item-id'),
+                        'rows',
+                        breakpoint
+                    );
+                }
+            }
+                
+            rowsClass = rowsClass.replace(self.regexpBreakpoints,'');
+
+            var colsClass = '';
+            if(null !== colsSelect){
+                colsClass = colsSelect.value;
+                if('' == colsSelect.value){
+                    colsClass = self.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(
+                        colsSelect.getAttribute('data-item-id'),
+                        'cols',
+                        breakpoint
+                    );
+                }
+            }
+            colsClass = colsClass.replace(self.regexpBreakpoints,'');
+
+            var strClass = itemgrid.querySelector('input[data-item-id="'+itemgrid.getAttribute('data-id')+'"]').value;
+            if(self.gridMode.custom === parentGrid.getAttribute('data-grid-mode')){
+                strClass+=' '
+                + rowsClass
+                + ' ' 
+                + colsClass;
+            }
+            itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass.replace('hidden','wem_hidden'));
+        },
+        getParentGridItemElement:function(element){
+            if(!element.classList.contains('be_item_grid')){
+                return self.getParentGridItemElement(element.parentNode);
+            }
+
+            return element;
+        }, 
+        getParentGridElement:function(element){
+            if(!element.classList.contains('be_subgrid') && !element.classList.contains('grid_preview')){
+                // return getParentGridItemElement(element.parentNode);
+                return self.getParentGridElement(element.parentNode);
+            }
+            return element;
+        },
+        changeLowerResolutionValues:function(itemId, type, breakpoint, value, triggerSave){
+            let resolutions = WEM.Grid.Drag.getLowerResolutions(breakpoint);
+            resolutions.forEach(function(resolution){
+                if(breakpoint != resolution){
+                    var select = WEM.Grid.Drag.getSelectForItemIdAndTypeAndBreakpoint(itemId, type, resolution);
+                    if(null == select){
+                        console.log(itemId, type, resolution);
+                    }else{
+                        var higherDefinedRes = WEM.Grid.Drag.getClosestHigherResolutionDefinedForItemIdAndTypeAndBreakpoint(itemId, type, resolution);
+                        var selectValue = WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(
+                            WEM.Grid.Drag.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(itemId, type, resolution)
+                        );
+                        // select.options[0].innerHTML = WEM.Grid.Drag.buildInheritedOptionTextForTypeAndBreakpoint(type, higherDefinedRes, selectValue);
+                    }
+                }
+            });
+        },
+        updateMainGridGap:function(gapValue,gapUnit){
+            var grid = document.querySelector(WEM.Grid.Drag.selectors.grid);
+            if(-1 < grid.className.indexOf('gap')){
+                grid.className = grid.className.replace(/gap-([0-6]{1})([-rem]{0,4})/,'gap-'+gapValue+('' != gapUnit ? '-'+gapUnit : ''));
+            }else{
+                grid.className = grid.className.concat('gap-'+gapValue+('' != gapUnit ? '-'+gapUnit : ''));
+            }
+        },
+        updateMainGridNbOfColumns:function(nbColumns){
+            var grid = document.querySelector(WEM.Grid.Drag.selectors.grid);
+            grid.className = grid.className.replace(/cols-([0-9]{1,2})/,'cols-'+nbColumns);
+        },
+        updateMainGridFakeElementsNbOfColumns:function(nbColumns){
+            document.querySelectorAll(WEM.Grid.Drag.selectors.grid + ' > .be_item_grid_fake').forEach(function(item){
+                item.className = item.className.replace(/cols-span-([0-9]{1,2})/,'cols-span-'+nbColumns);
+            });
+        },
+        updateGridElementsSelectNbColumnsVisibility:function(breakpoint){
+            document.querySelectorAll(WEM.Grid.Drag.selectors.grid + ' select').forEach(function(item){
+                if(null != item.getAttribute('data-breakpoint')){
+                    var grid = self.getGridFromElement(item);
+                    var shouldBeHidden = breakpoint != item.getAttribute('data-breakpoint') || "1" == item.getAttribute('data-force-hidden') || self.gridMode.automatic === grid.getAttribute('data-grid-mode');
+                    item.classList.toggle('hidden', shouldBeHidden);
+                    document.querySelector('label[for="'+item.id+'"]').classList.toggle('hidden', shouldBeHidden);
+                    if(breakpoint == item.getAttribute('data-breakpoint')){
+                        item.dispatchEvent(new Event('change_auto'));
+                    }
+                }
+            });
         }
     }
     var self = WEM.Grid.Drag;
@@ -516,7 +627,7 @@ WEM.Grid  = WEM.Grid || {};
 })();
 window.addEvent("domready", function () {
     WEM.Grid.Drag.init();
-    const regexpBreakpoints = /(-xxs|-xs|-sm|-md|-lg|-xl)/;
+    // const regexpBreakpoints = /(-xxs|-xs|-sm|-md|-lg|-xl)/;
     
     document.querySelectorAll('.gridelement .be_item_grid').forEach(function (item) {
         // Retrieve value of select and input
@@ -539,11 +650,11 @@ window.addEvent("domready", function () {
 
     document.querySelectorAll('.gridelement select[data-type="cols"]').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            var itemGrid = getParentGridItemElement(this);
-            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
+            var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
+            WEM.Grid.Drag.updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
             WEM.Grid.Saver.saveItemCols(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
             // update lower resolution values
-            changeLowerResolutionValues(
+            WEM.Grid.Drag.changeLowerResolutionValues(
                 i.getAttribute('data-item-id'),
                 i.getAttribute('data-type'),
                 i.getAttribute('data-breakpoint'),
@@ -551,10 +662,10 @@ window.addEvent("domready", function () {
             );
         });
         i.addEventListener("change_auto", function (e) {
-            var itemGrid = getParentGridItemElement(this);
-            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
+            var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
+            WEM.Grid.Drag.updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
             // update lower resolution values
-            changeLowerResolutionValues(
+            WEM.Grid.Drag.changeLowerResolutionValues(
                 i.getAttribute('data-item-id'),
                 i.getAttribute('data-type'),
                 i.getAttribute('data-breakpoint'),
@@ -565,11 +676,11 @@ window.addEvent("domready", function () {
 
     document.querySelectorAll('.gridelement select[data-type="rows"]').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            var itemGrid = getParentGridItemElement(this);
-            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
+            var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
+            WEM.Grid.Drag.updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
             WEM.Grid.Saver.saveItemRows(itemGrid.getAttribute('data-id'),i.value,i.getAttribute('data-breakpoint'));
             // update lower resolution values
-            changeLowerResolutionValues(
+            WEM.Grid.Drag.changeLowerResolutionValues(
                 i.getAttribute('data-item-id'),
                 i.getAttribute('data-type'),
                 i.getAttribute('data-breakpoint'),
@@ -577,8 +688,8 @@ window.addEvent("domready", function () {
             );
         });
         i.addEventListener("change_auto", function (e) {
-            var itemGrid = getParentGridItemElement(this);
-            updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
+            var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
+            WEM.Grid.Drag.updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             var select = WEM.Grid.Drag.getSelectForItemIdAndTypeAndBreakpoint(
                 i.getAttribute('data-item-id'),
@@ -586,7 +697,7 @@ window.addEvent("domready", function () {
                 i.getAttribute('data-breakpoint')
             );
 
-            changeLowerResolutionValues(
+            WEM.Grid.Drag.changeLowerResolutionValues(
                 select.getAttribute('data-item-id'),
                 select.getAttribute('data-type'),
                 select.getAttribute('data-breakpoint'),
@@ -595,29 +706,15 @@ window.addEvent("domready", function () {
         });
     });
 
-    function getParentGridItemElement(element){
-        if(!element.classList.contains('be_item_grid')){
-            return getParentGridItemElement(element.parentNode);
-        }
-        return element;
-    }
-
-    function getParentGridElement(element){
-        if(!element.classList.contains('be_subgrid') && !element.classList.contains('grid_preview')){
-            return getParentGridItemElement(element.parentNode);
-        }
-        return element;
-    }
-
     document.querySelectorAll('.gridelement input').forEach(function (i) {
         i.addEventListener("change", function (e) {
-            var itemGrid = getParentGridItemElement(this);
-            updateItemDataClass(itemGrid,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemGrid.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
+            var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
+            WEM.Grid.Drag.updateItemDataClass(itemGrid,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemGrid.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
             WEM.Grid.Saver.saveItemClass(itemGrid.getAttribute('data-id'),i.value);
         });
         i.addEventListener("keyup_auto", function (e) {
-            var itemGrid = getParentGridItemElement(this);
-            updateItemDataClass(itemGrid,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemGrid.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
+            var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
+            WEM.Grid.Drag.updateItemDataClass(itemGrid,this.parentNode.querySelector('select[data-type="rows"][data-item-id="'+itemGrid.getAttribute('data-id')+'"]:not(.hidden)').getAttribute('data-breakpoint'));
         });
     });
 
@@ -718,9 +815,9 @@ window.addEvent("domready", function () {
                     return;
                 }
                 // Update the main grid size
-                updateMainGridNbOfColumns(nbColumns);
+                WEM.Grid.Drag.updateMainGridNbOfColumns(nbColumns);
                 // Update the fake elements size
-                updateMainGridFakeElementsNbOfColumns(nbColumns);
+                WEM.Grid.Drag.updateMainGridFakeElementsNbOfColumns(nbColumns);
 
                 WEM.Grid.Drag.updateGridElementsAvailableColumns(document.querySelector(WEM.Grid.Drag.selectors.grid), document.querySelector(WEM.Grid.Drag.selectors.gridMode).value, event.target.getAttribute('data-breakpoint'), nbColumns);
             });
@@ -733,7 +830,7 @@ window.addEvent("domready", function () {
     var selectBreakpoints = document.querySelector(WEM.Grid.Drag.selectors.breakpointSelector);
     if(null != selectBreakpoints){
         selectBreakpoints.addEventListener('change',function(event){
-            updateGridElementsSelectNbColumnsVisibility(event.target.value);
+            WEM.Grid.Drag.updateGridElementsSelectNbColumnsVisibility(event.target.value);
             var select = document.querySelector('select[data-breakpoint="'+event.target.value+'"]');
             if(null != select){
                 select.dispatchEvent(new Event('change'));
@@ -741,7 +838,7 @@ window.addEvent("domready", function () {
         });
     }else{
         if(WEM.Grid.Drag.gridMode.automatic === document.querySelector(WEM.Grid.Drag.selectors.gridMode).value){
-            updateGridElementsSelectNbColumnsVisibility('all');
+            WEM.Grid.Drag.updateGridElementsSelectNbColumnsVisibility('all');
         }
     }
 
@@ -750,7 +847,7 @@ window.addEvent("domready", function () {
         selectGridGapValue.addEventListener('change',function(event){
             var selectGridGapUnit= document.querySelector(WEM.Grid.Drag.selectors.gridGapUnit);
             if(null != selectGridGapUnit){
-                updateMainGridGap(event.target.value, selectGridGapUnit.value);
+                WEM.Grid.Drag.updateMainGridGap(event.target.value, selectGridGapUnit.value);
             }
         });
     }
@@ -760,94 +857,8 @@ window.addEvent("domready", function () {
         selectGridGapUnit.addEventListener('change',function(event){
             var selectGridGapValue= document.querySelector(WEM.Grid.Drag.selectors.gridGapValue);
             if(null != selectGridGapValue){
-                updateMainGridGap(selectGridGapValue.value, event.target.value);
+                WEM.Grid.Drag.updateMainGridGap(selectGridGapValue.value, event.target.value);
             }
         });
-    }
-
-    function changeLowerResolutionValues(itemId, type, breakpoint, value, triggerSave){
-        let resolutions = WEM.Grid.Drag.getLowerResolutions(breakpoint);
-        resolutions.forEach(function(resolution){
-            if(breakpoint != resolution){
-                var select = WEM.Grid.Drag.getSelectForItemIdAndTypeAndBreakpoint(itemId, type, resolution);
-                if(null == select){
-                    console.log(itemId, type, resolution);
-                }else{
-                    var higherDefinedRes = WEM.Grid.Drag.getClosestHigherResolutionDefinedForItemIdAndTypeAndBreakpoint(itemId, type, resolution);
-                    var selectValue = WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(
-                        WEM.Grid.Drag.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(itemId, type, resolution)
-                    );
-                    // select.options[0].innerHTML = WEM.Grid.Drag.buildInheritedOptionTextForTypeAndBreakpoint(type, higherDefinedRes, selectValue);
-                }
-            }
-        });
-    }
-
-    function updateMainGridGap(gapValue,gapUnit){
-        var grid = document.querySelector(WEM.Grid.Drag.selectors.grid);
-        if(-1 < grid.className.indexOf('gap')){
-            grid.className = grid.className.replace(/gap-([0-6]{1})([-rem]{0,4})/,'gap-'+gapValue+('' != gapUnit ? '-'+gapUnit : ''));
-        }else{
-            grid.className = grid.className.concat('gap-'+gapValue+('' != gapUnit ? '-'+gapUnit : ''));
-        }
-    }
-
-    function updateMainGridNbOfColumns(nbColumns){
-        var grid = document.querySelector(WEM.Grid.Drag.selectors.grid);
-        grid.className = grid.className.replace(/cols-([0-9]{1,2})/,'cols-'+nbColumns);
-    }
-
-    function updateMainGridFakeElementsNbOfColumns(nbColumns){
-        document.querySelectorAll(WEM.Grid.Drag.selectors.grid + ' > .be_item_grid_fake').forEach(function(item){
-            item.className = item.className.replace(/cols-span-([0-9]{1,2})/,'cols-span-'+nbColumns);
-        });
-    }
-
-    function updateGridElementsSelectNbColumnsVisibility(breakpoint){
-        document.querySelectorAll(WEM.Grid.Drag.selectors.grid + ' select').forEach(function(item){
-            if(null != item.getAttribute('data-breakpoint')){
-                var shouldBeHidden = breakpoint != item.getAttribute('data-breakpoint') || "1" == item.getAttribute('data-force-hidden');
-                item.classList.toggle('hidden', shouldBeHidden);
-                document.querySelector('label[for="'+item.id+'"]').classList.toggle('hidden', shouldBeHidden);
-                if(breakpoint == item.getAttribute('data-breakpoint')){
-                    item.dispatchEvent(new Event('change_auto'));
-                }
-            }
-        });
-    }
-
-    function updateItemDataClass(itemgrid, breakpoint){
-        var parentGrid = getParentGridElement(itemgrid);
-        var rowsSelect= itemgrid.querySelector('select[data-type="rows"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
-        var colsSelect = itemgrid.querySelector('select[data-type="cols"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
-        
-        var rowsClass = rowsSelect.value;
-        if('' == rowsSelect.value){
-            rowsClass = WEM.Grid.Drag.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(
-                rowsSelect.getAttribute('data-item-id'),
-                'rows',
-                breakpoint
-            );
-        }
-        rowsClass = rowsClass.replace(regexpBreakpoints,'');
-
-        var colsClass = colsSelect.value;
-        if('' == colsSelect.value){
-            colsClass = WEM.Grid.Drag.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(
-                colsSelect.getAttribute('data-item-id'),
-                'cols',
-                breakpoint
-            );
-        }
-        colsClass = colsClass.replace(regexpBreakpoints,'');
-
-        var strClass = itemgrid.querySelector('input[data-item-id="'+itemgrid.getAttribute('data-id')+'"]').value;
-        if(WEM.Grid.Drag.gridMode.custom === parentGrid.getAttribute('data-grid-mode')){
-            strClass+=' '
-            + rowsClass
-            + ' ' 
-            + colsClass;
-        }
-        itemgrid.setAttribute('class', itemgrid.getAttribute('data-class')+' '+strClass.replace('hidden','wem_hidden'));
     }
 });
