@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
-class GridGapValuesWizard extends \Widget
+use Contao\FrontendTemplate;
+use Contao\Widget;
+
+class GridGapValuesWizard extends Widget
 {
     /**
      * Submit user input.
@@ -64,7 +67,7 @@ class GridGapValuesWizard extends \Widget
      */
     public function generate()
     {
-        $objTemplate = new \FrontendTemplate('be_gridGapValuesWizard');
+        $objTemplate = new FrontendTemplate('be_gridGapValuesWizard');
         $objTemplate->input = $this->strId;
         $objTemplate->value = $this->varValue['value'] ?? '1';
         $objTemplate->unit = $this->varValue['unit'] ?? '';
