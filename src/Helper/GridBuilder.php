@@ -153,7 +153,6 @@ class GridBuilder
         $grid = $gop->getGridById($gridId);
 
         // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : '';
-        // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperClasses()));
         $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',
             $grid->getWrapperClasses()[1]);
 
@@ -170,7 +169,6 @@ class GridBuilder
         $grid = $gop->getGridById($gridId);
 
         // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : '';
-        // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperClasses()));
         $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',
             $grid->getWrapperClasses()[1]);
 
@@ -186,7 +184,6 @@ class GridBuilder
 
         $grid = $gop->getGridById($gridId);
 
-        // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : '';
         $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '' : '';
 
         return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="false" draggable="false" data-type="fake-new-element"><div class="item-new"></div></div>', $additionnalCssClasses);
