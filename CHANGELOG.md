@@ -1,6 +1,17 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+1.0.4 - 2023-06-07
+---
+- FIXED : the last "fake" grid element now takes whole grid width
+- UPDATE : the "new" grid element is now higher
+
+1.0.3 - 2023-05-22
+---
+- UPDATE : the fake "new element" is now inside the main grid
+- FIX : when moving an item from an "custom" to "automatic" grid (or vice-versa), columns & rows settings are now displayed/hidden accordingly
+
+
 1.0.2 - 2023-05-12
 ---
 - ADDED : automatic configuration mode for grid
