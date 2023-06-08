@@ -4,12 +4,13 @@ Extension "Grid" for Contao Open Source CMS
 1.0.4 - 2023-06-07
 ---
 - FIXED : the last "fake" grid element now takes whole grid width
-- UPDATE : the "new" grid element is now higher
+- UPDATED : the "new" grid element is now taller
+- UPDATED : cleaning CSS classes in BE grid preview
 
 1.0.3 - 2023-05-22
 ---
-- UPDATE : the fake "new element" is now inside the main grid
-- FIX : when moving an item from an "custom" to "automatic" grid (or vice-versa), columns & rows settings are now displayed/hidden accordingly
+- UPDATED : the fake "new element" is now inside the main grid
+- FIXED : when moving an item from an "custom" to "automatic" grid (or vice-versa), columns & rows settings are now displayed/hidden accordingly
 
 
 1.0.2 - 2023-05-12
@@ -22,7 +23,7 @@ Extension "Grid" for Contao Open Source CMS
 
 1.0.0 - 2022-12-14
 ---
-- Fix : do not reopen a grid if it is already opened
+- FIXED : do not reopen a grid if it is already opened
 
 1.0.0-rc11 - 2022-11-14
 ---
@@ -52,21 +53,21 @@ Extension "Grid" for Contao Open Source CMS
 
 1.0.0-rc6 - 2022-06-17
 ---
-- Updated : rows displays "1 row" if it inerits from a breakpoint not defining one
+- UPDATED : rows displays "1 row" if it inerits from a breakpoint not defining one
 
 1.0.0-rc5 - 2022-06-17
 ---
-- Added : translations
-- Added : new inheritance system
-- Updated : root grid-start element get his CSS classes cleaned like its child elements
+- ADDED : translations
+- ADDED : new inheritance system
+- UPDATED : root grid-start element get his CSS classes cleaned like its child elements
 
 1.0.0-rc4 - 2022-06-17
 ---
-- Added : empty element for grid
-- Added : inheritance for cols & rows classes in grid builder
-- Removed : grid_preset
-- Removed : ability to get a preview in back-end
-- Removed : ability to hide helpers in back-end
+- ADDED : empty element for grid
+- ADDED : inheritance for cols & rows classes in grid builder
+- REMOVED : grid_preset
+- REMOVED : ability to get a preview in back-end
+- REMOVED : ability to hide helpers in back-end
 
 1.0.0-rc3 - 2022-06-17
 ---

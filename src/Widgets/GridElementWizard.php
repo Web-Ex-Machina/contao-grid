@@ -128,7 +128,7 @@ class GridElementWizard extends Widget
         $this->gridOpenedManager->openGrid($this->activeRecord);
         $openedGrid = $this->gridOpenedManager->getLastOpenedGrid();
 
-        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s" data-grid-mode="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id, $this->activeRecord->grid_mode);
+        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s" data-grid-mode="%s">', implode(' ', $openedGrid->getWrapperClassesWithoutResolutionSpecificClasses()), $this->activeRecord->id, $this->activeRecord->grid_mode);
 
         $strGrid .= $this->gridBuilder->fakeFirstGridElementMarkup((string) $this->activeRecord->id);
 
