@@ -1,0 +1,4 @@
+parameters:
+  phpVersion: 80200 # PHP 8.2
+  scanDirectories:
+    - ../../../vendor/contao

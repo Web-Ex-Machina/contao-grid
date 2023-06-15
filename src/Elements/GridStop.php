@@ -15,11 +15,12 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Elements;
 
 use WEM\GridBundle\Classes\GridOpenedManager;
-
+use Contao\ContentElement;
+use Contao\BackendTemplate;
 /**
  * Content Element "grid-stop".
  */
-class GridStop extends \ContentElement
+class GridStop extends ContentElement
 {
     /**
      * Template.
@@ -36,7 +37,7 @@ class GridStop extends \ContentElement
         // Backend template
         if (TL_MODE === 'BE' && !$this->isForGridElementWizard) {
             $this->strTemplate = 'be_wildcard';
-            $this->Template = new \BackendTemplate($this->strTemplate);
+            $this->Template = new BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
         }
 
