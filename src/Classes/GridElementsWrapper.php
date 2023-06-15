@@ -214,9 +214,9 @@ class GridElementsWrapper
             return sprintf(
                 '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s" data-grid-mode="%s">%s%s%s',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
-                $openGrid->getItemClassesColsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesRowsForItemId($objElement->id) ?: '',
-                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+                $openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: '',
+                $openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: '',
+                $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
                 $objElement->id,
                 $objElement->type,
                 !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
@@ -230,9 +230,9 @@ class GridElementsWrapper
         return sprintf(
             '<div class="%s %s %s %s">%s',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
-            $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
+            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
+            $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
             $strBuffer
         );
     }
@@ -261,9 +261,9 @@ class GridElementsWrapper
             return sprintf(
                 '<div class="%s %s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
-                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
-                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
-                $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
+                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
+                $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
                 true === $openGrid->isSubGrid() ? 'be_subgrid_item' : '',
                 'grid-item-empty' === $objElement->type ? 'be_grid_item_empty' : '',
                 $objElement->id,
@@ -277,10 +277,10 @@ class GridElementsWrapper
             '<div class="%s %s %s %s">%s</div>',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
             // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: '')),
-            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
+            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
             // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: '')),
-            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
-            $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
+            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
+            $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
             $strBuffer
         );
     }

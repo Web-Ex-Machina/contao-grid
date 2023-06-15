@@ -219,7 +219,7 @@ class GridOpenedManager
     {
         $arrGrid = null;
         foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
-            if ($g->hasChildByItemId($element->id)) {
+            if ($g->hasChildByItemId((string) $element->id)) {
                 $arrGrid = $g;
                 break;
             }

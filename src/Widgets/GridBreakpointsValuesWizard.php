@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
-class GridBreakpointsValuesWizard extends \Widget
+use Contao\Widget;
+use Contao\FrontendTemplate;
+
+class GridBreakpointsValuesWizard extends Widget
 {
     /**
      * Submit user input.
@@ -108,7 +111,7 @@ class GridBreakpointsValuesWizard extends \Widget
             }
         }
 
-        $objTemplate = new \FrontendTemplate('be_gridBreakpointsValuesWizard');
+        $objTemplate = new FrontendTemplate('be_gridBreakpointsValuesWizard');
         $objTemplate->input = $this->strId;
         $objTemplate->breakpoints = $this->arrGridBreakpoints;
         $objTemplate->expertMode = $this->User->isAdmin;

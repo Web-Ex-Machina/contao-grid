@@ -53,9 +53,9 @@ class GridBuilder
         }
 
         // We don't need rows, but what's the point of a grid without cols ?
-        if (!\is_array($cols)) {
-            return [];
-        }
+        // if (!\is_array($cols)) {
+        // return [];
+        // }
         $arrClasses[] = 'd-grid';
 
         if (\WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $objElement->grid_mode) {

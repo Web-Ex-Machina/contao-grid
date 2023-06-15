@@ -1,6 +1,10 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+1.0.5 - 2023-06-15
+---
+- UPDATED : PHP 8.2 compatibility
+
 1.0.4 - 2023-06-15
 ---
 - FIXED : the last "fake" grid element now takes whole grid width
