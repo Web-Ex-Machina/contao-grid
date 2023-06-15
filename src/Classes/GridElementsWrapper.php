@@ -276,8 +276,10 @@ class GridElementsWrapper
         return sprintf(
             '<div class="%s %s %s %s">%s</div>',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: '')),
-            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: '')),
+            // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: '')),
+            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId($objElement->id) ?: ''),
+            // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: '')),
+            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId($objElement->id) ?: ''),
             $openGrid->getItemClassesClassesForItemId($objElement->id) ?: '',
             $strBuffer
         );

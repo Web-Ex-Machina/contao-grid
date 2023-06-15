@@ -123,6 +123,32 @@ class GridOpened
         return $this->wrapper_classes;
     }
 
+    public function getWrapperClassesWithoutResolutionSpecificClasses(): ?array
+    {
+        $arrClasses = [];
+        foreach ($this->wrapper_classes as $class) {
+            if (!preg_match('/^cols-(.*)-([0-9]{1,2})$/', $class)
+            && !preg_match('/^rows-(.*)-([0-9]{1,2})$/', $class)
+            ) {
+                $arrClasses[] = $class;
+            }
+        }
+
+        return $arrClasses;
+    }
+
+    public function getWrapperColsClassesWithoutResolutionSpecificClasses(): ?array
+    {
+        $arrClasses = $this->getWrapperClassesWithoutResolutionSpecificClasses();
+        foreach ($arrClasses as $index => $class) {
+            if (!preg_match('/^cols-([0-9]{1,2})$/', $class)) {
+                unset($arrClasses[$index]);
+            }
+        }
+
+        return $arrClasses;
+    }
+
     public function setWrapperClasses(array $wrapper_classes): self
     {
         $this->wrapper_classes = $wrapper_classes;

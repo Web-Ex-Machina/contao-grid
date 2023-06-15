@@ -316,11 +316,11 @@ WEM.Grid  = WEM.Grid || {};
                         select.remove(0);
                     }
                     // recreate options
-                    // if('all' != breakpoint){
-                    //     select.add(new Option(self.buildInheritedOptionTextForTypeAndBreakpoint('cols',inheritedResolution,inheritedValue),'',false,"" == valueBeforeReconstruct ? true : false));
-                    // }else{
+                    if('all' != breakpoint){
+                        select.add(new Option(self.buildInheritedOptionTextForTypeAndBreakpoint('cols',inheritedResolution,inheritedValue),'',false,"" == valueBeforeReconstruct ? true : false));
+                    }else{
                         select.add(new Option('-','',false,"" == valueBeforeReconstruct ? true : false));
-                    // }
+                    }
                     for(var i = 1; i <= nbColumns; i++){
                         select.add(new Option(WEM.Grid.Translations.columns[i-1],classNameBase+i,false,parseInt(valueBeforeReconstruct) == i ? true : false));
                     }
@@ -501,7 +501,7 @@ WEM.Grid  = WEM.Grid || {};
                         var selectValue = WEM.Grid.Drag.getNbColumnsOrRowsFromCssClass(
                             WEM.Grid.Drag.getClosestHigherResolutionDefinedValueForItemIdAndTypeAndBreakpoint(itemId, type, resolution)
                         );
-                        // select.options[0].innerHTML = WEM.Grid.Drag.buildInheritedOptionTextForTypeAndBreakpoint(type, higherDefinedRes, selectValue);
+                        select.options[0].innerHTML = WEM.Grid.Drag.buildInheritedOptionTextForTypeAndBreakpoint(type, higherDefinedRes, selectValue);
                     }
                 }
             });

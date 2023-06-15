@@ -78,12 +78,12 @@
         <target>Glissez l'élement de contenu ici pour le placer à la fin de la grille</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.inheritedColumns">
-        <source>%s column(s) (Inherited from %s)</source>
-        <target>%s colonne(s) (Hérité de %s)</target>
+        <source>- (%s column(s) - Inherited from %s resolution)</source>
+        <target>- (%s colonne(s) - Hérité de la résolution %s)</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.inheritedRows">
-        <source>%s row(s) (Inherited from %s)</source>
-        <target>%s ligne(s) (Hérité de %s)</target>
+        <source>- (%s row(s) - Inherited from %s resolution)</source>
+        <target>- (%s ligne(s) - Hérité de la résolution %s)</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.breakpointAll">
         <source>Desktop</source>
