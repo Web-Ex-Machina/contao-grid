@@ -1,7 +1,7 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
-1.0.4 - 2023-06-07
+1.0.4 - 2023-06-15
 ---
 - FIXED : the last "fake" grid element now takes whole grid width
 - UPDATED : the "new" grid element is now taller
