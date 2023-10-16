@@ -434,10 +434,9 @@ WEM.Grid  = WEM.Grid || {};
             return document.querySelector('[name="grid_cols['+i+'][value]"]');
         },
         updateItemDataClass:function(itemgrid, breakpoint){
-            var parentGrid = self.getParentGridElement(itemgrid);
+            var parentGrid = self.getParentGridElement(itemgrid, itemgrid);
             var rowsSelect= itemgrid.querySelector('select[data-type="rows"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
             var colsSelect = itemgrid.querySelector('select[data-type="cols"][data-item-id="'+itemgrid.getAttribute('data-id')+'"][data-breakpoint="'+breakpoint+'"]');
-            
             var rowsClass = '';
             if(null !== rowsSelect){
                 rowsClass = rowsSelect.value;
@@ -482,11 +481,13 @@ WEM.Grid  = WEM.Grid || {};
 
             return element;
         }, 
-        getParentGridElement:function(element){
+        getParentGridElement:function(element,elementSource){
             if(!element.classList.contains('be_subgrid') && !element.classList.contains('grid_preview')){
-                // return getParentGridItemElement(element.parentNode);
-                return self.getParentGridElement(element.parentNode);
-            }
+                return self.getParentGridElement(element.parentNode, elementSource);
+            }else if(elementSource === element){
+                return self.getParentGridElement(element.parentNode, elementSource);
+            } 
+
             return element;
         },
         changeLowerResolutionValues:function(itemId, type, breakpoint, value, triggerSave){
