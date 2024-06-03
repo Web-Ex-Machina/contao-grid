@@ -34,10 +34,8 @@ class GridGapValuesWizard extends Widget
 
     /**
      * Grid breakpoints.
-     *
-     * @var array
      */
-    protected $arrGridBreakpoints = [];
+    protected array $arrGridBreakpoints = [];
 
     /**
      * Default constructor.
@@ -61,10 +59,8 @@ class GridGapValuesWizard extends Widget
 
     /**
      * Generate the widget and return it as string.
-     *
-     * @return string
      */
-    public function generate()
+    public function generate(): string
     {
         $objTemplate = new FrontendTemplate('be_gridGapValuesWizard');
         $objTemplate->input = $this->strId;
