@@ -72,10 +72,10 @@ class GridBuilderController extends \Contao\Controller
                 default:
                     throw new Exception('Unknown property');
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $response = [
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => $exception->getMessage(),
             ];
         }
 
