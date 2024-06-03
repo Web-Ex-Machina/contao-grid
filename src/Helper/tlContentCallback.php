@@ -29,6 +29,7 @@ class tlContentCallback
 {
     /** @var Connection */
     protected $connection;
+
     /** @var GridElementsCalculator */
     private $gridElementsCalculator;
 
@@ -49,14 +50,16 @@ class tlContentCallback
     {
         $this->createMissingGridStartStop($dc);
         $objItem = ContentModel::findOneById($dc->activeRecord->id);
-        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
+        $objItem->refresh();
+        // otherwise the $objItem still has its previous "sorting" value ...
         $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $dc->activeRecord->pid, $dc->activeRecord->ptable);
     }
 
     public function oncutCallback(DataContainer $dc): void
     {
         $objItem = ContentModel::findOneById($dc->id);
-        $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
+        $objItem->refresh();
+        // otherwise the $objItem still has its previous "sorting" value ...
         $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
@@ -76,10 +79,12 @@ class tlContentCallback
         if (!$dc->id) {
             return;
         }
+
         $objItem = ContentModel::findOneById($dc->id);
         if (!$objItem) {
             return;
         }
+
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
 
         $sessionKey = 'WEMGRID_ondeleteCallback';
@@ -87,6 +92,7 @@ class tlContentCallback
         if ($session->has($sessionKey)) {
             return;
         }
+
         $session->set($sessionKey, 1);
 
         if ('grid-start' === $objItem->type) {
@@ -106,6 +112,7 @@ class tlContentCallback
         if ($session->has($sessionKey)) {
             return;
         }
+
         $session->set($sessionKey, 1);
         if (ContentModel::getTable() === $table && 'grid-start' === $data['type']) {
             // restore the grid-stop
@@ -114,6 +121,7 @@ class tlContentCallback
             // restore the grid-start
             $this->restoreClosestGridStartFromGridStop($data, $dc);
         }
+
         $session->remove($sessionKey);
     }
 
@@ -128,6 +136,7 @@ class tlContentCallback
         if (!\is_array($arrRecordGridStartUndo)) {
             return;
         }
+
         $results = $this->getDeletedElementsOnSameEntity($arrRecordGridStartUndo);
         $arrData = $this->buildUseableArrayOfDataForDeletedElementsOnSameEntity($results);
 
@@ -138,6 +147,7 @@ class tlContentCallback
             if (null !== $gridStopUndoId) {
                 break;
             }
+
             // only work on elements placed AFTER the grid-start
             if ((int) $sorting > (int) $gridStartUndoData['sorting']) {
                 if ('grid-start' === $row['data'][ContentModel::getTable()][0]['type']) {
@@ -152,6 +162,7 @@ class tlContentCallback
                 }
             }
         }
+
         if ($gridStopUndoId) {
             $dc2 = new DC_Table('tl_undo');
             $dc2->id = $gridStopUndoId;
@@ -175,6 +186,7 @@ class tlContentCallback
         if (!\is_array($arrRecordGridStopUndo)) {
             return;
         }
+
         $results = $this->getDeletedElementsOnSameEntity($arrRecordGridStopUndo);
         $arrData = $this->buildUseableArrayOfDataForDeletedElementsOnSameEntity($results);
 
@@ -185,6 +197,7 @@ class tlContentCallback
             if (null !== $gridStartUndoId) {
                 break;
             }
+
             // only work on elements placed BEFORE the grid-stop
             if ((int) $sorting < (int) $gridStopUndoData['sorting']) {
                 if ('grid-stop' === $row['data'][ContentModel::getTable()][0]['type']) {
@@ -222,6 +235,7 @@ class tlContentCallback
         if (!$gridStop) {
             return;
         }
+
         $dc = new DC_Table(ContentModel::getTable());
         $dc->id = $gridStop->id;
         $dc->delete(true);
@@ -239,6 +253,7 @@ class tlContentCallback
         if (!$gridStart) {
             return;
         }
+
         $dc = new DC_Table(ContentModel::getTable());
         $dc->id = $gridStart->id;
         $dc->delete(true);
