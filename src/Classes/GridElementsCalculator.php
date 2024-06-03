@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
+use Contao\StringUtil;
 
 class GridElementsCalculator
 {
@@ -32,7 +33,7 @@ class GridElementsCalculator
         // first we keep track of all grid_items settings
         foreach ($objItems as $objItem) {
             if ('grid-start' === $objItem->type) {
-                $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? deserialize($objItem->grid_items) : []);
+                $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? StringUtil::deserialize($objItem->grid_items) : []);
             }
         }
 

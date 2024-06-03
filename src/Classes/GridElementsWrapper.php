@@ -221,11 +221,11 @@ class GridElementsWrapper
                 $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
                 $objElement->id,
                 $objElement->type,
-                !\is_array($objElement->grid_cols) ? deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
+                !\is_array($objElement->grid_cols) ? StringUtil::deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
                 $objElement->grid_mode,
                 $this->getBackendActionsForGridStartContentElement($objElement, $do, true),
                 $strBuffer,
-                $this->gridBuilder->fakeFirstGridElementMarkup((string) $currentGridId)
+                $this->gridBuilder->fakeFirstGridElementMarkup($currentGridId)
             );
         }
 

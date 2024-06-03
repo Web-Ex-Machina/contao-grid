@@ -16,7 +16,9 @@ namespace WEM\GridBundle\Helper;
 
 use Contao\ContentModel;
 use Contao\Database\Result as DatabaseResult;
+use Contao\StringUtil;
 use WEM\GridBundle\Classes\GridOpenedManager;
+use WEM\GridBundle\Elements\GridStart;
 
 /**
  * Function to centralize generic code to.
@@ -35,19 +37,19 @@ class GridBuilder
         $arrClasses = [];
 
         if (!\is_array($objElement->grid_rows)) {
-            $rows = \Contao\StringUtil::deserialize($objElement->grid_rows);
+            $rows = StringUtil::deserialize($objElement->grid_rows);
         } else {
             $rows = $objElement->grid_rows;
         }
 
         if (!\is_array($objElement->grid_cols)) {
-            $cols = \Contao\StringUtil::deserialize($objElement->grid_cols);
+            $cols = StringUtil::deserialize($objElement->grid_cols);
         } else {
             $cols = $objElement->grid_cols;
         }
 
         if (!\is_array($objElement->grid_gap)) {
-            $gap = \Contao\StringUtil::deserialize($objElement->grid_gap);
+            $gap = StringUtil::deserialize($objElement->grid_gap);
         } else {
             $gap = $objElement->grid_gap;
         }
@@ -58,9 +60,9 @@ class GridBuilder
         // }
         $arrClasses[] = 'd-grid';
 
-        if (\WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $objElement->grid_mode) {
+        if (GridStart::MODE_AUTOMATIC === $objElement->grid_mode) {
             $arrClasses[] = 'cols-autofit';
-        } elseif (\WEM\GridBundle\Elements\GridStart::MODE_CUSTOM === $objElement->grid_mode) {
+        } elseif (GridStart::MODE_CUSTOM === $objElement->grid_mode) {
             foreach ($cols as $k => $col) {
                 // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                 if (0 === $k) {
@@ -108,7 +110,7 @@ class GridBuilder
         if (\is_array($objElement->grid_cols)) {
             $cols = $objElement->grid_cols;
         } else {
-            $cols = \Contao\StringUtil::deserialize($objElement->grid_cols);
+            $cols = StringUtil::deserialize($objElement->grid_cols);
         }
 
         $arrClasses[] = 'item-grid';
@@ -117,7 +119,7 @@ class GridBuilder
         $arrItemsClasses = [];
         if (null !== $objElement->grid_items) {
             if (!\is_array($objElement->grid_items)) {
-                $items = \Contao\StringUtil::deserialize($objElement->grid_items);
+                $items = StringUtil::deserialize($objElement->grid_items);
             } else {
                 $items = $objElement->grid_items;
             }
@@ -150,7 +152,7 @@ class GridBuilder
         $grid = $gop->getGridById($gridId);
 
         // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',$grid->getWrapperClasses()[1]);
-        $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperColsClassesWithoutResolutionSpecificClasses()));
+        $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperColsClassesWithoutResolutionSpecificClasses()));
 
         return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
     }
@@ -165,7 +167,7 @@ class GridBuilder
         $grid = $gop->getGridById($gridId);
 
         // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',$grid->getWrapperClasses()[1]);
-        $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperColsClassesWithoutResolutionSpecificClasses()));
+        $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperColsClassesWithoutResolutionSpecificClasses()));
 
         return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-last-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
     }
@@ -179,7 +181,7 @@ class GridBuilder
 
         $grid = $gop->getGridById($gridId);
 
-        $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? '' : '';
+        $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? '' : '';
 
         return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="false" draggable="false" data-type="fake-new-element"><div class="item-new"></div></div>', $additionnalCssClasses);
     }
