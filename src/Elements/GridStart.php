@@ -122,5 +122,6 @@ class GridStart extends ContentElement
                 return $b;
             }
         }
+        return null;
     }
 }
