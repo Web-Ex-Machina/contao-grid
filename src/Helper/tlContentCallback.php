@@ -157,9 +157,7 @@ class tlContentCallback
             $dc2->id = $gridStopUndoId;
             try {
                 $dc2->undo();
-            } catch (AjaxRedirectResponseException $e) {
-                // do not redirect here
-            } catch (RedirectResponseException $e) {
+            } catch (AjaxRedirectResponseException|RedirectResponseException $e) {
                 // do not redirect here
             }
         }
@@ -207,9 +205,7 @@ class tlContentCallback
             $dc2->id = $gridStartUndoId;
             try {
                 $dc2->undo();
-            } catch (AjaxRedirectResponseException $e) {
-                // do not redirect here
-            } catch (RedirectResponseException $e) {
+            } catch (AjaxRedirectResponseException|RedirectResponseException $e) {
                 // do not redirect here
             }
         }
@@ -367,15 +363,15 @@ class tlContentCallback
      */
     protected function getUndoElementAsArray($id): ?array
     {
-        $objRecordUndo = null;
 
-        $objRecordsUndo = $this->connection->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
-            ->executeQuery(['id' => $id])
-        ;
+        $objRecordsUndo = $this->connection
+            ->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
+            ->executeQuery(['id' => $id]);
+
         try {
             $objRecordUndo = $objRecordsUndo->fetchAssociative();
-        } catch (Exception $e) {
-            return $objRecordUndo;
+        } catch (Exception $exception) {
+            return null;
         }
 
         return $objRecordUndo;

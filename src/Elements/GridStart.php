@@ -92,7 +92,7 @@ class GridStart extends ContentElement
         $gop = GridOpenedManager::getInstance();
         try {
             $arrGrid = $gop->getGridById((string) $this->id);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $gop->openGrid($this);
             $arrGrid = $gop->getGridById((string) $this->id);
         }
