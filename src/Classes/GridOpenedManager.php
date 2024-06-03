@@ -223,7 +223,7 @@ class GridOpenedManager
     public function getParentGrid(ContentModel $element): ?GridOpened
     {
         $arrGrid = null;
-        foreach ($GLOBALS['WEM']['GRID'] as $k => $g) {
+        foreach ($GLOBALS['WEM']['GRID'] as $g) {
             if ($g->hasChildByItemId((string) $element->id)) {
                 $arrGrid = $g;
                 break;
