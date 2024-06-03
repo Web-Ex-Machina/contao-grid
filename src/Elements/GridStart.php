@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -19,7 +19,6 @@ use Contao\ContentElement;
 use Contao\Database;
 use Contao\System;
 use WEM\GridBundle\Classes\GridOpenedManager;
-use WEM\GridBundle\Helper\GridBuilder;
 
 /**
  * Content Element "grid-start".
