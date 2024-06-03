@@ -30,7 +30,7 @@ class GridElementsCalculator
         $objItemsIdsToSkip = [];
         $itemsClasses = [];
         // first we keep track of all grid_items settings
-        foreach ($objItems as $index => $objItem) {
+        foreach ($objItems as $objItem) {
             if ('grid-start' === $objItem->type) {
                 $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? deserialize($objItem->grid_items) : []);
             }
@@ -123,7 +123,7 @@ class GridElementsCalculator
         $gridStart->grid_items = serialize([]);
         $gsm = GridStartManipulator::create($gridStart);
 
-        foreach ($objItems as $index => $objItem) {
+        foreach ($objItems as $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
             }

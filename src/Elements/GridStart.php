@@ -60,7 +60,7 @@ class GridStart extends ContentElement
                 $breakpoints = [];
                 // $arrGridValues = GridBuilder::getWrapperClasses($this);
                 $arrGridValues = System::getContainer()->get('wem.grid.helper.grid_builder')->getWrapperClasses($this);
-                foreach ($arrGridValues as $k => $b) {
+                foreach ($arrGridValues as $b) {
                     $b = explode('-', $b);
                     if ('cols' !== $b[0]) {
                         continue;
