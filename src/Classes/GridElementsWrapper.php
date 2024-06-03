@@ -28,10 +28,13 @@ class GridElementsWrapper
 {
     /** @var TranslatorInterface */
     protected $translator;
+
     /** @var GridBuilder */
     protected $gridBuilder;
+
     /** @var GridCssClassesInheritance */
     protected $gridCssClassesInheritance;
+
     protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
 
     public function __construct(
@@ -60,6 +63,7 @@ class GridElementsWrapper
         if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
             return $strBuffer;
         }
+
         // Get the last open grid
         $openGrid = $gop->getLastOpenedGrid();
         $currentGridId = $gop->getLastOpenedGridId();

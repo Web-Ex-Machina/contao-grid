@@ -21,16 +21,27 @@ use InvalidArgumentException;
 class GridStartManipulator
 {
     public const PROPERTY_COLS = 'cols';
+
     public const PROPERTY_ROWS = 'rows';
+
     public const PROPERTY_CLASSES = 'classes';
+
     public const RESOLUTION_ALL = 'all';
+
     public const RESOLUTION_XXS = 'xxs';
+
     public const RESOLUTION_XS = 'xs';
+
     public const RESOLUTION_SM = 'sm';
+
     public const RESOLUTION_MD = 'md';
+
     public const RESOLUTION_LG = 'lg';
+
     public const RESOLUTION_XL = 'xl';
+
     public const PROPERTIES = [self::PROPERTY_COLS, self::PROPERTY_ROWS, self::PROPERTY_CLASSES];
+
     public const RESOLUTIONS = [
         self::RESOLUTION_ALL,
         self::RESOLUTION_XL,
@@ -40,6 +51,7 @@ class GridStartManipulator
         self::RESOLUTION_XS,
         self::RESOLUTION_XXS,
     ];
+
     /* warning : This format depends on the widget used to manage the grid_cols in tl_content DCA */
     public const DEFAULT_GRID_COLS = [
         ['key' => self::RESOLUTION_ALL, 'value' => ''],
@@ -50,6 +62,7 @@ class GridStartManipulator
         ['key' => self::RESOLUTION_XS, 'value' => ''],
         ['key' => self::RESOLUTION_XXS, 'value' => ''],
     ];
+
     public const DEFAULT_GRID_ROWS = [
         ['key' => self::RESOLUTION_ALL, 'value' => ''],
         ['key' => self::RESOLUTION_XL, 'value' => ''],
@@ -59,6 +72,7 @@ class GridStartManipulator
         ['key' => self::RESOLUTION_XS, 'value' => ''],
         ['key' => self::RESOLUTION_XXS, 'value' => ''],
     ];
+
     public const DEFAULT_GRID_ITEM_COLS = [
         self::RESOLUTION_ALL => '',
         self::RESOLUTION_XL => '',
@@ -68,6 +82,7 @@ class GridStartManipulator
         self::RESOLUTION_XS => '',
         self::RESOLUTION_XXS => '',
     ];
+
     public const DEFAULT_GRID_ITEM_ROWS = [
         self::RESOLUTION_ALL => '',
         self::RESOLUTION_XL => '',
@@ -77,9 +92,13 @@ class GridStartManipulator
         self::RESOLUTION_XS => '',
         self::RESOLUTION_XXS => '',
     ];
+
     public const DEFAULT_GRID_CLASSES = '';
+
     public const DEFAULT_GRID_ITEMS = [self::PROPERTY_COLS => self::DEFAULT_GRID_ITEM_COLS, self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEM_ROWS, self::PROPERTY_CLASSES => self::DEFAULT_GRID_CLASSES];
+
     private $gridStart;
+
     /** @var GridElementsCalculator */
     private $gridElementsCalculator;
 
@@ -98,6 +117,7 @@ class GridStartManipulator
         if ('grid-start' !== $gridStart->type) {
             throw new InvalidArgumentException('The argument is not a grid-start content element !');
         }
+
         $this->gridStart = $gridStart;
 
         return $this;
@@ -811,9 +831,6 @@ class GridStartManipulator
         return \array_key_exists($id.'_'.self::PROPERTY_CLASSES, unserialize($this->gridStart->grid_items));
     }
 
-    /**
-     * @return mixed
-     */
     public function getGridElementsCalculator(): ?GridElementsCalculator
     {
         return $this->gridElementsCalculator;
@@ -843,6 +860,7 @@ class GridStartManipulator
                 $previousValues[$resolutionIndex]['value'] = $value;
             }
         }
+
         $this->gridStart->grid_cols = serialize($previousValues);
 
         return $this;

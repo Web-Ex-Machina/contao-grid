@@ -125,6 +125,7 @@ class GridBuilder
             } else {
                 $items = $objElement->grid_items;
             }
+
             if (!$forForm) {
                 foreach ($items as $itemId => $classes) {
                     if (\is_array($classes)) {

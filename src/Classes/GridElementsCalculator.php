@@ -35,10 +35,12 @@ class GridElementsCalculator
                 $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? deserialize($objItem->grid_items) : []);
             }
         }
-        foreach ($objItems as $index => $objItem) {
+
+        foreach ($objItems as $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
             }
+
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses));
@@ -59,6 +61,7 @@ class GridElementsCalculator
         if (!$objContents) {
             return null;
         }
+
         $nbGridOpened = 0;
         while ($objContents->next()) {
             if ('grid-stop' === $objContents->type) {
@@ -67,6 +70,7 @@ class GridElementsCalculator
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
+
                 --$nbGridOpened;
             }
         }
@@ -87,6 +91,7 @@ class GridElementsCalculator
         if (!$objContents) {
             return null;
         }
+
         $nbGridOpened = 0;
         while ($objContents->next()) {
             if ('grid-start' === $objContents->type) {
@@ -95,6 +100,7 @@ class GridElementsCalculator
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
+
                 --$nbGridOpened;
             }
         }
@@ -121,11 +127,13 @@ class GridElementsCalculator
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
             }
+
             if ('grid-stop' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
 
                 return $objItemsIdsToSkip;
             }
+
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses));
@@ -140,16 +148,20 @@ class GridElementsCalculator
                 if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
                     $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS]);
                 }
+
                 if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
                     $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS]);
                 }
+
                 if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
                     $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES]);
                 }
+
                 $gridStart = $gsm->getGridStart();
                 $gridStart->save();
                 $gsm->setGridStart($gridStart);
             }
+
             $objItemsIdsToSkip[] = $objItem->id;
         }
 

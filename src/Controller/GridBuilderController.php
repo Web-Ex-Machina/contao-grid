@@ -35,8 +35,10 @@ class GridBuilderController extends \Contao\Controller
 {
     /** @var TranslatorInterface */
     protected $translator;
+
     /** @var ContaoFramework */
     protected $framework;
+
     /** @var GridStartManipulator */
     protected $gridStartManipulator;
 
@@ -92,8 +94,10 @@ class GridBuilderController extends \Contao\Controller
         $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_COLS, Input::get('breakpoint'), Input::get('value'));
+
         $grid = $gsm->getGridStart();
         $grid->save();
+
         $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
         $grid = $gsm->getGridStart();
         $grid->save();
@@ -113,8 +117,10 @@ class GridBuilderController extends \Contao\Controller
         $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_ROWS, Input::get('breakpoint'), Input::get('value'));
+
         $grid = $gsm->getGridStart();
         $grid->save();
+
         $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
         $grid = $gsm->getGridStart();
         $grid->save();
@@ -130,8 +136,10 @@ class GridBuilderController extends \Contao\Controller
         $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_CLASSES, null, Input::get('value'));
+
         $grid = $gsm->getGridStart();
         $grid->save();
+
         $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
         $grid = $gsm->getGridStart();
         $grid->save();
@@ -147,6 +155,7 @@ class GridBuilderController extends \Contao\Controller
         if (null === Input::get('breakpoint')) {
             throw new Exception('No breakpoint provided');
         }
+
         $value = Input::get('value');
         $value = empty($value) ? null : (int) $value;
 
@@ -197,6 +206,7 @@ class GridBuilderController extends \Contao\Controller
         if (null === Input::get('grid')) {
             throw new Exception('No grid ID provided');
         }
+
         if (null === Input::get('value')) {
             throw new Exception('No value provided');
         }

@@ -26,7 +26,9 @@ class GridOpenedManager
 {
     /** @var int */
     protected $level = 0;
+
     private static $instance;
+
     /** @var GridBuilder */
     private $gridBuilder;
 
@@ -76,6 +78,7 @@ class GridOpenedManager
         if ('BE' === TL_MODE) {
             $grid->addItemClassesForAllResolution('be_item_grid helper');
         }
+
         if (!empty($element->cssID[1])) {
             $grid->addWrapperClasses($element->cssID[1]);
         }
@@ -152,6 +155,7 @@ class GridOpenedManager
         ) {
             return null;
         }
+
         $gridsCopy = $GLOBALS['WEM']['GRID'];
         array_pop($gridsCopy);
 
@@ -175,6 +179,7 @@ class GridOpenedManager
         ) {
             return null;
         }
+
         $gridsCopy = $GLOBALS['WEM']['GRID'];
         array_pop($gridsCopy);
 

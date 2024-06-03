@@ -26,7 +26,9 @@ use WEM\GridBundle\Classes\GridOpenedManager;
 class GridStart extends ContentElement
 {
     public const MODE_CUSTOM = 'custom';
+
     public const MODE_AUTOMATIC = 'automatic';
+
     /**
      * Template.
      *
@@ -63,6 +65,7 @@ class GridStart extends ContentElement
                     if ('cols' !== $b[0]) {
                         continue;
                     }
+
                     if (2 === \count($b)) {
                         $breakpoint = $this->getBreakpointData('all');
                         $val = $b[1];
@@ -75,6 +78,7 @@ class GridStart extends ContentElement
                         $breakpoints[] = $breakpoint['label'].': '.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
                     }
                 }
+
                 $this->Template->wildcard = 'Config: '.implode(', ', $breakpoints);
             } else {
                 $this->Template->wildcard = 'Config: '.$GLOBALS['TL_LANG']['tl_content']['grid_mode']['automatic'];
@@ -103,6 +107,7 @@ class GridStart extends ContentElement
         } else {
             $this->objModel->classes = $arrGrid->getWrapperClasses();
         }
+
         $gridCssClassesInheritance = new \WEM\GridBundle\Classes\GridCssClassesInheritance();
         $this->objModel->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
 

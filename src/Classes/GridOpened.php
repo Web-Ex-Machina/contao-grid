@@ -18,22 +18,24 @@ class GridOpened
 {
     /** @var string */
     protected $id;
+
     /** @var array */
     protected $cols;
+
     /** @var array */
     protected $wrapper_classes;
+
     /** @var array */
     protected $item_classes;
+
     /** @var array */
     protected $item_classes_form;
+
     /** @var int */
     protected $level;
+
     /** @var string */
     protected $mode;
-
-    public function __construct()
-    {
-    }
 
     public function isSubGrid(): bool
     {
