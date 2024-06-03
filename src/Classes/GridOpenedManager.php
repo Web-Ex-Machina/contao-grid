@@ -133,9 +133,9 @@ class GridOpenedManager
         ) {
             return null;
         }
-        end($GLOBALS['WEM']['GRID']);
 
-        $key = key($GLOBALS['WEM']['GRID']);
+
+        $key = array_key_last($GLOBALS['WEM']['GRID']);
 
         reset($GLOBALS['WEM']['GRID']);
 
@@ -183,9 +183,7 @@ class GridOpenedManager
         $gridsCopy = $GLOBALS['WEM']['GRID'];
         array_pop($gridsCopy);
 
-        end($gridsCopy);
-
-        $key = key($gridsCopy);
+        $key = array_key_last($gridsCopy);
 
         unset($gridsCopy);
 
@@ -207,7 +205,7 @@ class GridOpenedManager
             || !\array_key_exists('GRID', $GLOBALS['WEM'])
             || !\array_key_exists($id, $GLOBALS['WEM']['GRID'])
         ) {
-            throw new Exception('The grid doesn\'t exists.');
+            throw new Exception("The grid doesn't exists.");
         }
 
         return $GLOBALS['WEM']['GRID'][$id];
@@ -242,7 +240,7 @@ class GridOpenedManager
      */
     public function validateElementAsAGridStart($element): void
     {
-        if (!(is_a($element, DbResult::class) || is_a($element, ContentModel::class) || is_a($element, GridStartElement::class))
+        if (!(is_a($element, DbResult::class) || $element instanceof ContentModel::class || $element instanceof GridStartElement::class)
             || 'grid-start' !== $element->type
         ) {
             throw new InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
