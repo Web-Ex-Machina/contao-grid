@@ -129,8 +129,8 @@ class GridOpened
     {
         $arrClasses = [];
         foreach ($this->wrapper_classes as $class) {
-            if (!preg_match('/^cols-(.*)-([0-9]{1,2})$/', $class)
-            && !preg_match('/^rows-(.*)-([0-9]{1,2})$/', $class)
+            if (!preg_match('/^cols-(.*)-(\d{1,2})$/', $class)
+                && !preg_match('/^rows-(.*)-(\d{1,2})$/', $class)
             ) {
                 $arrClasses[] = $class;
             }
@@ -143,7 +143,7 @@ class GridOpened
     {
         $arrClasses = $this->getWrapperClassesWithoutResolutionSpecificClasses();
         foreach ($arrClasses as $index => $class) {
-            if (!preg_match('/^cols-([0-9]{1,2})$/', $class)) {
+            if (!preg_match('/^cols-(\d{1,2})$/', $class)) {
                 unset($arrClasses[$index]);
             }
         }
