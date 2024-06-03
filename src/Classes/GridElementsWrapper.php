@@ -69,11 +69,9 @@ class GridElementsWrapper
         $currentGridId = $gop->getLastOpenedGridId();
 
         // Yep, same code in FE/BE, but FE here if we want it to work /shrug
-        if (TL_MODE === 'FE') {
-            // We won't need this grid anymore so we pop the global grid array
-            if ('grid-stop' === $objElement->type) {
-                $gop->closeLastOpenedGrid();
-            }
+        // We won't need this grid anymore so we pop the global grid array
+        if (TL_MODE === 'FE' && 'grid-stop' === $objElement->type) {
+            $gop->closeLastOpenedGrid();
         }
 
         // If we used grids elements, we had to adjust the behaviour

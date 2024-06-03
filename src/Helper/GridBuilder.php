@@ -65,14 +65,12 @@ class GridBuilder
                 // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                 if (0 === $k) {
                     $arrClasses[] = sprintf('cols-%d', $col['value']);
-                } else {
-                    if ('FE' === TL_MODE) {
-                        if (0 !== (int) $col['value']) {
-                            $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
-                        }
-                    } else {
+                } elseif ('FE' === TL_MODE) {
+                    if (0 !== (int)$col['value']) {
                         $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
                     }
+                } else {
+                    $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
                 }
             }
 
@@ -81,14 +79,12 @@ class GridBuilder
                     // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                     if (0 === $k) {
                         $arrClasses[] = sprintf('rows-%d', $row['value']);
-                    } else {
-                        if ('FE' === TL_MODE) {
-                            if (0 !== (int) $row['value']) {
-                                $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
-                            }
-                        } else {
+                    } elseif ('FE' === TL_MODE) {
+                        if (0 !== (int)$row['value']) {
                             $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
                         }
+                    } else {
+                        $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
                     }
                 }
             }
