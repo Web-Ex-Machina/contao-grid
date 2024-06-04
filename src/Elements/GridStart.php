@@ -18,6 +18,7 @@ use Contao\BackendTemplate;
 use Contao\ContentElement;
 use Contao\Database;
 use Contao\System;
+use WEM\GridBundle\Classes\GridCssClassesInheritance;
 use WEM\GridBundle\Classes\GridOpenedManager;
 
 /**
@@ -108,7 +109,7 @@ class GridStart extends ContentElement
             $this->objModel->classes = $arrGrid->getWrapperClasses();
         }
 
-        $gridCssClassesInheritance = new \WEM\GridBundle\Classes\GridCssClassesInheritance();
+        $gridCssClassesInheritance = new GridCssClassesInheritance();
         $this->objModel->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
 
         // Send the grid_id to template

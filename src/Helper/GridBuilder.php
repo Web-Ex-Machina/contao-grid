@@ -26,13 +26,13 @@ use WEM\GridBundle\Elements\GridStart;
 class GridBuilder
 {
     /**
-     * Generate wrapper classes, depending of the element.
+     * Returns an array of CSS classes for the wrapper element of a grid.
+     * @param ContentModel $objElement The content element object.
+     * @return array The array of CSS classes.
      *
-     * @param \ContentModel $objElement [description]
-     *
-     * @return [type] [description]
+     * @throws \Exception
      */
-    public static function getWrapperClasses($objElement)
+    public static function getWrapperClasses(ContentModel $objElement): array
     {
         $arrClasses = [];
 
@@ -100,9 +100,12 @@ class GridBuilder
     }
 
     /**
-     * Generate item classes, depending of the element.
+     * Generate item classes, depending on the element.
      *
-     * @param ContentModel|DatabaseResult $objElement [description]
+     * @param ContentModel|DatabaseResult $objElement The grid element object.
+     * @param bool|null $forForm If true, prepares the classes for rendering in a form, for rendering in the grid.
+     *
+     * @return array An array of classes for the grid item element.
      */
     public static function getItemClasses($objElement, ?bool $forForm = false): array
     {
@@ -144,6 +147,7 @@ class GridBuilder
      * Returns a "fake" grid element to allow element to be placed at the beggining of the grid.
      *
      * @param string $gridId The grid's id
+     * @throws \Exception
      */
     public function fakeFirstGridElementMarkup(string $gridId): string
     {
@@ -159,6 +163,7 @@ class GridBuilder
 
     /**
      * Returns a "fake" grid element to allow element to be placed at the end of the grid.
+     * @throws \Exception
      */
     public function fakeLastGridElementMarkup(string $gridId): string
     {
@@ -166,7 +171,7 @@ class GridBuilder
 
         $grid = $gop->getGridById($gridId);
 
-        // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',$grid->getWrapperClasses()[1]);
+        // $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',$grid->getWrapperClasses()[1]);
         $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperColsClassesWithoutResolutionSpecificClasses()));
 
         return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-last-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
@@ -174,8 +179,9 @@ class GridBuilder
 
     /**
      * Returns a "fake" grid element to allow new elements to be added at the end of the grid.
+     * @throws \Exception
      */
-    public function fakeNewGridElementMarkup(string $gridId): string
+    public function fakeNewGridElementMarkup(string $gridId): string // TODO : One day, delete all the function because she is useless.
     {
         $gop = GridOpenedManager::getInstance();
 

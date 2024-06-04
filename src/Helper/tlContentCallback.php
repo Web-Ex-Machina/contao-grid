@@ -24,14 +24,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Exception;
 use WEM\GridBundle\Classes\GridElementsCalculator;
+use WEM\GridBundle\Elements\GridStart;
 
 class tlContentCallback
 {
-    /** @var Connection */
-    protected $connection;
+    protected Connection $connection;
 
-    /** @var GridElementsCalculator */
-    private $gridElementsCalculator;
+    private GridElementsCalculator $gridElementsCalculator;
 
     public function __construct(
         Connection $connection,
@@ -129,6 +128,7 @@ class tlContentCallback
      * Restores the corresponding "grid-stop" content element to the "grid-start" `tl_undo`.`data` (unserialized) in parameter.
      *
      * @param DataContainer $dc The DataContainer
+     * @throws \Doctrine\DBAL\Exception
      */
     public function restoreClosestGridStopFromGridStart(array $gridStartUndoData, DataContainer $dc): void
     {
@@ -177,8 +177,9 @@ class tlContentCallback
     /**
      * Restores the corresponding "grid-start" content element to the "grid-stop" `tl_undo`.`data` (unserialized) in parameter.
      *
-     * @param array         $gridStopUndoData The `tl_undo`.`data` value (unserialized)
-     * @param DataContainer $dc               The DataContainer
+     * @param array $gridStopUndoData The `tl_undo`.`data` value (unserialized)
+     * @param DataContainer $dc The DataContainer
+     * @throws \Doctrine\DBAL\Exception
      */
     public function restoreClosestGridStartFromGridStop(array $gridStopUndoData, DataContainer $dc): void
     {
@@ -277,6 +278,7 @@ class tlContentCallback
      * @param array $gridStartStopUndoElementData The `tl_undo`.`data` columns value
      *
      * @return Result|null The list if items found, null otherwise
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getDeletedElementsOnSameEntity(array $gridStartStopUndoElementData): ?Result
     {
@@ -291,6 +293,7 @@ class tlContentCallback
      * @param Result $results The results set
      *
      * @return array An array on the form [sorting=>['data'=>tl_undo.data unserialized,'undo_id'=>tl_undo.id],...]
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function buildUseableArrayOfDataForDeletedElementsOnSameEntity(Result $results): array
     {
@@ -362,7 +365,7 @@ class tlContentCallback
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
                 $objElement->type = 'grid-start';
-                $objElement->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC;
+                $objElement->grid_mode = GridStart::MODE_AUTOMATIC;
                 $objElement->sorting = $dc->activeRecord->sorting - 1;
                 $objElement->save();
             }
@@ -375,6 +378,7 @@ class tlContentCallback
      * @param int|string $id The record's id
      *
      * @return array|null The record as an associative array if foudn, null otherwise
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getUndoElementAsArray($id): ?array
     {

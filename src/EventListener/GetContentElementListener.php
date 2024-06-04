@@ -23,8 +23,7 @@ use WEM\GridBundle\Classes\GridElementsWrapper;
  */
 class GetContentElementListener
 {
-    /** @var GridElementsWrapper */
-    protected $gridElementsWrapper;
+    protected GridElementsWrapper $gridElementsWrapper;
 
     public function __construct(
         GridElementsWrapper $gridElementsWrapper
