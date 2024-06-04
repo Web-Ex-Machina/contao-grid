@@ -50,6 +50,7 @@ class GridBuilderController extends Controller
         $this->translator = $translator;
         $this->gridStartManipulator = $gridStartManipulator;
         $this->framework->initialize();
+        Parent::__construct();
     }
 
     public function __invoke(): Response
