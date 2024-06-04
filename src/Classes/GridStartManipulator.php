@@ -97,10 +97,9 @@ class GridStartManipulator
 
     public const DEFAULT_GRID_ITEMS = [self::PROPERTY_COLS => self::DEFAULT_GRID_ITEM_COLS, self::PROPERTY_ROWS => self::DEFAULT_GRID_ITEM_ROWS, self::PROPERTY_CLASSES => self::DEFAULT_GRID_CLASSES];
 
-    private $gridStart;
+    private ContentModel $gridStart;
 
-    /** @var GridElementsCalculator */
-    private $gridElementsCalculator;
+    private GridElementsCalculator $gridElementsCalculator;
 
     public function __construct(GridElementsCalculator $gridElementsCalculator)
     {
@@ -151,13 +150,14 @@ class GridStartManipulator
     /**
      * Allow to set the grid cols settings.
      *
-     * @param int $all The settings for all resolutions
-     * @param int $xl  The settings for the XL resolution
-     * @param int $lg  The settings for the LG resolution
-     * @param int $md  The settings for the MD resolution
-     * @param int $sm  The settings for the SM resolution
-     * @param int $xs  The settings for the XS resolution
-     * @param int $xxs The settings for the XXS resolution
+     * @param int|null $all The settings for all resolutions
+     * @param int|null $xl The settings for the XL resolution
+     * @param int|null $lg The settings for the LG resolution
+     * @param int|null $md The settings for the MD resolution
+     * @param int|null $sm The settings for the SM resolution
+     * @param int|null $xs The settings for the XS resolution
+     * @param int|null $xxs The settings for the XXS resolution
+     * @return GridStartManipulator
      */
     public function setGridCols(?int $all, ?int $xl, ?int $lg, ?int $md, ?int $sm, ?int $xs, ?int $xxs): self
     {
@@ -175,7 +175,8 @@ class GridStartManipulator
     /**
      * Set the grid cols value for all resolution.
      *
-     * @param int $value the value
+     * @param int|null $value the value
+     * @return GridStartManipulator
      */
     public function setGridColsAll(?int $value): self
     {
@@ -187,7 +188,8 @@ class GridStartManipulator
     /**
      * Set the grid cols value for XXS resolution.
      *
-     * @param int $value the value
+     * @param int|null $value the value
+     * @return GridStartManipulator
      */
     public function setGridColsXxs(?int $value): self
     {
@@ -199,7 +201,8 @@ class GridStartManipulator
     /**
      * Set the grid cols value for XS resolution.
      *
-     * @param int $value the value
+     * @param int|null $value the value
+     * @return GridStartManipulator
      */
     public function setGridColsXs(?int $value): self
     {
@@ -211,7 +214,8 @@ class GridStartManipulator
     /**
      * Set the grid cols value for SM resolution.
      *
-     * @param int $value the value
+     * @param int|null $value the value
+     * @return GridStartManipulator
      */
     public function setGridColsSm(?int $value): self
     {
@@ -223,7 +227,8 @@ class GridStartManipulator
     /**
      * Set the grid cols value for MD resolution.
      *
-     * @param int $value the value
+     * @param int|null $value the value
+     * @return GridStartManipulator
      */
     public function setGridColsMd(?int $value): self
     {
@@ -235,7 +240,8 @@ class GridStartManipulator
     /**
      * Set the grid cols value for LG resolution.
      *
-     * @param int $value the value
+     * @param int|null $value the value
+     * @return GridStartManipulator
      */
     public function setGridColsLg(?int $value): self
     {
@@ -247,7 +253,8 @@ class GridStartManipulator
     /**
      * Set the grid cols value for XL resolution.
      *
-     * @param int $value the value
+     * @param int|null $value the value
+     * @return GridStartManipulator
      */
     public function setGridColsXl(?int $value): self
     {
@@ -356,10 +363,11 @@ class GridStartManipulator
     /**
      * Set the value of a property on a certain resolution for a specified item ID.
      *
-     * @param int    $itemId     The item's ID
-     * @param string $property   The property
-     * @param string $resolution The resolution
-     * @param string $value      The value
+     * @param int $itemId The item's ID
+     * @param string $property The property
+     * @param string|null $resolution The resolution
+     * @param string $value The value
+     * @return GridStartManipulator
      */
     public function setGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, ?string $resolution, string $value): self
     {
@@ -579,9 +587,10 @@ class GridStartManipulator
     /**
      * Get the value of a property on a certain resolution for a specified item ID.
      *
-     * @param int    $itemId     The item's ID
-     * @param string $property   The property
-     * @param string $resolution The resolution
+     * @param int $itemId The item's ID
+     * @param string $property The property
+     * @param string|null $resolution The resolution
+     * @return mixed
      */
     public function getGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, ?string $resolution = null)
     {

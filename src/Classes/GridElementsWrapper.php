@@ -19,6 +19,7 @@ use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use WEM\GridBundle\Elements\GridStart;
 use WEM\GridBundle\Helper\GridBuilder;
 
 /**
@@ -26,16 +27,13 @@ use WEM\GridBundle\Helper\GridBuilder;
  */
 class GridElementsWrapper
 {
-    /** @var TranslatorInterface */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
-    /** @var GridBuilder */
-    protected $gridBuilder;
+    protected GridBuilder $gridBuilder;
 
-    /** @var GridCssClassesInheritance */
-    protected $gridCssClassesInheritance;
+    protected GridCssClassesInheritance $gridCssClassesInheritance;
 
-    protected static $arrSkipContentTypes = ['grid-start', 'grid-stop'];
+    protected static array $arrSkipContentTypes = ['grid-start', 'grid-stop'];
 
     public function __construct(
         TranslatorInterface $translator,
@@ -50,11 +48,11 @@ class GridElementsWrapper
     /**
      * Hook getContentElement : Check if the element is in a Grid and wrap them.
      *
-     * @param [ContentModel] $objElement [Content Element Model]
-     * @param [String]       $strBuffer  [Content Template parsed]
-     * @param [String]       $do  The $_GET['do'] paramater
+     * @param ContentModel $objElement Content Element Model
+     * @param string       $strBuffer  Content Template parsed
+     * @param string       $do  The $_GET['do'] paramater
      *
-     * @return [String] [Content Template, untouched or adjusted]
+     * @return string Content Template, untouched or adjusted
      */
     public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
@@ -263,8 +261,8 @@ class GridElementsWrapper
             return sprintf(
                 '<div class="%s %s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
-                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
-                \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
+                GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
+                GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
                 $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
                 true === $openGrid->isSubGrid() ? 'be_subgrid_item' : '',
                 'grid-item-empty' === $objElement->type ? 'be_grid_item_empty' : '',
@@ -278,10 +276,10 @@ class GridElementsWrapper
         return sprintf(
             '<div class="%s %s %s %s">%s</div>',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
-            // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: '')),
-            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
-            // \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: '')),
-            \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
+            // GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: '')),
+            GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
+            // GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId($objElement->id) ?: '')),
+            GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
             $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
             $strBuffer
         );

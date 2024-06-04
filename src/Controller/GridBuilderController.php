@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Controller;
 
 use Contao\ContentModel;
+use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
 use Exception;
@@ -31,16 +32,14 @@ use WEM\GridBundle\Classes\GridStartManipulator;
  * )
  * @ServiceTag("controller.service_arguments")
  */
-class GridBuilderController extends \Contao\Controller
+class GridBuilderController extends Controller
 {
-    /** @var TranslatorInterface */
-    protected $translator;
 
-    /** @var ContaoFramework */
-    protected $framework;
+    protected TranslatorInterface $translator;
 
-    /** @var GridStartManipulator */
-    protected $gridStartManipulator;
+    protected ContaoFramework $framework;
+
+    protected GridStartManipulator $gridStartManipulator;
 
     public function __construct(
         ContaoFramework $framework,
@@ -82,6 +81,9 @@ class GridBuilderController extends \Contao\Controller
         return new Response(json_encode($response));
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveCols(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -105,6 +107,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveRows(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -128,6 +133,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveClasses(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -147,6 +155,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveGridCols(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -193,6 +204,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function validateMandatoryGridItemParameters(): void
     {
         $this->validateMandatoryGridParameters();
@@ -201,6 +215,9 @@ class GridBuilderController extends \Contao\Controller
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function validateMandatoryGridParameters(): void
     {
         if (null === Input::get('grid')) {
@@ -212,6 +229,9 @@ class GridBuilderController extends \Contao\Controller
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function getGridStart(int $id): ContentModel
     {
         $grid = $this->framework->getAdapter(ContentModel::class)->findOneById($id); // to allow Unit Tests to run

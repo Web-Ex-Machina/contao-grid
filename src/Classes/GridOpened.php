@@ -16,26 +16,20 @@ namespace WEM\GridBundle\Classes;
 
 class GridOpened
 {
-    /** @var string */
-    protected $id;
 
-    /** @var array */
-    protected $cols;
+    protected string $id;
 
-    /** @var array */
-    protected $wrapper_classes;
+    protected array $cols;
 
-    /** @var array */
-    protected $item_classes;
+    protected array $wrapper_classes;
 
-    /** @var array */
-    protected $item_classes_form;
+    protected array $item_classes;
 
-    /** @var int */
-    protected $level;
+    protected array $item_classes_form;
 
-    /** @var string */
-    protected $mode;
+    protected int $level;
+
+    protected string $mode;
 
     public function isSubGrid(): bool
     {
@@ -108,7 +102,7 @@ class GridOpened
         return $this;
     }
 
-    public function getCols()
+    public function getCols(): ?array
     {
         return $this->cols;
     }

@@ -24,13 +24,11 @@ use WEM\GridBundle\Helper\GridBuilder;
 
 class GridOpenedManager
 {
-    /** @var int */
-    protected $level = 0;
+    protected int $level = 0;
 
     private static $instance;
 
-    /** @var GridBuilder */
-    private $gridBuilder;
+    private GridBuilder $gridBuilder;
 
     private function __construct()
     {

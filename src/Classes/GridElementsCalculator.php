@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
+use Contao\Model\Collection;
 use Contao\StringUtil;
 
 class GridElementsCalculator
@@ -114,11 +115,11 @@ class GridElementsCalculator
      *
      * @param ContentModel             $gridStart         The "grid-start" content element
      * @param array                    $objItemsIdsToSkip Array of content elements' ID to skip (not in the grid started by the current content element)
-     * @param \Contao\Model\Collection $objItems          Array of all content elements sharing the same pid & ptable with the current content element
+     * @param Collection               $objItems          Array of all content elements sharing the same pid & ptable with the current content element
      *
      * @return array Array of content elements' ID to skip (for the next grid to not use the current content elements items)
      */
-    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses): array
+    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, Collection $objItems, array $itemsClasses): array
     {
         $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
         $gridStart->grid_items = serialize([]);
