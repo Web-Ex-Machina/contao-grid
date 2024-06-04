@@ -72,8 +72,6 @@ class GridBreakpointsValuesWizard extends Widget
      */
     public function validate(): void
     {
-        $mandatory = $this->mandatory;
-        $varValue = $this->getPost($this->strName);
         parent::validate();
     }
 

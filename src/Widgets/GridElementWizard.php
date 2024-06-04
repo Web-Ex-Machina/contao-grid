@@ -74,7 +74,6 @@ class GridElementWizard extends Widget
      */
     public function validate(): void
     {
-        $mandatory = $this->mandatory;
         $varValue = $this->getPost($this->strName);
 
         foreach ($varValue as $k => &$v) {
