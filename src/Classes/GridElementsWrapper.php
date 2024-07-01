@@ -18,6 +18,7 @@ use Contao\ContentModel;
 use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
+use Contao\System;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use WEM\GridBundle\Elements\GridStart;
 use WEM\GridBundle\Helper\GridBuilder;
@@ -57,8 +58,9 @@ class GridElementsWrapper
     public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
         $gop = GridOpenedManager::getInstance();
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
         // Skip elements we never want to wrap or if we are not in a grid
-        if ((TL_MODE === 'BE' && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
+        if (($scopeMatcher->isBackend() && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
             return $strBuffer;
         }
 
@@ -68,7 +70,7 @@ class GridElementsWrapper
 
         // Yep, same code in FE/BE, but FE here if we want it to work /shrug
         // We won't need this grid anymore so we pop the global grid array
-        if (TL_MODE === 'FE' && 'grid-stop' === $objElement->type) {
+        if ($scopeMatcher->isFrontend() && 'grid-stop' === $objElement->type) {
             $gop->closeLastOpenedGrid();
         }
 
@@ -86,7 +88,7 @@ class GridElementsWrapper
             $str = $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
 
             // Yep, same code in FE/BE, but BE here if we want it to work /shrug
-            if (TL_MODE === 'BE') {
+            if ($scopeMatcher->isBackend()) {
                 // We won't need this grid anymore so we pop the global grid array
                 $gop->closeLastOpenedGrid();
             }
@@ -210,7 +212,8 @@ class GridElementsWrapper
 
     protected function getSubGridStartHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
     {
-        if (TL_MODE === 'BE') {
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        if ($scopeMatcher->isBackend()) {
             return sprintf(
                 '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s" data-grid-mode="%s">%s%s%s',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
@@ -239,7 +242,8 @@ class GridElementsWrapper
 
     protected function getGridStopHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $strBuffer): string
     {
-        if (TL_MODE === 'BE') {
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        if ($scopeMatcher->isBackend()) {
             return sprintf(
                 '%s<div data-id="%s" data-type="%s">%s</div></div>',
                !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup((string) $openGrid->getId()) : '',
@@ -257,7 +261,8 @@ class GridElementsWrapper
 
     protected function getGridElementHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
     {
-        if (TL_MODE === 'BE') {
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        if ($scopeMatcher->isBackend()) {
             return sprintf(
                 '<div class="%s %s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),

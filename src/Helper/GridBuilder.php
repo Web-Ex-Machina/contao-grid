@@ -17,6 +17,7 @@ namespace WEM\GridBundle\Helper;
 use Contao\ContentModel;
 use Contao\Database\Result as DatabaseResult;
 use Contao\StringUtil;
+use Contao\System;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Elements\GridStart;
 
@@ -37,6 +38,8 @@ class GridBuilder
     public static function getWrapperClasses($objElement): array
     {
         $arrClasses = [];
+
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
 
         if (!\is_array($objElement->grid_rows)) {
             $rows = StringUtil::deserialize($objElement->grid_rows);
@@ -69,7 +72,7 @@ class GridBuilder
                 // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                 if (0 === $k) {
                     $arrClasses[] = sprintf('cols-%d', $col['value']);
-                } elseif ('FE' === TL_MODE) {
+                } elseif ($scopeMatcher->isFrontend()) {
                     if (0 !== (int) $col['value']) {
                         $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
                     }
@@ -83,7 +86,7 @@ class GridBuilder
                     // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                     if (0 === $k) {
                         $arrClasses[] = sprintf('rows-%d', $row['value']);
-                    } elseif ('FE' === TL_MODE) {
+                    } elseif ($scopeMatcher->isFrontend()) {
                         if (0 !== (int) $row['value']) {
                             $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
                         }

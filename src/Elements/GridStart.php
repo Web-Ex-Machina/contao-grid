@@ -43,7 +43,8 @@ class GridStart extends ContentElement
     protected function compile(): void
     {
         // Backend template
-        if (TL_MODE === 'BE' && !$this->isForGridElementWizard) {
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        if ($scopeMatcher->isBackend() && !$this->isForGridElementWizard) {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];

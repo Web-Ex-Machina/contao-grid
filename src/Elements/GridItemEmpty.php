@@ -16,6 +16,7 @@ namespace WEM\GridBundle\Elements;
 
 use Contao\BackendTemplate;
 use Contao\ContentElement;
+use Contao\System;
 use WEM\GridBundle\Classes\GridOpenedManager;
 
 /**
@@ -36,7 +37,8 @@ class GridItemEmpty extends ContentElement
     protected function compile(): void
     {
         // Backend template
-        if (TL_MODE === 'BE' && !$this->isForGridElementWizard) {
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        if ($scopeMatcher->isBackend() && !$this->isForGridElementWizard) {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];

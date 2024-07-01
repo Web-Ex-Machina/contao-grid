@@ -71,7 +71,8 @@ class GridOpenedManager
             ->setLevel($this->level)
             ->setMode($element->grid_mode)
         ;
-        if ('BE' === TL_MODE) {
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        if ($scopeMatcher->isBackend()) {
             $grid->addItemClassesForAllResolution('be_item_grid helper');
         }
 
