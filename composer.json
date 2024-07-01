@@ -13,8 +13,8 @@
     ],
     "support":{
         "website":"https://www.webexmachina.fr/",
-        "issues":"https://github.com/webexmachina/contao-grid/issues",
-        "source":"https://github.com/webexmachina/contao-grid"
+        "issues":"https://github.com/web-ex-machina/contao-grid/issues",
+        "source":"https://github.com/web-ex-machina/contao-grid"
     },
     "require": {
         "php": "^7.4|^8.2",
