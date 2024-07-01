@@ -27,12 +27,14 @@ class GridBuilder
 {
     /**
      * Returns an array of CSS classes for the wrapper element of a grid.
-     * @param ContentModel $objElement The content element object.
-     * @return array The array of CSS classes.
+     *
+     * @param ContentModel|DatabaseResult $objElement the content element object
      *
      * @throws \Exception
+     *
+     * @return array the array of CSS classes
      */
-    public static function getWrapperClasses(ContentModel $objElement): array
+    public static function getWrapperClasses($objElement): array
     {
         $arrClasses = [];
 
@@ -68,7 +70,7 @@ class GridBuilder
                 if (0 === $k) {
                     $arrClasses[] = sprintf('cols-%d', $col['value']);
                 } elseif ('FE' === TL_MODE) {
-                    if (0 !== (int)$col['value']) {
+                    if (0 !== (int) $col['value']) {
                         $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
                     }
                 } else {
@@ -82,7 +84,7 @@ class GridBuilder
                     if (0 === $k) {
                         $arrClasses[] = sprintf('rows-%d', $row['value']);
                     } elseif ('FE' === TL_MODE) {
-                        if (0 !== (int)$row['value']) {
+                        if (0 !== (int) $row['value']) {
                             $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
                         }
                     } else {
@@ -102,10 +104,10 @@ class GridBuilder
     /**
      * Generate item classes, depending on the element.
      *
-     * @param ContentModel|DatabaseResult $objElement The grid element object.
-     * @param bool|null $forForm If true, prepares the classes for rendering in a form, for rendering in the grid.
+     * @param ContentModel|DatabaseResult $objElement the grid element object
+     * @param bool|null                   $forForm    if true, prepares the classes for rendering in a form, for rendering in the grid
      *
-     * @return array An array of classes for the grid item element.
+     * @return array an array of classes for the grid item element
      */
     public static function getItemClasses($objElement, ?bool $forForm = false): array
     {
@@ -147,6 +149,7 @@ class GridBuilder
      * Returns a "fake" grid element to allow element to be placed at the beggining of the grid.
      *
      * @param string $gridId The grid's id
+     *
      * @throws \Exception
      */
     public function fakeFirstGridElementMarkup(string $gridId): string
@@ -163,6 +166,7 @@ class GridBuilder
 
     /**
      * Returns a "fake" grid element to allow element to be placed at the end of the grid.
+     *
      * @throws \Exception
      */
     public function fakeLastGridElementMarkup(string $gridId): string
@@ -179,6 +183,7 @@ class GridBuilder
 
     /**
      * Returns a "fake" grid element to allow new elements to be added at the end of the grid.
+     *
      * @throws \Exception
      */
     public function fakeNewGridElementMarkup(string $gridId): string // TODO : One day, delete all the function because she is useless.

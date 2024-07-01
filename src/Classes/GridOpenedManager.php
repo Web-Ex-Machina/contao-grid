@@ -17,8 +17,6 @@ namespace WEM\GridBundle\Classes;
 use Contao\ContentModel;
 use Contao\Database\Result as DbResult;
 use Contao\System;
-use Exception;
-use InvalidArgumentException;
 use WEM\GridBundle\Elements\GridStart as GridStartElement;
 use WEM\GridBundle\Helper\GridBuilder;
 
@@ -132,7 +130,6 @@ class GridOpenedManager
             return null;
         }
 
-
         $key = array_key_last($GLOBALS['WEM']['GRID']);
 
         reset($GLOBALS['WEM']['GRID']);
@@ -193,7 +190,7 @@ class GridOpenedManager
      *
      * @param string $id The id
      *
-     * @throws Exception if no grid is found
+     * @throws \Exception if no grid is found
      *
      * @return GridOpened the grid
      */
@@ -203,7 +200,7 @@ class GridOpenedManager
             || !\array_key_exists('GRID', $GLOBALS['WEM'])
             || !\array_key_exists($id, $GLOBALS['WEM']['GRID'])
         ) {
-            throw new Exception("The grid doesn't exists.");
+            throw new \Exception("The grid doesn't exists.");
         }
 
         return $GLOBALS['WEM']['GRID'][$id];
@@ -234,14 +231,20 @@ class GridOpenedManager
      *
      * @param ContentModel|DbResult $element The element to check
      *
-     * @throws InvalidArgumentException if the element is not a grid start
+     * @throws \InvalidArgumentException if the element is not a grid start
      */
     public function validateElementAsAGridStart($element): void
     {
-        if (!(is_a($element, DbResult::class) || $element instanceof ContentModel::class || $element instanceof GridStartElement::class)
+        if (!(
+            is_a($element, DbResult::class)
+            || is_a($element, ContentModel::class)
+            || is_a($element, GridStartElement::class)
+            // || $element instanceof ContentModel::class
+            // || $element instanceof GridStartElement::class
+        )
             || 'grid-start' !== $element->type
         ) {
-            throw new InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
+            throw new \InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
         }
     }
 
