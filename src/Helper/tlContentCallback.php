@@ -22,7 +22,6 @@ use Contao\DC_Table;
 use Contao\System;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
-use Exception;
 use WEM\GridBundle\Classes\GridElementsCalculator;
 use WEM\GridBundle\Elements\GridStart;
 
@@ -71,6 +70,32 @@ class tlContentCallback
         $objItem->save();
         // end of ugly fix
         $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+
+        // Cannot work !
+        // Contao executes the callback after each copy and not after the copies are done
+        // START
+        // $objItem->refresh(); // just in case
+        // $objItemSource = ContentModel::findOneById($dc->id);
+        // if (!$objItemSource) {
+        //     return;
+        // }
+
+        // $gridItemsSource = null !== $objItemSource->grid_items ? unserialize($objItemSource->grid_items) : [];
+        // $gridItemsDest = null !== $objItem->grid_items ? unserialize($objItem->grid_items) : [];
+
+        // if (\count($gridItemsDest) !== \count($gridItemsSource)) {
+        //     return;
+        // }
+
+        // $gridItemsSourceKeys = array_keys($gridItemsSource);
+        // $gridItemsDestKeys = array_keys($gridItemsDest);
+
+        // foreach ($gridItemsSourceKeys as $index => $sourceKey) {
+        //     $gridItemsDest[$gridItemsDestKeys[$index]] = $gridItemsSource[$sourceKey];
+        // }
+        // $objItem->grid_items = serialize($gridItemsDest);
+        // $objItem->save();
+        // END
     }
 
     public function ondeleteCallback(DataContainer $dc, int $undoItemId): void
@@ -128,6 +153,7 @@ class tlContentCallback
      * Restores the corresponding "grid-stop" content element to the "grid-start" `tl_undo`.`data` (unserialized) in parameter.
      *
      * @param DataContainer $dc The DataContainer
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function restoreClosestGridStopFromGridStart(array $gridStartUndoData, DataContainer $dc): void
@@ -154,7 +180,7 @@ class tlContentCallback
                     ++$nbGridOpened;
                 } elseif ('grid-stop' === $row['data'][ContentModel::getTable()][0]['type']) {
                     if (0 === $nbGridOpened) {
-                        //it's the one
+                        // it's the one
                         $gridStopUndoId = $row['undo_id'];
                     } else {
                         --$nbGridOpened;
@@ -177,8 +203,9 @@ class tlContentCallback
     /**
      * Restores the corresponding "grid-start" content element to the "grid-stop" `tl_undo`.`data` (unserialized) in parameter.
      *
-     * @param array $gridStopUndoData The `tl_undo`.`data` value (unserialized)
-     * @param DataContainer $dc The DataContainer
+     * @param array         $gridStopUndoData The `tl_undo`.`data` value (unserialized)
+     * @param DataContainer $dc               The DataContainer
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function restoreClosestGridStartFromGridStop(array $gridStopUndoData, DataContainer $dc): void
@@ -205,7 +232,7 @@ class tlContentCallback
                     ++$nbGridOpened;
                 } elseif ('grid-start' === $row['data'][ContentModel::getTable()][0]['type']) {
                     if (0 === $nbGridOpened) {
-                        //it's the one
+                        // it's the one
                         $gridStartUndoId = $row['undo_id'];
                     } else {
                         --$nbGridOpened;
@@ -277,8 +304,9 @@ class tlContentCallback
      *
      * @param array $gridStartStopUndoElementData The `tl_undo`.`data` columns value
      *
-     * @return Result|null The list if items found, null otherwise
      * @throws \Doctrine\DBAL\Exception
+     *
+     * @return Result|null The list if items found, null otherwise
      */
     protected function getDeletedElementsOnSameEntity(array $gridStartStopUndoElementData): ?Result
     {
@@ -292,8 +320,9 @@ class tlContentCallback
      *
      * @param Result $results The results set
      *
-     * @return array An array on the form [sorting=>['data'=>tl_undo.data unserialized,'undo_id'=>tl_undo.id],...]
      * @throws \Doctrine\DBAL\Exception
+     *
+     * @return array An array on the form [sorting=>['data'=>tl_undo.data unserialized,'undo_id'=>tl_undo.id],...]
      */
     protected function buildUseableArrayOfDataForDeletedElementsOnSameEntity(Result $results): array
     {
@@ -313,7 +342,7 @@ class tlContentCallback
             && (
                 'grid-start' === $rowData[ContentModel::getTable()][0]['type']
                 || 'grid-stop' === $rowData[ContentModel::getTable()][0]['type']
-                )
+            )
             ) {
                 $arrDataFormatted[$rowData[ContentModel::getTable()][0]['sorting']] = [
                     'data' => $rowData,
@@ -377,19 +406,20 @@ class tlContentCallback
      *
      * @param int|string $id The record's id
      *
-     * @return array|null The record as an associative array if foudn, null otherwise
      * @throws \Doctrine\DBAL\Exception
+     *
+     * @return array|null The record as an associative array if foudn, null otherwise
      */
     protected function getUndoElementAsArray($id): ?array
     {
-
         $objRecordsUndo = $this->connection
             ->prepare('SELECT * FROM tl_undo WHERE id=:id LIMIT 1')
-            ->executeQuery(['id' => $id]);
+            ->executeQuery(['id' => $id])
+        ;
 
         try {
             $objRecordUndo = $objRecordsUndo->fetchAssociative();
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             return null;
         }
 
