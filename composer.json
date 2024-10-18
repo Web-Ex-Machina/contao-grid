@@ -19,8 +19,7 @@
     "require": {
         "php": "^5.6|^7.0|^8.0",
         "contao/core-bundle": "^4.4",
-        "contao-community-alliance/composer-plugin": "*",
-        "codefog/contao-haste": "^4.23"
+        "contao-community-alliance/composer-plugin": "*"
     },
     "require-dev":
     {
