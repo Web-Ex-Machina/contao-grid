@@ -39,7 +39,7 @@ class GridElementsWrapper
     public function __construct(
         TranslatorInterface $translator,
         GridBuilder $gridBuilder,
-        GridCssClassesInheritance $gridCssClassesInheritance
+        GridCssClassesInheritance $gridCssClassesInheritance,
     ) {
         $this->translator = $translator;
         $this->gridBuilder = $gridBuilder;
