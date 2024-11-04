@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -14,10 +14,11 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
+use Contao\BackendUser;
 use Contao\ContentModel;
-use Contao\Input;
 use Contao\Widget;
 use WEM\GridBundle\Classes\GridOpenedManager;
+use WEM\GridBundle\Elements\GridStart;
 use WEM\GridBundle\Helper\GridBuilder;
 
 class GridElementWizard extends Widget
@@ -31,16 +32,12 @@ class GridElementWizard extends Widget
 
     /**
      * Template.
-     *
-     * @var string
      */
     protected $strTemplate = 'be_widget';
 
-    /** @var GridOpenedManager */
-    protected $gridOpenedManager;
+    protected GridOpenedManager $gridOpenedManager;
 
-    /** @var GridBuilder */
-    protected $gridBuilder;
+    protected GridBuilder $gridBuilder;
 
     /**
      * Default constructor.
@@ -61,20 +58,15 @@ class GridElementWizard extends Widget
      */
     public function __set($strKey, $varValue): void
     {
-        switch ($strKey) {
-            case 'mandatory':
-                if ($varValue) {
-                    $this->arrAttributes['required'] = 'required';
-                } else {
-                    unset($this->arrAttributes['required']);
-                }
-
-                parent::__set($strKey, $varValue);
-                break;
-
-            default:
-                parent::__set($strKey, $varValue);
+        if ($strKey == 'mandatory') {
+            if ($varValue) {
+                $this->arrAttributes['required'] = 'required';
+            } else {
+                unset($this->arrAttributes['required']);
+            }
         }
+
+        parent::__set($strKey, $varValue);
     }
 
     /**
@@ -82,7 +74,6 @@ class GridElementWizard extends Widget
      */
     public function validate(): void
     {
-        $mandatory = $this->mandatory;
         $varValue = $this->getPost($this->strName);
 
         foreach ($varValue as $k => &$v) {
@@ -104,11 +95,11 @@ class GridElementWizard extends Widget
     /**
      * Generate the widget and return it as string.
      *
-     * @return string
+     * @throws \Exception
      */
-    public function generate()
+    public function generate(): string
     {
-        $this->import(\Contao\BackendUser::class, 'User');
+        $this->import(BackendUser::class, 'User');
         // Since it's only tl_content for the moment, it's a bit overkill, but it's to ease the future integrations.
         switch ($this->strTable) {
             case 'tl_content':
@@ -146,10 +137,8 @@ class GridElementWizard extends Widget
             }
 
             // And break the loop if we hit the grid-stop element corresponding to the very first grid
-            if ('grid-stop' === $objItems->type) {
-                if ((string) $this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
-                    break;
-                }
+            if ('grid-stop' === $objItems->type && (string)$this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
+                break;
             }
 
             $objItems->isForGridElementWizard = true;
@@ -187,9 +176,10 @@ class GridElementWizard extends Widget
     /**
      * Returns HTML markup to edit a grid item' settings.
      *
-     * @param string $gridId     The grid id inside $GLOBALS['WEM']['GRID']
-     * @param string $objItemId  The content element's id
+     * @param string $gridId The grid id inside $GLOBALS['WEM']['GRID']
+     * @param string $objItemId The content element's id
      * @param string $strElement The generated HTML markup
+     * @throws \Exception
      */
     protected function BEGridItemSettings(string $gridId, string $objItemId, string $strElement): string
     {
@@ -231,7 +221,7 @@ class GridElementWizard extends Widget
                     $breakpoint,
                     $v,
                     '0', // we never force hidden here, JS will handle showing/hiding those elements, plus no restrictions about if user is admin or not (contrary to cols)
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
+                    GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
                 );
 
                 $options = '<option value="">-</option>';
@@ -257,7 +247,7 @@ class GridElementWizard extends Widget
                     $breakpoint,
                     $v,
                     !$this->User->isAdmin, // we only force hidden if user isn't admin
-                    \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden')
+                    GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden')
                 );
             }
 

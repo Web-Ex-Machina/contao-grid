@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Elements;
 
-use WEM\GridBundle\Classes\GridOpenedManager;
-use Contao\ContentElement;
 use Contao\BackendTemplate;
+use Contao\ContentElement;
+use Contao\System;
+use WEM\GridBundle\Classes\GridOpenedManager;
+
 /**
  * Content Element "grid-stop".
  */
@@ -34,8 +36,8 @@ class GridStop extends ContentElement
      */
     protected function compile(): void
     {
-        // Backend template
-        if (TL_MODE === 'BE' && !$this->isForGridElementWizard) {
+        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        if ($scopeMatcher->isBackend() && !$this->isForGridElementWizard) {
             $this->strTemplate = 'be_wildcard';
             $this->Template = new BackendTemplate($this->strTemplate);
             $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];

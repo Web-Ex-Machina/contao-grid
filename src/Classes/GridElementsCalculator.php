@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
+use Contao\Model\Collection;
+use Contao\StringUtil;
 
 class GridElementsCalculator
 {
@@ -30,15 +32,17 @@ class GridElementsCalculator
         $objItemsIdsToSkip = [];
         $itemsClasses = [];
         // first we keep track of all grid_items settings
-        foreach ($objItems as $index => $objItem) {
+        foreach ($objItems as $objItem) {
             if ('grid-start' === $objItem->type) {
-                $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? deserialize($objItem->grid_items) : []);
+                $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? StringUtil::deserialize($objItem->grid_items) : []);
             }
         }
-        foreach ($objItems as $index => $objItem) {
+
+        foreach ($objItems as $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
             }
+
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses));
@@ -59,6 +63,7 @@ class GridElementsCalculator
         if (!$objContents) {
             return null;
         }
+
         $nbGridOpened = 0;
         while ($objContents->next()) {
             if ('grid-stop' === $objContents->type) {
@@ -67,6 +72,7 @@ class GridElementsCalculator
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
+
                 --$nbGridOpened;
             }
         }
@@ -87,6 +93,7 @@ class GridElementsCalculator
         if (!$objContents) {
             return null;
         }
+
         $nbGridOpened = 0;
         while ($objContents->next()) {
             if ('grid-start' === $objContents->type) {
@@ -95,6 +102,7 @@ class GridElementsCalculator
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
+
                 --$nbGridOpened;
             }
         }
@@ -107,25 +115,27 @@ class GridElementsCalculator
      *
      * @param ContentModel             $gridStart         The "grid-start" content element
      * @param array                    $objItemsIdsToSkip Array of content elements' ID to skip (not in the grid started by the current content element)
-     * @param \Contao\Model\Collection $objItems          Array of all content elements sharing the same pid & ptable with the current content element
+     * @param Collection               $objItems          Array of all content elements sharing the same pid & ptable with the current content element
      *
      * @return array Array of content elements' ID to skip (for the next grid to not use the current content elements items)
      */
-    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, \Contao\Model\Collection $objItems, array $itemsClasses): array
+    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, Collection $objItems, array $itemsClasses): array
     {
         $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
         $gridStart->grid_items = serialize([]);
         $gsm = GridStartManipulator::create($gridStart);
 
-        foreach ($objItems as $index => $objItem) {
+        foreach ($objItems as $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
             }
+
             if ('grid-stop' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
 
                 return $objItemsIdsToSkip;
             }
+
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses));
@@ -140,16 +150,20 @@ class GridElementsCalculator
                 if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
                     $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS]);
                 }
+
                 if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
                     $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS]);
                 }
+
                 if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
                     $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES]);
                 }
+
                 $gridStart = $gsm->getGridStart();
                 $gridStart->save();
                 $gsm->setGridStart($gridStart);
             }
+
             $objItemsIdsToSkip[] = $objItem->id;
         }
 

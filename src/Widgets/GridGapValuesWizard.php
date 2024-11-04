@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -13,8 +13,9 @@ declare(strict_types=1);
  */
 
 namespace WEM\GridBundle\Widgets;
-use Contao\Widget;
 use Contao\FrontendTemplate;
+use Contao\Widget;
+
 class GridGapValuesWizard extends Widget
 {
     /**
@@ -33,10 +34,8 @@ class GridGapValuesWizard extends Widget
 
     /**
      * Grid breakpoints.
-     *
-     * @var array
      */
-    protected $arrGridBreakpoints = [];
+    protected array $arrGridBreakpoints = [];
 
     /**
      * Default constructor.
@@ -53,17 +52,13 @@ class GridGapValuesWizard extends Widget
      */
     public function validate(): void
     {
-        $mandatory = $this->mandatory;
-        $varValue = $this->getPost($this->strName);
         parent::validate();
     }
 
     /**
      * Generate the widget and return it as string.
-     *
-     * @return string
      */
-    public function generate()
+    public function generate(): string
     {
         $objTemplate = new FrontendTemplate('be_gridGapValuesWizard');
         $objTemplate->input = $this->strId;

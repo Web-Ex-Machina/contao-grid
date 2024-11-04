@@ -1,6 +1,15 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+1.0.8 - 2023-11-04
+---
+- UPDATED : compatibility with PHP 8.2
+- UPDATED : compatibility with Contao 5.3
+
+1.0.7 - 2023-10-18
+---
+- UPDATED: Remove contao-haste dependency since we do not use it
+
 1.0.6 - 2023-10-16
 ---
 - FIXED : subgrid element in back-end builder does not take its cols-span & rows-span configuration into account
