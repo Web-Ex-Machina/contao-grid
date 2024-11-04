@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -14,7 +14,11 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
-class GridBreakpointsValuesWizard extends \Widget
+use Contao\BackendUser;
+use Contao\FrontendTemplate;
+use Contao\Widget;
+
+class GridBreakpointsValuesWizard extends Widget
 {
     /**
      * Submit user input.
@@ -32,10 +36,8 @@ class GridBreakpointsValuesWizard extends \Widget
 
     /**
      * Grid breakpoints.
-     *
-     * @var array
      */
-    protected $arrGridBreakpoints = [];
+    protected array $arrGridBreakpoints = [];
 
     /**
      * Default constructor.
@@ -54,20 +56,15 @@ class GridBreakpointsValuesWizard extends \Widget
      */
     public function __set($strKey, $varValue): void
     {
-        switch ($strKey) {
-            case 'mandatory':
-                if ($varValue) {
-                    $this->arrAttributes['required'] = 'required';
-                } else {
-                    unset($this->arrAttributes['required']);
-                }
-
-                parent::__set($strKey, $varValue);
-                break;
-
-            default:
-                parent::__set($strKey, $varValue);
+        if ($strKey == 'mandatory') {
+            if ($varValue) {
+                $this->arrAttributes['required'] = 'required';
+            } else {
+                unset($this->arrAttributes['required']);
+            }
         }
+
+        parent::__set($strKey, $varValue);
     }
 
     /**
@@ -75,19 +72,15 @@ class GridBreakpointsValuesWizard extends \Widget
      */
     public function validate(): void
     {
-        $mandatory = $this->mandatory;
-        $varValue = $this->getPost($this->strName);
         parent::validate();
     }
 
     /**
      * Generate the widget and return it as string.
-     *
-     * @return string
      */
-    public function generate()
+    public function generate(): string
     {
-        $this->import(\Contao\BackendUser::class, 'User');
+        $this->import(BackendUser::class, 'User');
         $this->arrGridBreakpoints = [
             ['name' => 'all', 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointAll'], 'required' => true, 'value' => 2],
             ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXl']],
@@ -108,7 +101,7 @@ class GridBreakpointsValuesWizard extends \Widget
             }
         }
 
-        $objTemplate = new \FrontendTemplate('be_gridBreakpointsValuesWizard');
+        $objTemplate = new FrontendTemplate('be_gridBreakpointsValuesWizard');
         $objTemplate->input = $this->strId;
         $objTemplate->breakpoints = $this->arrGridBreakpoints;
         $objTemplate->expertMode = $this->User->isAdmin;

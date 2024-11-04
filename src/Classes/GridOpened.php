@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -16,22 +16,20 @@ namespace WEM\GridBundle\Classes;
 
 class GridOpened
 {
-    /** @var string */
-    protected $id;
-    /** @var array */
-    protected $cols;
-    /** @var array */
-    protected $wrapper_classes;
-    /** @var array */
-    protected $item_classes;
-    /** @var array */
-    protected $item_classes_form;
-    /** @var int */
-    protected $level;
 
-    public function __construct()
-    {
-    }
+    protected string $id;
+
+    protected array $cols;
+
+    protected array $wrapper_classes;
+
+    protected array $item_classes;
+
+    protected array $item_classes_form;
+
+    protected int $level;
+
+    protected string $mode;
 
     public function isSubGrid(): bool
     {
@@ -104,7 +102,7 @@ class GridOpened
         return $this;
     }
 
-    public function getCols()
+    public function getCols(): ?array
     {
         return $this->cols;
     }
@@ -119,6 +117,32 @@ class GridOpened
     public function getWrapperClasses(): ?array
     {
         return $this->wrapper_classes;
+    }
+
+    public function getWrapperClassesWithoutResolutionSpecificClasses(): ?array
+    {
+        $arrClasses = [];
+        foreach ($this->wrapper_classes as $class) {
+            if (!preg_match('/^cols-(.*)-(\d{1,2})$/', $class)
+                && !preg_match('/^rows-(.*)-(\d{1,2})$/', $class)
+            ) {
+                $arrClasses[] = $class;
+            }
+        }
+
+        return $arrClasses;
+    }
+
+    public function getWrapperColsClassesWithoutResolutionSpecificClasses(): ?array
+    {
+        $arrClasses = $this->getWrapperClassesWithoutResolutionSpecificClasses();
+        foreach ($arrClasses as $index => $class) {
+            if (!preg_match('/^cols-(\d{1,2})$/', $class)) {
+                unset($arrClasses[$index]);
+            }
+        }
+
+        return $arrClasses;
     }
 
     public function setWrapperClasses(array $wrapper_classes): self
@@ -160,6 +184,18 @@ class GridOpened
     public function setLevel(int $level): self
     {
         $this->level = $level;
+
+        return $this;
+    }
+
+    public function getMode(): string
+    {
+        return $this->mode;
+    }
+
+    public function setMode(string $mode): self
+    {
+        $this->mode = $mode;
 
         return $this;
     }

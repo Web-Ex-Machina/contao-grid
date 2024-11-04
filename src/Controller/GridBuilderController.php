@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace WEM\GridBundle\Controller;
 
 use Contao\ContentModel;
+use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
 use Exception;
@@ -31,14 +32,14 @@ use WEM\GridBundle\Classes\GridStartManipulator;
  * )
  * @ServiceTag("controller.service_arguments")
  */
-class GridBuilderController extends \Contao\Controller
+class GridBuilderController extends Controller
 {
-    /** @var TranslatorInterface */
-    protected $translator;
-    /** @var ContaoFramework */
-    protected $framework;
-    /** @var GridStartManipulator */
-    protected $gridStartManipulator;
+
+    protected TranslatorInterface $translator;
+
+    protected ContaoFramework $framework;
+
+    protected GridStartManipulator $gridStartManipulator;
 
     public function __construct(
         ContaoFramework $framework,
@@ -49,6 +50,7 @@ class GridBuilderController extends \Contao\Controller
         $this->translator = $translator;
         $this->gridStartManipulator = $gridStartManipulator;
         $this->framework->initialize();
+        Parent::__construct();
     }
 
     public function __invoke(): Response
@@ -70,16 +72,19 @@ class GridBuilderController extends \Contao\Controller
                 default:
                     throw new Exception('Unknown property');
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $response = [
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => $exception->getMessage(),
             ];
         }
 
         return new Response(json_encode($response));
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveCols(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -92,8 +97,10 @@ class GridBuilderController extends \Contao\Controller
         $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_COLS, Input::get('breakpoint'), Input::get('value'));
+
         $grid = $gsm->getGridStart();
         $grid->save();
+
         $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
         $grid = $gsm->getGridStart();
         $grid->save();
@@ -101,6 +108,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveRows(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -113,8 +123,10 @@ class GridBuilderController extends \Contao\Controller
         $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_ROWS, Input::get('breakpoint'), Input::get('value'));
+
         $grid = $gsm->getGridStart();
         $grid->save();
+
         $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
         $grid = $gsm->getGridStart();
         $grid->save();
@@ -122,6 +134,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveClasses(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -130,8 +145,10 @@ class GridBuilderController extends \Contao\Controller
         $gsm = $this->gridStartManipulator->setGridStart($grid);
         $gsm->setGridStart($grid);
         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) Input::get('id'), GridStartManipulator::PROPERTY_CLASSES, null, Input::get('value'));
+
         $grid = $gsm->getGridStart();
         $grid->save();
+
         $gsm->recalculateElementsForAllGridSharingTheSamePidAndPtable();
         $grid = $gsm->getGridStart();
         $grid->save();
@@ -139,6 +156,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveGridCols(): array
     {
         $response = ['status' => 'success', 'message' => ''];
@@ -147,6 +167,7 @@ class GridBuilderController extends \Contao\Controller
         if (null === Input::get('breakpoint')) {
             throw new Exception('No breakpoint provided');
         }
+
         $value = Input::get('value');
         $value = empty($value) ? null : (int) $value;
 
@@ -184,6 +205,9 @@ class GridBuilderController extends \Contao\Controller
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     public function validateMandatoryGridItemParameters(): void
     {
         $this->validateMandatoryGridParameters();
@@ -192,16 +216,23 @@ class GridBuilderController extends \Contao\Controller
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function validateMandatoryGridParameters(): void
     {
         if (null === Input::get('grid')) {
             throw new Exception('No grid ID provided');
         }
+
         if (null === Input::get('value')) {
             throw new Exception('No value provided');
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function getGridStart(int $id): ContentModel
     {
         $grid = $this->framework->getAdapter(ContentModel::class)->findOneById($id); // to allow Unit Tests to run

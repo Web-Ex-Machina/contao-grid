@@ -29,6 +29,22 @@
         <source>Container</source>
         <target>Container</target>
       </trans-unit>
+      <trans-unit id="tl_content.grid_mode.0">
+        <source>Mode</source>
+        <target>Mode</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.1">
+        <source>Select the grid mode</source>
+        <target>Sélectionner le mode de la grille</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.custom">
+        <source>Custom</source>
+        <target>Personnalisé</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.automatic">
+        <source>Automatic</source>
+        <target>Automatique</target>
+      </trans-unit>
       <trans-unit id="tl_content.grid_cols.0">
         <source>Columns</source>
         <target>Colonnes</target>

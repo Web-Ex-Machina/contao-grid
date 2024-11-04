@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -21,7 +21,7 @@ use WEM\GridBundle\Helper\GridBuilder;
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina.
+ * Copyright (c) 2015-2024 Web ex Machina.
  *
  * @category ContaoBundle
  *
@@ -92,12 +92,14 @@ class GridOpenedManagerTest extends ContaoTestCase
         $gridStartFoo->type = 'grid-start';
         $gridStartFoo->grid_preset = 'bs4';
         $gridStartFoo->grid_cols = serialize([]);
+        $gridStartFoo->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartBar = new \Contao\ContentModel();
         $gridStartBar->id = 'bar';
         $gridStartBar->type = 'grid-start';
         $gridStartBar->grid_preset = 'bs4';
         $gridStartBar->grid_cols = serialize([]);
+        $gridStartBar->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $this->sut->openGrid($gridStartFoo);
         $lastOpenedGrid = $this->sut->openGrid($gridStartBar);
@@ -112,12 +114,14 @@ class GridOpenedManagerTest extends ContaoTestCase
         $gridStartFoo->type = 'grid-start';
         $gridStartFoo->grid_preset = 'bs4';
         $gridStartFoo->grid_cols = serialize([]);
+        $gridStartFoo->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartBar = new \Contao\ContentModel();
         $gridStartBar->id = 'bar';
         $gridStartBar->type = 'grid-start';
         $gridStartBar->grid_preset = 'bs4';
         $gridStartBar->grid_cols = serialize([]);
+        $gridStartBar->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $this->sut->openGrid($gridStartFoo);
         $lastOpenedGrid = $this->sut->openGrid($gridStartBar);
@@ -133,12 +137,14 @@ class GridOpenedManagerTest extends ContaoTestCase
         $gridStartFoo->type = 'grid-start';
         $gridStartFoo->grid_preset = 'bs4';
         $gridStartFoo->grid_cols = serialize([]);
+        $gridStartFoo->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartBar = new \Contao\ContentModel();
         $gridStartBar->id = 'bar';
         $gridStartBar->type = 'grid-start';
         $gridStartBar->grid_preset = 'bs4';
         $gridStartBar->grid_cols = serialize([]);
+        $gridStartBar->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $previousOpenedGrid = $this->sut->openGrid($gridStartFoo);
         $this->sut->openGrid($gridStartBar);
@@ -153,12 +159,14 @@ class GridOpenedManagerTest extends ContaoTestCase
         $gridStartFoo->type = 'grid-start';
         $gridStartFoo->grid_preset = 'bs4';
         $gridStartFoo->grid_cols = serialize([]);
+        $gridStartFoo->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartBar = new \Contao\ContentModel();
         $gridStartBar->id = 'bar';
         $gridStartBar->type = 'grid-start';
         $gridStartBar->grid_preset = 'bs4';
         $gridStartBar->grid_cols = serialize([]);
+        $gridStartBar->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $previousOpenedGrid = $this->sut->openGrid($gridStartFoo);
         $this->sut->openGrid($gridStartBar);
@@ -174,12 +182,14 @@ class GridOpenedManagerTest extends ContaoTestCase
         $gridStartFoo->type = 'grid-start';
         $gridStartFoo->grid_preset = 'bs4';
         $gridStartFoo->grid_cols = serialize([]);
+        $gridStartFoo->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartBar = new \Contao\ContentModel();
         $gridStartBar->id = 'bar';
         $gridStartBar->type = 'grid-start';
         $gridStartBar->grid_preset = 'bs4';
         $gridStartBar->grid_cols = serialize([]);
+        $gridStartBar->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartFooOpened = $this->sut->openGrid($gridStartFoo);
         $gridStartBarOpened = $this->sut->openGrid($gridStartBar);
@@ -198,12 +208,14 @@ class GridOpenedManagerTest extends ContaoTestCase
         $gridStartFoo->type = 'grid-start';
         $gridStartFoo->grid_preset = 'bs4';
         $gridStartFoo->grid_cols = serialize([]);
+        $gridStartFoo->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartBar = new \Contao\ContentModel();
         $gridStartBar->id = 'bar';
         $gridStartBar->type = 'grid-start';
         $gridStartBar->grid_preset = 'bs4';
         $gridStartBar->grid_cols = serialize([]);
+        $gridStartBar->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartFooOpened = $this->sut->openGrid($gridStartFoo);
         $gridStartBarOpened = $this->sut->openGrid($gridStartBar);
@@ -251,12 +263,14 @@ class GridOpenedManagerTest extends ContaoTestCase
         $gridStartFoo->grid_items = serialize([
             'barElement_classes' => [],
         ]);
+        $gridStartFoo->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $gridStartBar = new \Contao\ContentModel();
         $gridStartBar->id = 'bar';
         $gridStartBar->type = 'grid-start';
         $gridStartBar->grid_preset = 'bs4';
         $gridStartBar->grid_cols = serialize([]);
+        $gridStartBar->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
         $element = new \Contao\ContentModel();
         $element->id = 'barElement';
@@ -282,6 +296,7 @@ class GridOpenedManagerTest extends ContaoTestCase
                     $gridStart->type = 'grid-starttttttteeee';
                     $gridStart->grid_preset = 'bs4';
                     $gridStart->grid_cols = serialize([]);
+                    $gridStart->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $gridStart;
                 },
@@ -296,6 +311,7 @@ class GridOpenedManagerTest extends ContaoTestCase
                     $gridStart->type = 'grid-starttttttteeee';
                     $gridStart->grid_preset = 'bs4';
                     $gridStart->grid_cols = serialize([]);
+                    $gridStart->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $gridStart;
                 },
@@ -310,6 +326,7 @@ class GridOpenedManagerTest extends ContaoTestCase
                     $gridStart->type = 'grid-starttttttteeee';
                     $gridStart->grid_preset = 'bs4';
                     $gridStart->grid_cols = serialize([]);
+                    $gridStart->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $gridStart;
                 },
@@ -338,6 +355,7 @@ class GridOpenedManagerTest extends ContaoTestCase
                     $gridStart->type = 'grid-start';
                     $gridStart->grid_preset = 'bs4';
                     $gridStart->grid_cols = serialize([]);
+                    $gridStart->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $gridStart;
                 },
@@ -349,6 +367,7 @@ class GridOpenedManagerTest extends ContaoTestCase
                     $gridStart->type = 'grid-start';
                     $gridStart->grid_preset = 'bs4';
                     $gridStart->grid_cols = serialize([]);
+                    $gridStart->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $gridStart;
                 },
@@ -360,6 +379,7 @@ class GridOpenedManagerTest extends ContaoTestCase
                     $gridStart->type = 'grid-start';
                     $gridStart->grid_preset = 'bs4';
                     $gridStart->grid_cols = serialize([]);
+                    $gridStart->grid_mode = \WEM\GridBundle\Elements\GridStart::MODE_CUSTOM;
 
                     return $gridStart;
                 },

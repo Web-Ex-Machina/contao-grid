@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2022 Web ex Machina
+ * Copyright (c) 2015-2024 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -14,10 +14,11 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Widgets;
 
+use Contao\BackendUser;
 use Contao\ContentModel;
-use Contao\Input;
 use Contao\Widget;
 use WEM\GridBundle\Classes\GridOpenedManager;
+use WEM\GridBundle\Elements\GridStart;
 use WEM\GridBundle\Helper\GridBuilder;
 
 class GridElementWizard extends Widget
@@ -31,16 +32,12 @@ class GridElementWizard extends Widget
 
     /**
      * Template.
-     *
-     * @var string
      */
     protected $strTemplate = 'be_widget';
 
-    /** @var GridOpenedManager */
-    protected $gridOpenedManager;
+    protected GridOpenedManager $gridOpenedManager;
 
-    /** @var GridBuilder */
-    protected $gridBuilder;
+    protected GridBuilder $gridBuilder;
 
     /**
      * Default constructor.
@@ -61,20 +58,15 @@ class GridElementWizard extends Widget
      */
     public function __set($strKey, $varValue): void
     {
-        switch ($strKey) {
-            case 'mandatory':
-                if ($varValue) {
-                    $this->arrAttributes['required'] = 'required';
-                } else {
-                    unset($this->arrAttributes['required']);
-                }
-
-                parent::__set($strKey, $varValue);
-                break;
-
-            default:
-                parent::__set($strKey, $varValue);
+        if ($strKey == 'mandatory') {
+            if ($varValue) {
+                $this->arrAttributes['required'] = 'required';
+            } else {
+                unset($this->arrAttributes['required']);
+            }
         }
+
+        parent::__set($strKey, $varValue);
     }
 
     /**
@@ -82,7 +74,6 @@ class GridElementWizard extends Widget
      */
     public function validate(): void
     {
-        $mandatory = $this->mandatory;
         $varValue = $this->getPost($this->strName);
 
         foreach ($varValue as $k => &$v) {
@@ -104,11 +95,11 @@ class GridElementWizard extends Widget
     /**
      * Generate the widget and return it as string.
      *
-     * @return string
+     * @throws \Exception
      */
-    public function generate()
+    public function generate(): string
     {
-        $this->import(\Contao\BackendUser::class, 'User');
+        $this->import(BackendUser::class, 'User');
         // Since it's only tl_content for the moment, it's a bit overkill, but it's to ease the future integrations.
         switch ($this->strTable) {
             case 'tl_content':
@@ -128,14 +119,14 @@ class GridElementWizard extends Widget
         $this->gridOpenedManager->openGrid($this->activeRecord);
         $openedGrid = $this->gridOpenedManager->getLastOpenedGrid();
 
-        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s">', implode(' ', $openedGrid->getWrapperClasses()), $this->activeRecord->id);
+        $strGrid = sprintf('<div class="grid_preview %s" data-id="%s" data-grid-mode="%s">', implode(' ', $openedGrid->getWrapperClassesWithoutResolutionSpecificClasses()), $this->activeRecord->id, $this->activeRecord->grid_mode);
 
         $strGrid .= $this->gridBuilder->fakeFirstGridElementMarkup((string) $this->activeRecord->id);
 
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
             // If we start a grid, start fetching items for the wizard
-            if ($objItems->id === $this->activeRecord->id) {
+            if ((int) $objItems->id === (int) $this->activeRecord->id) {
                 $blnGridStart = true;
                 continue;
             }
@@ -146,10 +137,8 @@ class GridElementWizard extends Widget
             }
 
             // And break the loop if we hit the grid-stop element corresponding to the very first grid
-            if ('grid-stop' === $objItems->type) {
-                if ($this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
-                    break;
-                }
+            if ('grid-stop' === $objItems->type && (string)$this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
+                break;
             }
 
             $objItems->isForGridElementWizard = true;
@@ -158,13 +147,13 @@ class GridElementWizard extends Widget
             } elseif ('grid-stop' === $objItems->type) {
                 $strElement = $this->BEGridItemSettings(
                     $this->gridOpenedManager->getPreviousLastOpenedGridId(),
-                    $this->gridOpenedManager->getLastOpenedGridId(),
+                    (string) $this->gridOpenedManager->getLastOpenedGridId(),
                     $this->getContentElement($objItems->current())
                 );
             } else {
                 $strElement = $this->BEGridItemSettings(
                     $this->gridOpenedManager->getLastOpenedGridId(),
-                    $objItems->id,
+                    (string) $objItems->id,
                     $this->getContentElement($objItems->current())
                 );
             }
@@ -175,8 +164,8 @@ class GridElementWizard extends Widget
         // Add CSS & JS to the Wizard
         $this->addAssets();
 
-        $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup();
-        $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup();
+        $strGrid .= $this->gridBuilder->fakeNewGridElementMarkup((string) $this->activeRecord->id);
+        $strGrid .= $this->gridBuilder->fakeLastGridElementMarkup((string) $this->activeRecord->id);
         $strGrid .= '</div>';
 
         return '<div class="gridelement">
@@ -187,9 +176,10 @@ class GridElementWizard extends Widget
     /**
      * Returns HTML markup to edit a grid item' settings.
      *
-     * @param string $gridId     The grid id inside $GLOBALS['WEM']['GRID']
-     * @param string $objItemId  The content element's id
+     * @param string $gridId The grid id inside $GLOBALS['WEM']['GRID']
+     * @param string $objItemId The content element's id
      * @param string $strElement The generated HTML markup
+     * @throws \Exception
      */
     protected function BEGridItemSettings(string $gridId, string $objItemId, string $strElement): string
     {
@@ -222,14 +212,16 @@ class GridElementWizard extends Widget
                 }
 
                 $selectsCols[] = sprintf('
-                        <label for="ctrl_%1$s_%2$s_cols_%5$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols" data-previous-value="%6$s">%3$s</select>',
+                        <label for="ctrl_%1$s_%2$s_cols_%5$s" class="%8$s" data-force-hidden="%7$s">%4$s</label>
+                        <select id="ctrl_%1$s_%2$s_cols_%5$s" name="%1$s[%2$s_cols][%5$s]" class="tl_select %8$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="cols"  data-force-hidden="%7$s" data-previous-value="%6$s" %7$s>%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsSelectLabel'],
                     $breakpoint,
-                    $v
+                    $v,
+                    '0', // we never force hidden here, JS will handle showing/hiding those elements, plus no restrictions about if user is admin or not (contrary to cols)
+                    GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ''
                 );
 
                 $options = '<option value="">-</option>';
@@ -246,16 +238,16 @@ class GridElementWizard extends Widget
                 }
 
                 $selectsRows[] = sprintf('
-                        <label for="ctrl_%1$s_%2$s_rows_%5$s" class="%6$s" data-force-hidden="%7$s">%4$s</label>
-                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %6$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s" data-previous-value="%8$s">%3$s</select>',
+                        <label for="ctrl_%1$s_%2$s_rows_%5$s" class="%8$s" data-force-hidden="%7$s">%4$s</label>
+                        <select id="ctrl_%1$s_%2$s_rows_%5$s" name="%1$s[%2$s_rows][%5$s]" class="tl_select %8$s" data-breakpoint="%5$s" data-item-id="%2$s" data-type="rows" data-force-hidden="%7$s" data-previous-value="%6$s">%3$s</select>',
                     $this->strId,
                     $objItemId,
                     $options,
                     $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbRowsSelectLabel'],
                     $breakpoint,
-                    $this->User->isAdmin ? '' : 'hidden',
-                    !$this->User->isAdmin,
-                    $v
+                    $v,
+                    !$this->User->isAdmin, // we only force hidden if user isn't admin
+                    GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'hidden' : ($this->User->isAdmin ? '' : 'hidden')
                 );
             }
 
@@ -306,7 +298,6 @@ class GridElementWizard extends Widget
     protected function addAssets(): void
     {
         $GLOBALS['TL_CSS']['wemgrid'] = 'bundles/wemgrid/css/backend.css';
-        $GLOBALS['TL_CSS']['wemgrid_bs'] = 'bundles/wemgrid/css/bootstrap-grid.min.css';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid'] = 'bundles/wemgrid/js/backend.js';
         $GLOBALS['TL_JAVASCRIPT']['wemgrid_translations'] = 'bundles/wemgrid/js/wem_grid_translations.js';
         $GLOBALS['TL_MOOTOOLS']['wemgrid'] = '<script>
