@@ -1,6 +1,10 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+0.4.6 - 2024-12-18
+---
+- Allow PHP 8+
+
 0.4 - 2020-03-23
 ---
 - Use a new system to setup a grid with its breakpoints
