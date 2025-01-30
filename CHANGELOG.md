@@ -1,12 +1,16 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
-1.0.8 - 2023-11-04
+1.0.9 - 2025-01-30
+---
+- FIXED : management of scope. Instead of testing if `FE` or `BE`, test if `BE` or `not BE`
+
+1.0.8 - 2024-11-04
 ---
 - UPDATED : compatibility with PHP 8.2
 - UPDATED : compatibility with Contao 5.3
 
-1.0.7 - 2023-10-18
+1.0.7 - 2024-10-18
 ---
 - UPDATED: Remove contao-haste dependency since we do not use it
 

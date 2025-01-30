@@ -71,13 +71,13 @@ class GridBuilder
             foreach ($cols as $k => $col) {
                 // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                 if (0 === $k) {
-                    $arrClasses[] = sprintf('cols-%d', $col['value']);
-                } elseif ($scopeMatcher->isFrontend()) {
+                    $arrClasses[] = \sprintf('cols-%d', $col['value']);
+                } elseif (!$scopeMatcher->isBackend()) {
                     if (0 !== (int) $col['value']) {
-                        $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
+                        $arrClasses[] = \sprintf('cols-%s-%d', $col['key'], $col['value']);
                     }
                 } else {
-                    $arrClasses[] = sprintf('cols-%s-%d', $col['key'], $col['value']);
+                    $arrClasses[] = \sprintf('cols-%s-%d', $col['key'], $col['value']);
                 }
             }
 
@@ -85,20 +85,20 @@ class GridBuilder
                 foreach ($rows as $k => $row) {
                     // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                     if (0 === $k) {
-                        $arrClasses[] = sprintf('rows-%d', $row['value']);
-                    } elseif ($scopeMatcher->isFrontend()) {
+                        $arrClasses[] = \sprintf('rows-%d', $row['value']);
+                    } elseif (!$scopeMatcher->isBackend()) {
                         if (0 !== (int) $row['value']) {
-                            $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                            $arrClasses[] = \sprintf('rows-%s-%d', $row['key'], $row['value']);
                         }
                     } else {
-                        $arrClasses[] = sprintf('rows-%s-%d', $row['key'], $row['value']);
+                        $arrClasses[] = \sprintf('rows-%s-%d', $row['key'], $row['value']);
                     }
                 }
             }
         }
 
         if (\is_array($gap)) {
-            $arrClasses[] = sprintf('gap-%d%s', $gap['value'], '' !== $gap['unit'] ? sprintf('-%s', $gap['unit']) : '');
+            $arrClasses[] = \sprintf('gap-%d%s', $gap['value'], '' !== $gap['unit'] ? \sprintf('-%s', $gap['unit']) : '');
         }
 
         return $arrClasses;
@@ -164,7 +164,7 @@ class GridBuilder
         // $additionnalCssClasses = \WEM\GridBundle\Elements\GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',$grid->getWrapperClasses()[1]);
         $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperColsClassesWithoutResolutionSpecificClasses()));
 
-        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
+        return \sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-first-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridStart']);
     }
 
     /**
@@ -181,7 +181,7 @@ class GridBuilder
         // $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-',$grid->getWrapperClasses()[1]);
         $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? 'cols-span-all' : str_replace('cols-', 'cols-span-', implode(' ', $grid->getWrapperColsClassesWithoutResolutionSpecificClasses()));
 
-        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-last-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
+        return \sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="true" draggable="false" data-type="fake-last-element">%s</div>', $additionnalCssClasses, $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['placeToGridEnd']);
     }
 
     /**
@@ -197,6 +197,6 @@ class GridBuilder
 
         $additionnalCssClasses = GridStart::MODE_AUTOMATIC === $grid->getMode() ? '' : '';
 
-        return sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="false" draggable="false" data-type="fake-new-element"><div class="item-new"></div></div>', $additionnalCssClasses);
+        return \sprintf('<div class="item-grid be_item_grid fake-helper be_item_grid_fake %s" dropable="false" draggable="false" data-type="fake-new-element"><div class="item-new"></div></div>', $additionnalCssClasses);
     }
 }

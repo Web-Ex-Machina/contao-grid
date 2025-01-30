@@ -51,7 +51,7 @@ class GridElementsWrapper
      *
      * @param ContentModel $objElement Content Element Model
      * @param string       $strBuffer  Content Template parsed
-     * @param string       $do  The $_GET['do'] paramater
+     * @param string       $do         The $_GET['do'] paramater
      *
      * @return string Content Template, untouched or adjusted
      */
@@ -70,7 +70,7 @@ class GridElementsWrapper
 
         // Yep, same code in FE/BE, but FE here if we want it to work /shrug
         // We won't need this grid anymore so we pop the global grid array
-        if ($scopeMatcher->isFrontend() && 'grid-stop' === $objElement->type) {
+        if (!$scopeMatcher->isBackend() && 'grid-stop' === $objElement->type) {
             $gop->closeLastOpenedGrid();
         }
 
@@ -122,7 +122,7 @@ class GridElementsWrapper
             $buttons = '';
 
             if ('grid-item-empty' !== $objElement->type) {
-                $buttons .= sprintf('
+                $buttons .= \sprintf('
                 <a
                 href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1&amp;rt=%s"
                 title="%s"
@@ -131,7 +131,7 @@ class GridElementsWrapper
                 </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
             }
 
-            $buttons .= sprintf('
+            $buttons .= \sprintf('
                 <a class="item-copy"
                 href="#"
                 data-element-id="%s"
@@ -140,7 +140,7 @@ class GridElementsWrapper
                 %s
                 </a>', $objElement->id, StringUtil::specialchars($titleCopy), Image::getHtml('copy.svg', $titleCopy));
 
-            $buttons .= sprintf('
+            $buttons .= \sprintf('
                 <a class="item-delete"
                 href="#"
                 data-element-id="%s"
@@ -150,7 +150,7 @@ class GridElementsWrapper
                 %s
                 </a>', $objElement->id, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
 
-            $buttons .= sprintf('
+            $buttons .= \sprintf('
                 <a
                 href="#"
                 onClick="return false;"
@@ -160,7 +160,7 @@ class GridElementsWrapper
                 </a>', StringUtil::specialchars($titleDrag), Image::getHtml('drag.svg', $titleDrag));
         }
 
-        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $GLOBALS['TL_LANG']['CTE'][$objElement->type][0], $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
+        return \sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $GLOBALS['TL_LANG']['CTE'][$objElement->type][0], $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
     }
 
     /**
@@ -179,7 +179,7 @@ class GridElementsWrapper
             $titleDrag = $this->translator->trans('DCA.drag', [$objElement->id], 'contao_default');
             $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $this->translator->trans('MSC.deleteConfirm', [$objElement->id], 'contao_default') : null;
 
-            $buttons = sprintf('
+            $buttons = \sprintf('
                 <a
                 href="contao?do=%s&id=%s&table=tl_content&act=edit&nb=1&amp;rt=%s"
                 title="%s"
@@ -187,7 +187,7 @@ class GridElementsWrapper
                 %s
                 </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
 
-            $buttons .= sprintf('
+            $buttons .= \sprintf('
                 <a class="item-delete"
                 href="#"
                 data-element-id="%s"
@@ -197,7 +197,7 @@ class GridElementsWrapper
                 %s
                 </a>', $objElement->id, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
 
-            $buttons .= sprintf('
+            $buttons .= \sprintf('
                 <a
                 href="#"
                 onClick="return false;"
@@ -207,14 +207,14 @@ class GridElementsWrapper
                 </a>', StringUtil::specialchars($titleDrag), Image::getHtml('drag.svg', $titleDrag));
         }
 
-        return sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
+        return \sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
     }
 
     protected function getSubGridStartHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
     {
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
         if ($scopeMatcher->isBackend()) {
-            return sprintf(
+            return \sprintf(
                 '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s" data-grid-mode="%s">%s%s%s',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
                 $openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: '',
@@ -230,7 +230,7 @@ class GridElementsWrapper
             );
         }
 
-        return sprintf(
+        return \sprintf(
             '<div class="%s %s %s %s">%s',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
             $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
@@ -244,16 +244,16 @@ class GridElementsWrapper
     {
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
         if ($scopeMatcher->isBackend()) {
-            return sprintf(
+            return \sprintf(
                 '%s<div data-id="%s" data-type="%s">%s</div></div>',
-               !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup((string) $openGrid->getId()) : '',
+                !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup((string) $openGrid->getId()) : '',
                 $objElement->id,
                 $objElement->type,
                 $strBuffer
             );
         }
 
-        return sprintf(
+        return \sprintf(
             '<div>%s</div></div>',
             $strBuffer
         );
@@ -263,7 +263,7 @@ class GridElementsWrapper
     {
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
         if ($scopeMatcher->isBackend()) {
-            return sprintf(
+            return \sprintf(
                 '<div class="%s %s %s %s %s %s" data-id="%s" data-type="%s">%s%s</div>',
                 implode(' ', $openGrid->getItemClassesForAllResolution()),
                 GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
@@ -278,7 +278,7 @@ class GridElementsWrapper
             );
         }
 
-        return sprintf(
+        return \sprintf(
             '<div class="%s %s %s %s">%s</div>',
             implode(' ', $openGrid->getItemClassesForAllResolution()),
             // GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId($objElement->id) ?: '')),
