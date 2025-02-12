@@ -77,7 +77,7 @@ class GridStart extends ContentElement
                     }
 
                     if (0 !== (int) $val) {
-                        $breakpoints[] = $breakpoint['label'].': '.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
+                        $breakpoints[] = $breakpoint['label'].': '.\sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
                     }
                 }
 
@@ -124,6 +124,7 @@ class GridStart extends ContentElement
                 return $b;
             }
         }
+
         return null;
     }
 }
