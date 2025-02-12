@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -17,6 +17,8 @@ namespace WEM\GridBundle\Classes;
 use Contao\ContentModel;
 use Contao\Model\Collection;
 use Contao\StringUtil;
+use WEM\GridBundle\Elements\GridStart;
+use WEM\GridBundle\Elements\GridStop;
 
 class GridElementsCalculator
 {
@@ -46,7 +48,7 @@ class GridElementsCalculator
         $itemsClasses = [];
         // first we keep track of all grid_items settings
         foreach ($objItems as $objItem) {
-            if ('grid-start' === $objItem->type) {
+            if (GridStart::TYPE === $objItem->type) {
                 $itemsClasses += (null !== $objItem->grid_items ? StringUtil::deserialize($objItem->grid_items) : []);
             }
         }
@@ -56,7 +58,7 @@ class GridElementsCalculator
                 continue;
             }
 
-            if ('grid-start' === $objItem->type) {
+            if (GridStart::TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
             }
@@ -79,9 +81,9 @@ class GridElementsCalculator
 
         $nbGridOpened = 0;
         while ($objContents->next()) {
-            if ('grid-stop' === $objContents->type) {
+            if (GridStop::TYPE === $objContents->type) {
                 ++$nbGridOpened;
-            } elseif ('grid-start' === $objContents->type) {
+            } elseif (GridStart::TYPE === $objContents->type) {
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
@@ -109,9 +111,9 @@ class GridElementsCalculator
 
         $nbGridOpened = 0;
         while ($objContents->next()) {
-            if ('grid-start' === $objContents->type) {
+            if (GridStart::TYPE === $objContents->type) {
                 ++$nbGridOpened;
-            } elseif ('grid-stop' === $objContents->type) {
+            } elseif (GridStop::TYPE === $objContents->type) {
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
@@ -146,13 +148,13 @@ class GridElementsCalculator
                 continue;
             }
 
-            if ('grid-stop' === $objItem->type) {
+            if (GridStop::TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
 
                 return $objItemsIdsToSkip;
             }
 
-            if ('grid-start' === $objItem->type) {
+            if (GridStart::TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
             }
@@ -170,18 +172,6 @@ class GridElementsCalculator
                         $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
                         $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
                     );
-
-                    // if (\array_key_exists($oldContentId.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
-                    //     $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$oldContentId.'_'.GridStartManipulator::PROPERTY_COLS]);
-                    // }
-
-                    // if (\array_key_exists($oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
-                    //     $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS]);
-                    // }
-
-                    // if (\array_key_exists($oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
-                    //     $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES]);
-                    // }
 
                     ++$itemIndexInGrid;
                 } else {

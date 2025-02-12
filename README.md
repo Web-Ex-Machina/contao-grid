@@ -13,8 +13,8 @@ Functionnalities
 System requirements
 -------------------
 
- * Contao 3.*
- * Contao 4.* (Manager Edition)
+ * Contao 4.13 (Manager Edition)
+ * Contao 5.3
 
 
 Installation
