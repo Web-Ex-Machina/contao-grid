@@ -23,18 +23,31 @@ class GridElementsCalculator
     /**
      * Recalculate grid items by pid and ptable.
      *
-     * @param int    $pid    The pid
-     * @param string $ptable The ptable
+     * @param int       $pid          The pid
+     * @param string    $ptable       The ptable
+     * @param bool|int  $sortingMin   The min sorting for elements
+     * @param bool|int  $sortingMax   The max sorting for elements
+     * @param bool|null $isAfterACopy true if the grid was copied
      */
-    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable): void
+    public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable, ?int $sortingMin = null, ?int $sortingMax = null, ?bool $isAfterACopy = false): void
     {
-        $objItems = ContentModel::findBy(['pid = ?', 'ptable = ?'], [$pid, $ptable], ['order' => 'sorting ASC']);
+        $conditions = ['pid = ?', 'ptable = ?'];
+        $values = [$pid, $ptable];
+        if (null !== $sortingMin) {
+            $conditions[] = 'sorting >= ?';
+            $values[] = $sortingMin;
+        }
+        if (null !== $sortingMax) {
+            $conditions[] = 'sorting <= ?';
+            $values[] = $sortingMax;
+        }
+        $objItems = ContentModel::findBy($conditions, $values, ['order' => 'sorting ASC']);
         $objItemsIdsToSkip = [];
         $itemsClasses = [];
         // first we keep track of all grid_items settings
         foreach ($objItems as $objItem) {
             if ('grid-start' === $objItem->type) {
-                $itemsClasses = $itemsClasses + (null !== $objItem->grid_items ? StringUtil::deserialize($objItem->grid_items) : []);
+                $itemsClasses += (null !== $objItem->grid_items ? StringUtil::deserialize($objItem->grid_items) : []);
             }
         }
 
@@ -45,7 +58,7 @@ class GridElementsCalculator
 
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses));
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
             }
         }
     }
@@ -113,18 +126,21 @@ class GridElementsCalculator
     /**
      * Recalculate elements inside a grid.
      *
-     * @param ContentModel             $gridStart         The "grid-start" content element
-     * @param array                    $objItemsIdsToSkip Array of content elements' ID to skip (not in the grid started by the current content element)
-     * @param Collection               $objItems          Array of all content elements sharing the same pid & ptable with the current content element
+     * @param ContentModel $gridStart         The "grid-start" content element
+     * @param array        $objItemsIdsToSkip Array of content elements' ID to skip (not in the grid started by the current content element)
+     * @param Collection   $objItems          Array of all content elements sharing the same pid & ptable with the current content element
+     * @param array        $itemsClasses      Array of all item classes from all grids
+     * @param bool|null    $isAfterACopy      True if is grid a copy
      *
      * @return array Array of content elements' ID to skip (for the next grid to not use the current content elements items)
      */
-    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, Collection $objItems, array $itemsClasses): array
+    protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, Collection $objItems, array $itemsClasses, ?bool $isAfterACopy = false): array
     {
         $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
         $gridStart->grid_items = serialize([]);
         $gsm = GridStartManipulator::create($gridStart);
 
+        $itemIndexInGrid = 0;
         foreach ($objItems as $objItem) {
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
                 continue;
@@ -138,25 +154,53 @@ class GridElementsCalculator
 
             if ('grid-start' === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
-                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses));
+                $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
             }
 
             if (!$gsm->isItemInGrid($objItem)) {
-                $gsm->setGridItemsSettingsForItem((int) $objItem->id,
+                if ($isAfterACopy) {
+                    // we will replace items IDS, based on the index
+                    $oldKeys = array_keys($gridItemsSave);
+
+                    $oldContentFirstKey = $oldKeys[$itemIndexInGrid * 3]; // 3 because we set 3 properties !
+                    $oldContentId = substr($oldContentFirstKey, 0, strpos($oldContentFirstKey, '_'));
+
+                    $gsm->setGridItemsSettingsForItem((int) $objItem->id,
+                        $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_COLS] ?? [],
+                        $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
+                        $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
+                    );
+
+                    // if (\array_key_exists($oldContentId.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
+                    //     $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$oldContentId.'_'.GridStartManipulator::PROPERTY_COLS]);
+                    // }
+
+                    // if (\array_key_exists($oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
+                    //     $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS]);
+                    // }
+
+                    // if (\array_key_exists($oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
+                    //     $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES]);
+                    // }
+
+                    ++$itemIndexInGrid;
+                } else {
+                    $gsm->setGridItemsSettingsForItem((int) $objItem->id,
                         $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS] ?? [],
                         $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
                         $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
                     );
-                if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
-                    $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS]);
-                }
+                    if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
+                        $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS]);
+                    }
 
-                if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
-                    $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS]);
-                }
+                    if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
+                        $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS]);
+                    }
 
-                if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
-                    $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES]);
+                    if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
+                        $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES]);
+                    }
                 }
 
                 $gridStart = $gsm->getGridStart();

@@ -1,6 +1,10 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+1.0.10 - 2025-02-12
+---
+- FIXED : Grid recalculates its elements after a copy
+
 1.0.9 - 2025-01-30
 ---
 - FIXED : management of scope. Instead of testing if `FE` or `BE`, test if `BE` or `not BE`

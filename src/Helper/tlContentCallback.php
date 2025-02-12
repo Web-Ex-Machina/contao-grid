@@ -63,39 +63,79 @@ class tlContentCallback
 
     public function oncopyCallback(int $itemId, DataContainer $dc): void
     {
+        // copy 1 tl_article
+        // GET act=copy&do=article
+        // CLIPBOARD => tl_content && tl_article
+        // copy 1 tl_content
+        // GET act=copy&id=XXX => copy item XXX
+        // copy 2 tl_content
+        // GET act=copyAll => copy multiple items
+
+        $blnJustForceGridItemsRecalculation = false;
+
+        $session = System::getContainer()->get('session');
+        if (1 === \count($session->get('CLIPBOARD'))
+        && \array_key_exists('tl_content', $session->get('CLIPBOARD'))) {
+            // We are copying tl_content ONLY
+            if ('copy' === \Contao\Input::get('act')) {
+                // only 1 item copied
+                $blnJustForceGridItemsRecalculation = true;
+            }
+
+            if ('copyAll' === \Contao\Input::get('act')) {
+                // multiple items copied
+                $idsToCopy = $session->get('CURRENT')['IDS'];
+
+                $nbGridStart = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], ['grid-start']);
+                $nbGridStop = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], ['grid-stop']);
+                if ($nbGridStart !== $nbGridStop) {
+                    // not the same number of grid start & stop
+                    // do not take any chance, just recalculate everything
+                    $blnJustForceGridItemsRecalculation = true;
+                }
+            }
+        }
+
+        if ($blnJustForceGridItemsRecalculation) {
+            $objItem = ContentModel::findOneById($itemId);
+            $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
+            // ugly fix to allow duplication of element in grid edition
+            $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
+            $objItem->save();
+            $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+
+            return;
+        }
+
+        // we are copying article or page or whatever
         $objItem = ContentModel::findOneById($itemId);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         // ugly fix to allow duplication of element in grid edition
         $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
         $objItem->save();
         // end of ugly fix
-        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
 
-        // Cannot work !
-        // Contao executes the callback after each copy and not after the copies are done
-        // START
-        // $objItem->refresh(); // just in case
-        // $objItemSource = ContentModel::findOneById($dc->id);
-        // if (!$objItemSource) {
-        //     return;
-        // }
+        if ('grid-start' === $objItem->type) {
+            $sessionKey = 'WEMGRID_oncopyCallback_'.$objItem->id;
+            $session = System::getContainer()->get('session');
+            if ($session->has($sessionKey)) {
+                return;
+            }
+            $session->set($sessionKey, $dc->id); // new grid-start ID reference old grid-start ID
+        } elseif ('grid-stop' === $objItem->type) {
+            $objNewGridStart = $this->gridElementsCalculator->getGridStartCorrespondingToGridStop($objItem);
+            if (null === $objNewGridStart) {
+                return;
+            }
 
-        // $gridItemsSource = null !== $objItemSource->grid_items ? unserialize($objItemSource->grid_items) : [];
-        // $gridItemsDest = null !== $objItem->grid_items ? unserialize($objItem->grid_items) : [];
-
-        // if (\count($gridItemsDest) !== \count($gridItemsSource)) {
-        //     return;
-        // }
-
-        // $gridItemsSourceKeys = array_keys($gridItemsSource);
-        // $gridItemsDestKeys = array_keys($gridItemsDest);
-
-        // foreach ($gridItemsSourceKeys as $index => $sourceKey) {
-        //     $gridItemsDest[$gridItemsDestKeys[$index]] = $gridItemsSource[$sourceKey];
-        // }
-        // $objItem->grid_items = serialize($gridItemsDest);
-        // $objItem->save();
-        // END
+            $sessionKey = 'WEMGRID_oncopyCallback_'.$objNewGridStart->id;
+            $session = System::getContainer()->get('session');
+            if (!$session->has($sessionKey)) {
+                return;
+            }
+            $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable, (int) $objNewGridStart->sorting, (int) $objItem->sorting, true);
+            $session->remove($sessionKey);
+        }
     }
 
     public function ondeleteCallback(DataContainer $dc, int $undoItemId): void
