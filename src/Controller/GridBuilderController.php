@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -18,7 +18,6 @@ use Contao\ContentModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
-use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -30,11 +29,11 @@ use WEM\GridBundle\Classes\GridStartManipulator;
  *     name=GridBuilderController::class,
  *     defaults={"_scope": "backend"}
  * )
+ *
  * @ServiceTag("controller.service_arguments")
  */
 class GridBuilderController extends Controller
 {
-
     protected TranslatorInterface $translator;
 
     protected ContaoFramework $framework;
@@ -50,7 +49,7 @@ class GridBuilderController extends Controller
         $this->translator = $translator;
         $this->gridStartManipulator = $gridStartManipulator;
         $this->framework->initialize();
-        Parent::__construct();
+        parent::__construct();
     }
 
     public function __invoke(): Response
@@ -59,18 +58,18 @@ class GridBuilderController extends Controller
             switch (Input::get('property')) {
                 case 'cols':
                     $response = $this->saveCols();
-                break;
+                    break;
                 case 'rows':
                     $response = $this->saveRows();
-                break;
+                    break;
                 case 'classes':
                     $response = $this->saveClasses();
-                break;
+                    break;
                 case 'grid_cols':
                     $response = $this->saveGridCols();
-                break;
+                    break;
                 default:
-                    throw new Exception('Unknown property');
+                    throw new \Exception('Unknown property');
             }
         } catch (\Exception $exception) {
             $response = [
@@ -83,14 +82,14 @@ class GridBuilderController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveCols(): array
     {
         $response = ['status' => 'success', 'message' => ''];
         $this->validateMandatoryGridItemParameters();
         if (null === Input::get('breakpoint')) {
-            throw new Exception('No breakpoint provided');
+            throw new \Exception('No breakpoint provided');
         }
 
         $grid = $this->getGridStart((int) Input::get('grid'));
@@ -109,14 +108,14 @@ class GridBuilderController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveRows(): array
     {
         $response = ['status' => 'success', 'message' => ''];
         $this->validateMandatoryGridItemParameters();
         if (null === Input::get('breakpoint')) {
-            throw new Exception('No breakpoint provided');
+            throw new \Exception('No breakpoint provided');
         }
 
         $grid = $this->getGridStart((int) Input::get('grid'));
@@ -135,7 +134,7 @@ class GridBuilderController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveClasses(): array
     {
@@ -157,7 +156,7 @@ class GridBuilderController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveGridCols(): array
     {
@@ -165,7 +164,7 @@ class GridBuilderController extends Controller
 
         $this->validateMandatoryGridParameters();
         if (null === Input::get('breakpoint')) {
-            throw new Exception('No breakpoint provided');
+            throw new \Exception('No breakpoint provided');
         }
 
         $value = Input::get('value');
@@ -178,25 +177,25 @@ class GridBuilderController extends Controller
         switch (strtolower(Input::get('breakpoint'))) {
             case 'all':
                 $gsm->setGridColsAll($value);
-            break;
+                break;
             case 'xl':
                 $gsm->setGridColsXl($value);
-            break;
+                break;
             case 'lg':
                 $gsm->setGridColsLg($value);
-            break;
+                break;
             case 'md':
                 $gsm->setGridColsMd($value);
-            break;
+                break;
             case 'sm':
                 $gsm->setGridColsSm($value);
-            break;
+                break;
             case 'xs':
                 $gsm->setGridColsXs($value);
-            break;
+                break;
             case 'xxs':
                 $gsm->setGridColsXxs($value);
-            break;
+                break;
         }
 
         $grid = $gsm->getGridStart();
@@ -206,38 +205,38 @@ class GridBuilderController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function validateMandatoryGridItemParameters(): void
     {
         $this->validateMandatoryGridParameters();
         if (null === Input::get('id')) {
-            throw new Exception('No element ID provided');
+            throw new \Exception('No element ID provided');
         }
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function validateMandatoryGridParameters(): void
     {
         if (null === Input::get('grid')) {
-            throw new Exception('No grid ID provided');
+            throw new \Exception('No grid ID provided');
         }
 
         if (null === Input::get('value')) {
-            throw new Exception('No value provided');
+            throw new \Exception('No value provided');
         }
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function getGridStart(int $id): ContentModel
     {
         $grid = $this->framework->getAdapter(ContentModel::class)->findOneById($id); // to allow Unit Tests to run
         if (!$grid) {
-            throw new Exception('No grid found with the provided ID');
+            throw new \Exception('No grid found with the provided ID');
         }
 
         return $grid;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -16,7 +16,6 @@ namespace WEM\GridBundle\Classes;
 
 class GridOpened
 {
-
     protected string $id;
 
     protected array $cols;
