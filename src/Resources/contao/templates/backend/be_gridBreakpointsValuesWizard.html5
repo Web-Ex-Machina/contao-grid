@@ -22,7 +22,7 @@
 			</h3>
 			<?php foreach($this->breakpoints as $k => $b): ?>
 				<input type="hidden" name="<?= $this->input ?>[<?= $k ?>][key]" id="<?= $this->input ?>_key_<?= $k ?>" class="tl_text" value="<?= $b['name'] ?>">
-				<select name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= $b['required'] ? 'required' : ''; ?>>
+				<select name="<?= $this->input ?>[<?= $k ?>][value]" id="<?= $this->input ?>_value_<?= $k ?>" class="tl_select hidden" data-breakpoint="<?= $b['name'] ?>" <?= array_key_exists('required', $b) && true === (bool) $b['required'] ? 'required' : ''; ?>>
 					<?php if('all' != $b['name']): ?>
 						<option value="">
 							-
