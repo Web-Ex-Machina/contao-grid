@@ -41,10 +41,12 @@ class GridBuilder
 
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
 
-        if (!\is_array($objElement->grid_rows)) {
-            $rows = StringUtil::deserialize($objElement->grid_rows);
-        } else {
-            $rows = $objElement->grid_rows;
+        if (property_exists($objElement, 'grid_rows')) {
+            if (!\is_array($objElement->grid_rows)) {
+                $rows = StringUtil::deserialize($objElement->grid_rows);
+            } else {
+                $rows = $objElement->grid_rows;
+            }
         }
 
         if (!\is_array($objElement->grid_cols)) {
@@ -81,7 +83,7 @@ class GridBuilder
                 }
             }
 
-            if (\is_array($rows)) {
+            if (isset($rows) && \is_array($rows)) {
                 foreach ($rows as $k => $row) {
                     // Quickfix : we need the first col to be generic, no matter what is the breakpoint
                     if (0 === $k) {
