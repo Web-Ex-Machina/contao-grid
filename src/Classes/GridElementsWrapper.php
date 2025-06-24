@@ -130,7 +130,7 @@ class GridElementsWrapper
                 title="%s"
                 onclick="WEM.Grid.Utils.openModalIframe({\'title\':\'%s\',\'url\':this.href,\'onHide\':function(){window.location.reload();}});return false">
                 %s
-                </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
+                </a>', $do, $objElement->id, System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(), StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
             }
 
             $buttons .= \sprintf('
@@ -187,7 +187,7 @@ class GridElementsWrapper
                 title="%s"
                 target="_blank">
                 %s
-                </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
+                </a>', $do, $objElement->id, System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(), StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
 
             $buttons .= \sprintf('
                 <a class="item-delete"
