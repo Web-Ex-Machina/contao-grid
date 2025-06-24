@@ -36,7 +36,7 @@ class GridElementsWrapper
 
     protected GridCssClassesInheritance $gridCssClassesInheritance;
 
-    protected static array $arrSkipContentTypes = [GridStart::TYPE, GridStop::TYPE];
+    protected static array $arrSkipContentTypes = ['grid-start', 'grid-stop'];
 
     public function __construct(
         TranslatorInterface $translator,
@@ -72,12 +72,12 @@ class GridElementsWrapper
 
         // Yep, same code in FE/BE, but FE here if we want it to work /shrug
         // We won't need this grid anymore so we pop the global grid array
-        if (!$scopeMatcher->isBackend() && GridStop::TYPE === $objElement->type) {
+        if (!$scopeMatcher->isBackend() && 'grid-stop' === $objElement->type) {
             $gop->closeLastOpenedGrid();
         }
 
         // If we used grids elements, we had to adjust the behaviour
-        if (GridStart::TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
+        if ('grid-start' === $objElement->type && true === $openGrid->isSubGrid()) {
             $gop->openGrid($objElement);
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
@@ -86,7 +86,7 @@ class GridElementsWrapper
             return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }
 
-        if (GridStop::TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
+        if ('grid-stop' === $objElement->type && true === $openGrid->isSubGrid()) {
             $str = $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
 
             // Yep, same code in FE/BE, but BE here if we want it to work /shrug
@@ -123,7 +123,7 @@ class GridElementsWrapper
 
             $buttons = '';
 
-            if (GridItemEmpty::TYPE !== $objElement->type) {
+            if ('grid-item-empty' !== $objElement->type) {
                 $buttons .= \sprintf('
                 <a
                 href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1&amp;rt=%s"
@@ -272,7 +272,7 @@ class GridElementsWrapper
                 GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
                 $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
                 true === $openGrid->isSubGrid() ? 'be_subgrid_item' : '',
-                GridItemEmpty::TYPE === $objElement->type ? 'be_grid_item_empty' : '',
+                'grid-item-empty' === $objElement->type ? 'be_grid_item_empty' : '',
                 $objElement->id,
                 $objElement->type,
                 $this->getBackendActionsForContentElement($objElement, $do, true),
