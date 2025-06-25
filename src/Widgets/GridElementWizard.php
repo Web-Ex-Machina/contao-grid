@@ -137,14 +137,14 @@ class GridElementWizard extends Widget
             }
 
             // And break the loop if we hit the grid-stop element corresponding to the very first grid
-            if ('grid-stop' === $objItems->type && (string)$this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
+            if (GridStop::ELEMENT_TYPE === $objItems->type && (string)$this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
                 break;
             }
 
             $objItems->isForGridElementWizard = true;
-            if ('grid-start' === $objItems->type) {
+            if (GridStart::ELEMENT_TYPE === $objItems->type) {
                 $strElement = $this->getContentElement($objItems->current());
-            } elseif ('grid-stop' === $objItems->type) {
+            } elseif (GridStop::ELEMENT_TYPE === $objItems->type) {
                 $strElement = $this->BEGridItemSettings(
                     $this->gridOpenedManager->getPreviousLastOpenedGridId(),
                     (string) $this->gridOpenedManager->getLastOpenedGridId(),

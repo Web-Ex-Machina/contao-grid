@@ -24,7 +24,7 @@ use WEM\GridBundle\Classes\GridOpenedManager;
  */
 class GridStop extends ContentElement
 {
-    public const TYPE = 'grid-stop';
+    public const ELEMENT_TYPE = 'grid-stop';
     /**
      * Template.
      *
