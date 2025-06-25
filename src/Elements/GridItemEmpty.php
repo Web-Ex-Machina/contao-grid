@@ -24,7 +24,7 @@ use WEM\GridBundle\Classes\GridOpenedManager;
  */
 class GridItemEmpty extends ContentElement
 {
-    public const TYPE = 'grid-item-empty';
+    public const ELEMENT_TYPE = 'grid-item-empty';
     /**
      * Template.
      *

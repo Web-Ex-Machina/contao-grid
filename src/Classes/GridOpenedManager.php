@@ -244,7 +244,7 @@ class GridOpenedManager
             // || $element instanceof ContentModel::class
             // || $element instanceof GridStartElement::class
         )
-            || 'grid-start' !== $element->type
+            || GridStartElement::ELEMENT_TYPE !== $element->type
         ) {
             throw new \InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
         }

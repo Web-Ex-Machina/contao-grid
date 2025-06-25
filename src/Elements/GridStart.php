@@ -26,7 +26,7 @@ use WEM\GridBundle\Classes\GridOpenedManager;
  */
 class GridStart extends ContentElement
 {
-    public const TYPE = 'grid-start';
+    public const ELEMENT_TYPE = 'grid-start';
     public const MODE_CUSTOM = 'custom';
     public const MODE_AUTOMATIC = 'automatic';
 
