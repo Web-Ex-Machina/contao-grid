@@ -87,8 +87,8 @@ class tlContentCallback
                 // multiple items copied
                 $idsToCopy = $session->get('CURRENT')['IDS'];
 
-                $nbGridStart = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], [GridStart::TYPE]);
-                $nbGridStop = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], [GridStop::TYPE]);
+                $nbGridStart = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], [GridStart::ELEMENT_TYPE]);
+                $nbGridStop = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], [GridStop::ELEMENT_TYPE]);
                 if ($nbGridStart !== $nbGridStop) {
                     // not the same number of grid start & stop
                     // do not take any chance, just recalculate everything
@@ -116,14 +116,14 @@ class tlContentCallback
         $objItem->save();
         // end of ugly fix
 
-        if (GridStart::TYPE === $objItem->type) {
+        if (GridStart::ELEMENT_TYPE === $objItem->type) {
             $sessionKey = 'WEMGRID_oncopyCallback_'.$objItem->id;
             $session = System::getContainer()->get('session');
             if ($session->has($sessionKey)) {
                 return;
             }
             $session->set($sessionKey, $dc->id); // new grid-start ID reference old grid-start ID
-        } elseif (GridStop::TYPE === $objItem->type) {
+        } elseif (GridStop::ELEMENT_TYPE === $objItem->type) {
             $objNewGridStart = $this->gridElementsCalculator->getGridStartCorrespondingToGridStop($objItem);
             if (null === $objNewGridStart) {
                 return;
@@ -160,9 +160,9 @@ class tlContentCallback
 
         $session->set($sessionKey, 1);
 
-        if (GridStart::TYPE === $objItem->type) {
+        if (GridStart::ELEMENT_TYPE === $objItem->type) {
             $this->deleteCorrespondingGridStopFromGridStart($objItem);
-        } elseif (GridStop::TYPE === $objItem->type) {
+        } elseif (GridStop::ELEMENT_TYPE === $objItem->type) {
             $this->deleteCorrespondingGridStartFromGridStop($objItem);
         }
 
@@ -179,10 +179,10 @@ class tlContentCallback
         }
 
         $session->set($sessionKey, 1);
-        if (ContentModel::getTable() === $table && GridStart::TYPE === $data['type']) {
+        if (ContentModel::getTable() === $table && GridStart::ELEMENT_TYPE === $data['type']) {
             // restore the grid-stop
             $this->restoreClosestGridStopFromGridStart($data, $dc);
-        } elseif (ContentModel::getTable() === $table && GridStop::TYPE === $data['type']) {
+        } elseif (ContentModel::getTable() === $table && GridStop::ELEMENT_TYPE === $data['type']) {
             // restore the grid-start
             $this->restoreClosestGridStartFromGridStop($data, $dc);
         }
@@ -217,9 +217,9 @@ class tlContentCallback
 
             // only work on elements placed AFTER the grid-start
             if ((int) $sorting > (int) $gridStartUndoData['sorting']) {
-                if (GridStart::TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
+                if (GridStart::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     ++$nbGridOpened;
-                } elseif (GridStop::TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
+                } elseif (GridStop::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     if (0 === $nbGridOpened) {
                         // it's the one
                         $gridStopUndoId = $row['undo_id'];
@@ -269,9 +269,9 @@ class tlContentCallback
 
             // only work on elements placed BEFORE the grid-stop
             if ((int) $sorting < (int) $gridStopUndoData['sorting']) {
-                if (GridStop::TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
+                if (GridStop::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     ++$nbGridOpened;
-                } elseif (GridStart::TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
+                } elseif (GridStart::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     if (0 === $nbGridOpened) {
                         // it's the one
                         $gridStartUndoId = $row['undo_id'];
@@ -332,9 +332,9 @@ class tlContentCallback
     protected function createMissingGridStartStop(DataContainer $dc): void
     {
         if (null !== $dc->activeRecord) {
-            if (GridStart::TYPE === $dc->activeRecord->type) {
+            if (GridStart::ELEMENT_TYPE === $dc->activeRecord->type) {
                 $this->createMissingGridStop($dc);
-            } elseif (GridStop::TYPE === $dc->activeRecord->type) {
+            } elseif (GridStop::ELEMENT_TYPE === $dc->activeRecord->type) {
                 $this->createMissingGridStart($dc);
             }
         }
@@ -381,8 +381,8 @@ class tlContentCallback
             && \array_key_exists('type', $rowData[ContentModel::getTable()][0])
             && \array_key_exists('sorting', $rowData[ContentModel::getTable()][0])
             && (
-                GridStart::TYPE === $rowData[ContentModel::getTable()][0]['type']
-                || GridStop::TYPE === $rowData[ContentModel::getTable()][0]['type']
+                GridStart::ELEMENT_TYPE === $rowData[ContentModel::getTable()][0]['type']
+                || GridStop::ELEMENT_TYPE === $rowData[ContentModel::getTable()][0]['type']
             )
             ) {
                 $arrDataFormatted[$rowData[ContentModel::getTable()][0]['sorting']] = [
@@ -402,16 +402,16 @@ class tlContentCallback
      */
     protected function createMissingGridStop(DataContainer $dc): void
     {
-        if (null !== $dc->activeRecord && GridStart::TYPE === $dc->activeRecord->type) {
-            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStart::TYPE]);
-            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStop::TYPE]);
+        if (null !== $dc->activeRecord && GridStart::ELEMENT_TYPE === $dc->activeRecord->type) {
+            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStart::ELEMENT_TYPE]);
+            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStop::ELEMENT_TYPE]);
 
             if ($gridStarts > $gridStops) {
                 $objElement = new ContentModel();
                 $objElement->tstamp = time();
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
-                $objElement->type = GridStop::TYPE;
+                $objElement->type = GridStop::ELEMENT_TYPE;
                 $objElement->sorting = $dc->activeRecord->sorting + 1;
                 $objElement->save();
             }
@@ -425,16 +425,16 @@ class tlContentCallback
      */
     protected function createMissingGridStart(DataContainer $dc): void
     {
-        if (null !== $dc->activeRecord && GridStop::TYPE === $dc->activeRecord->type) {
-            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStart::TYPE]);
-            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStop::TYPE]);
+        if (null !== $dc->activeRecord && GridStop::ELEMENT_TYPE === $dc->activeRecord->type) {
+            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStart::ELEMENT_TYPE]);
+            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStop::ELEMENT_TYPE]);
 
             if ($gridStarts < $gridStops) {
                 $objElement = new ContentModel();
                 $objElement->tstamp = time();
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
-                $objElement->type = GridStart::TYPE;
+                $objElement->type = GridStart::ELEMENT_TYPE;
                 $objElement->grid_mode = GridStart::MODE_AUTOMATIC;
                 $objElement->sorting = $dc->activeRecord->sorting - 1;
                 $objElement->save();

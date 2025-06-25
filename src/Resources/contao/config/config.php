@@ -24,9 +24,9 @@ ArrayUtil::arrayInsert(
     \count($GLOBALS['TL_CTE']) + 1,
     [
         'grid' => [
-            GridStart::TYPE => GridStart::class,
-            GridStop::TYPE => GridStop::class,
-            GridItemEmpty::TYPE => GridItemEmpty::class,
+            GridStart::ELEMENT_TYPE => GridStart::class,
+            GridStop::ELEMENT_TYPE => GridStop::class,
+            GridItemEmpty::ELEMENT_TYPE => GridItemEmpty::class,
         ],
     ]
 );
@@ -35,8 +35,8 @@ ArrayUtil::arrayInsert(
 $GLOBALS['WEM']['GRID'] = [];
 
 // Add wrappers
-$GLOBALS['TL_WRAPPERS']['start'][] = GridStart::TYPE;
-$GLOBALS['TL_WRAPPERS']['stop'][] = GridStop::TYPE;
+$GLOBALS['TL_WRAPPERS']['start'][] = GridStart::ELEMENT_TYPE;
+$GLOBALS['TL_WRAPPERS']['stop'][] = GridStop::ELEMENT_TYPE;
 
 // Add Hook
 $GLOBALS['TL_HOOKS']['getContentElement'][] = ['wem.grid.event_listener.get_content_element', '__invoke'];

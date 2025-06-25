@@ -48,7 +48,7 @@ class GridElementsCalculator
         $itemsClasses = [];
         // first we keep track of all grid_items settings
         foreach ($objItems as $objItem) {
-            if (GridStart::TYPE === $objItem->type) {
+            if (GridStart::ELEMENT_TYPE === $objItem->type) {
                 $itemsClasses += (null !== $objItem->grid_items ? StringUtil::deserialize($objItem->grid_items) : []);
             }
         }
@@ -58,7 +58,7 @@ class GridElementsCalculator
                 continue;
             }
 
-            if (GridStart::TYPE === $objItem->type) {
+            if (GridStart::ELEMENT_TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
             }
@@ -81,9 +81,9 @@ class GridElementsCalculator
 
         $nbGridOpened = 0;
         while ($objContents->next()) {
-            if (GridStop::TYPE === $objContents->type) {
+            if (GridStop::ELEMENT_TYPE === $objContents->type) {
                 ++$nbGridOpened;
-            } elseif (GridStart::TYPE === $objContents->type) {
+            } elseif (GridStart::ELEMENT_TYPE === $objContents->type) {
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
@@ -111,9 +111,9 @@ class GridElementsCalculator
 
         $nbGridOpened = 0;
         while ($objContents->next()) {
-            if (GridStart::TYPE === $objContents->type) {
+            if (GridStart::ELEMENT_TYPE === $objContents->type) {
                 ++$nbGridOpened;
-            } elseif (GridStop::TYPE === $objContents->type) {
+            } elseif (GridStop::ELEMENT_TYPE === $objContents->type) {
                 if (0 === $nbGridOpened) {
                     return $objContents->current();
                 }
@@ -148,13 +148,13 @@ class GridElementsCalculator
                 continue;
             }
 
-            if (GridStop::TYPE === $objItem->type) {
+            if (GridStop::ELEMENT_TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
 
                 return $objItemsIdsToSkip;
             }
 
-            if (GridStart::TYPE === $objItem->type) {
+            if (GridStart::ELEMENT_TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
             }
