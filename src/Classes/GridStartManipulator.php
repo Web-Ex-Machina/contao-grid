@@ -113,7 +113,7 @@ class GridStartManipulator
 
     public function setGridStart(ContentModel $gridStart): self
     {
-        if (GridStart::TYPE !== $gridStart->type) {
+        if (GridStart::ELEMENT_TYPE !== $gridStart->type) {
             throw new \InvalidArgumentException('The argument is not a grid-start content element !');
         }
 
