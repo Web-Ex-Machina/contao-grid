@@ -75,8 +75,11 @@ class tlContentCallback
         $blnJustForceGridItemsRecalculation = false;
 
         $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
-        if (1 === \count($session->get('CLIPBOARD'))
-        && \array_key_exists('tl_content', $session->get('CLIPBOARD'))) {
+        if (
+            \is_array($session->get('CLIPBOARD')) 
+            && 1 === \count($session->get('CLIPBOARD'))
+            && \array_key_exists('tl_content', $session->get('CLIPBOARD'))
+        ) {
             // We are copying tl_content ONLY
             if ('copy' === \Contao\Input::get('act')) {
                 // only 1 item copied
