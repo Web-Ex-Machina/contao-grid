@@ -74,7 +74,7 @@ class tlContentCallback
 
         $blnJustForceGridItemsRecalculation = false;
 
-        $session = System::getContainer()->get('session');
+        $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
         if (1 === \count($session->get('CLIPBOARD'))
         && \array_key_exists('tl_content', $session->get('CLIPBOARD'))) {
             // We are copying tl_content ONLY
@@ -118,7 +118,7 @@ class tlContentCallback
 
         if (GridStart::ELEMENT_TYPE === $objItem->type) {
             $sessionKey = 'WEMGRID_oncopyCallback_'.$objItem->id;
-            $session = System::getContainer()->get('session');
+            $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
             if ($session->has($sessionKey)) {
                 return;
             }
@@ -130,7 +130,7 @@ class tlContentCallback
             }
 
             $sessionKey = 'WEMGRID_oncopyCallback_'.$objNewGridStart->id;
-            $session = System::getContainer()->get('session');
+            $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
             if (!$session->has($sessionKey)) {
                 return;
             }
@@ -153,7 +153,7 @@ class tlContentCallback
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
 
         $sessionKey = 'WEMGRID_ondeleteCallback';
-        $session = System::getContainer()->get('session');
+        $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
         if ($session->has($sessionKey)) {
             return;
         }
@@ -173,7 +173,7 @@ class tlContentCallback
     public function onundoCallback(string $table, array $data, DataContainer $dc): void
     {
         $sessionKey = 'WEMGRID_onundoCallback';
-        $session = System::getContainer()->get('session');
+        $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
         if ($session->has($sessionKey)) {
             return;
         }
