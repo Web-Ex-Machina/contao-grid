@@ -19,6 +19,7 @@ use Contao\ContentModel;
 use Contao\Widget;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Elements\GridStart;
+use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Helper\GridBuilder;
 
 class GridElementWizard extends Widget
