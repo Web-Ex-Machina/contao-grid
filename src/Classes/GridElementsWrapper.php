@@ -60,6 +60,7 @@ class GridElementsWrapper
     public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
         $gop = GridOpenedManager::getInstance();
+        // dump($gop);
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
         // Skip elements we never want to wrap or if we are not in a grid
         if (($scopeMatcher->isBackend() && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
@@ -68,6 +69,7 @@ class GridElementsWrapper
 
         // Get the last open grid
         $openGrid = $gop->getLastOpenedGrid();
+        // dump($openGrid);
         $currentGridId = $gop->getLastOpenedGridId();
 
         // Yep, same code in FE/BE, but FE here if we want it to work /shrug
@@ -82,6 +84,11 @@ class GridElementsWrapper
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
             $openGrid = $gop->getParentGrid($objElement);
+        // dump($openGrid);
+        // if(null === $openGrid){
+        //     dump($GLOBALS['WEM']['GRID']);
+        //     die;
+        // }
 
             return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }

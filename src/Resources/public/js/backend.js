@@ -242,6 +242,7 @@ WEM.Grid  = WEM.Grid || {};
             if(-1 < element.className.indexOf(self.selectors.grid.substring(1))
             // ||  -1 < element.className.indexOf('d-grid')
             || -1 < element.className.indexOf('ce_grid-start')
+            // || -1 < element.className.indexOf('grid_preview')
             ){
                 return element;
             }else{
@@ -663,7 +664,10 @@ window.addEvent("domready", function () {
             );
         });
         i.addEventListener("change_auto", function (e) {
+            console.log("=====");
+            console.log(this);
             var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
+            console.log("=====");
             WEM.Grid.Drag.updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             WEM.Grid.Drag.changeLowerResolutionValues(
@@ -720,10 +724,15 @@ window.addEvent("domready", function () {
     });
 
     document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
+        // console.log(container);
+        // console.log(container.parentNode);
+        // console.log(container.parentNode.parentNode.querySelector('div').querySelector('div').nextElementSibling);
         var lastElement = WEM.Grid.Drag.getGridLastRealElement(container);
         if(null == lastElement){
             lastElement = WEM.Grid.Drag.getGridFromElement(container);
+            // lastElement = WEM.Grid.Drag.getGridFromElement(container.parentNode.parentNode.querySelector('div').querySelector('div').nextElementSibling);
         }
+        // console.log(lastElement);
         container.addEventListener("click", function (e) {
             e.preventDefault();
             WEM.Grid.Utils.openModalIframe({

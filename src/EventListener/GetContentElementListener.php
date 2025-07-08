@@ -33,6 +33,7 @@ class GetContentElementListener
 
     public function __invoke(ContentModel $contentModel, string $buffer, $element): string
     {
+        // dump($contentModel->id);
         return $this->gridElementsWrapper->wrapGridElements($contentModel, $buffer, Input::get('do') ?? '');
     }
 }

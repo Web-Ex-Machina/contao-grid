@@ -85,7 +85,7 @@ class GridElementWizard extends Widget
 
             // Check if the _classes item for this key contains stuff
             // If true, concat the values
-            if ($varValue[$k.'_classes']) {
+            if ($varValue[$k.'_classes'] ?? false) {
                 $v .= ' '.$varValue[$k.'_classes'];
             }
         }
