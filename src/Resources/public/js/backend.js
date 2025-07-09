@@ -664,10 +664,7 @@ window.addEvent("domready", function () {
             );
         });
         i.addEventListener("change_auto", function (e) {
-            console.log("=====");
-            console.log(this);
             var itemGrid = WEM.Grid.Drag.getParentGridItemElement(this);
-            console.log("=====");
             WEM.Grid.Drag.updateItemDataClass(itemGrid,i.getAttribute('data-breakpoint'));
             // update lower resolution values
             WEM.Grid.Drag.changeLowerResolutionValues(
