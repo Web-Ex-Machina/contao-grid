@@ -246,7 +246,7 @@ class GridOpenedManager
         )
             || GridStartElement::ELEMENT_TYPE !== $element->type
         ) {
-            throw new \InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
+            throw new \InvalidArgumentException('The element "'.$element::class.'" is not a "grid-start"');
         }
     }
 

@@ -17,7 +17,6 @@ namespace WEM\GridBundle\Classes;
 use Contao\ContentModel;
 use Contao\Model\Collection;
 use Contao\StringUtil;
-use WEM\GridBundle\Classes\StringUtil as ClassesStringUtil;
 use WEM\GridBundle\Elements\GridStart;
 use WEM\GridBundle\Elements\GridStop;
 
@@ -34,7 +33,6 @@ class GridElementsCalculator
      */
     public function recalculateGridItemsByPidAndPtable(int $pid, string $ptable, ?int $sortingMin = null, ?int $sortingMax = null, ?bool $isAfterACopy = false): void
     {
-        ClassesStringUtil::log('=== recalculateGridItemsByPidAndPtable ===');
         $conditions = ['pid = ?', 'ptable = ?'];
         $values = [$pid, $ptable];
         if (null !== $sortingMin) {
@@ -55,24 +53,15 @@ class GridElementsCalculator
             }
         }
 
-        // dump($objItems);
-        // dump($objItemsIdsToSkip);
-
         foreach ($objItems as $objItem) {
-            ClassesStringUtil::log('item '.$objItem->id);
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
-            ClassesStringUtil::log('Is skipped');
                 continue;
             }
 
             if (GridStart::ELEMENT_TYPE === $objItem->type) {
-            // ClassesStringUtil::log('Is GridStart');
                 $objItemsIdsToSkip[] = $objItem->id;
-            // ClassesStringUtil::log('Ids to skip BEFORE');
-            // ClassesStringUtil::log($objItemsIdsToSkip);
+
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
-            // ClassesStringUtil::log('Ids to skip AFTER');
-            // ClassesStringUtil::log($objItemsIdsToSkip);
             }
         }
     }
@@ -150,45 +139,35 @@ class GridElementsCalculator
      */
     protected function recalculateGridItems(ContentModel $gridStart, array $objItemsIdsToSkip, Collection $objItems, array $itemsClasses, ?bool $isAfterACopy = false): array
     {
-        ClassesStringUtil::log('=== '.__METHOD__.' ===');
-        ClassesStringUtil::log($gridStart->id);
         $gridItemsSave = null !== $gridStart->grid_items ? unserialize($gridStart->grid_items) : [];
         $gridStart->grid_items = serialize([]);
         $gsm = GridStartManipulator::create($gridStart);
 
         $itemIndexInGrid = 0;
         foreach ($objItems as $objItem) {
-            ClassesStringUtil::log($objItem->id.' ('.$objItem->type.')');
             if (\in_array($objItem->id, $objItemsIdsToSkip, true)) {
-            ClassesStringUtil::log('Is skipped');
                 continue;
             }
 
             if (GridStop::ELEMENT_TYPE === $objItem->type) {
-            ClassesStringUtil::log('Is GridStop');
                 $objItemsIdsToSkip[] = $objItem->id;
 
                 return $objItemsIdsToSkip;
             }
 
             if (GridStart::ELEMENT_TYPE === $objItem->type) {
-            ClassesStringUtil::log('Is GridStart');
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
-                return $objItemsIdsToSkip;
+                // DO NOT RETURN, GRID-START ELEMENT SHOULD BE A CHILD OF THE PARENT GRID !
+                // return $objItemsIdsToSkip;
             }
 
             if (!$gsm->isItemInGrid($objItem)) {
-            ClassesStringUtil::log('Is NOT in grid');
                 if ($isAfterACopy) {
-            ClassesStringUtil::log('Is after copy');
                     // we will replace items IDS, based on the index
                     $oldKeys = array_keys($gridItemsSave);
-            ClassesStringUtil::log('oldKeys');
-            ClassesStringUtil::log($oldKeys);
 
-                    if(array_key_exists($itemIndexInGrid * 3,$oldKeys)){
-            ClassesStringUtil::log('Key found by index');
+                    if (\array_key_exists($itemIndexInGrid * 3, $oldKeys)) {
                         $oldContentFirstKey = $oldKeys[$itemIndexInGrid * 3]; // 3 because we set 3 properties !
                         $oldContentId = substr($oldContentFirstKey, 0, strpos($oldContentFirstKey, '_'));
 
@@ -197,8 +176,7 @@ class GridElementsCalculator
                             $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
                             $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
                         );
-                    }else{
-            ClassesStringUtil::log('Key NOT found');
+                    } else {
                         $gsm->setGridItemsSettingsForItem((int) $objItem->id,
                             [],
                             [],
@@ -208,24 +186,20 @@ class GridElementsCalculator
 
                     ++$itemIndexInGrid;
                 } else {
-            ClassesStringUtil::log('Is NOT after copy');
                     $gsm->setGridItemsSettingsForItem((int) $objItem->id,
                         $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS] ?? [],
                         $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
                         $gridItemsSave[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
                     );
                     if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_COLS, $itemsClasses)) {
-            ClassesStringUtil::log('Current item was already in current GridStart (cols)');
                         $gsm->setGridItemCols((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_COLS]);
                     }
 
                     if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS, $itemsClasses)) {
-            ClassesStringUtil::log('Current item was already in current GridStart (rows)');
                         $gsm->setGridItemRows((int) $objItem->id, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_ROWS]);
                     }
 
                     if (\array_key_exists($objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES, $itemsClasses)) {
-            ClassesStringUtil::log('Current item was already in current GridStart (classes)');
                         $gsm->setGridItemsSettingsForItemAndPropertyAndResolution((int) $objItem->id, GridStartManipulator::PROPERTY_CLASSES, null, $itemsClasses[$objItem->id.'_'.GridStartManipulator::PROPERTY_CLASSES]);
                     }
                 }
@@ -233,8 +207,6 @@ class GridElementsCalculator
                 $gridStart = $gsm->getGridStart();
                 $gridStart->save();
                 $gsm->setGridStart($gridStart);
-            }else{
-                ClassesStringUtil::log('Is already in grid');
             }
 
             $objItemsIdsToSkip[] = $objItem->id;

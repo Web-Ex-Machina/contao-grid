@@ -724,15 +724,10 @@ window.addEvent("domready", function () {
     });
 
     document.querySelectorAll('.be_item_grid > .item-new').forEach(function (container){
-        // console.log(container);
-        // console.log(container.parentNode);
-        // console.log(container.parentNode.parentNode.querySelector('div').querySelector('div').nextElementSibling);
         var lastElement = WEM.Grid.Drag.getGridLastRealElement(container);
         if(null == lastElement){
             lastElement = WEM.Grid.Drag.getGridFromElement(container);
-            // lastElement = WEM.Grid.Drag.getGridFromElement(container.parentNode.parentNode.querySelector('div').querySelector('div').nextElementSibling);
         }
-        // console.log(lastElement);
         container.addEventListener("click", function (e) {
             e.preventDefault();
             WEM.Grid.Utils.openModalIframe({
