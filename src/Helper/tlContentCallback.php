@@ -54,8 +54,8 @@ class tlContentCallback
             && 0 === \count($session->get('CLIPBOARD')['tl_content'])
         ) {
             $sessionBe = $session->getBag('contao_backend');
-            $sessionBe->remove('WEM_oncopyCallback_index');
-            $sessionBe->remove('WEM_oncopyCallback_ids');
+            $sessionBe->remove('WEMGRID_oncopyCallback_index');
+            $sessionBe->remove('WEMGRID_oncopyCallback_ids');
         }
     }
 
@@ -83,9 +83,6 @@ class tlContentCallback
 
     public function oncopyCallback(int $itemId, DataContainer $dc): void
     {
-        $session = System::getContainer()->get('request_stack')->getSession();
-        $sessionBe = $session->getBag('contao_backend');
-
         // copy 1 tl_article
         // GET act=copy&do=article
         // CLIPBOARD => tl_content && tl_article
@@ -96,16 +93,19 @@ class tlContentCallback
 
         $blnJustForceGridItemsRecalculation = false;
 
-        if (!$sessionBe->has('WEM_oncopyCallback_index')) {
-            $sessionBe->set('WEM_oncopyCallback_index', 0);
+        $session = System::getContainer()->get('request_stack')->getSession();
+        $sessionBe = $session->getBag('contao_backend');
+
+        if (!$sessionBe->has('WEMGRID_oncopyCallback_index')) {
+            $sessionBe->set('WEMGRID_oncopyCallback_index', 0);
         } else {
-            $sessionBe->set('WEM_oncopyCallback_index', ((int) $sessionBe->get('WEM_oncopyCallback_index')) + 1);
+            $sessionBe->set('WEMGRID_oncopyCallback_index', ((int) $sessionBe->get('WEMGRID_oncopyCallback_index')) + 1);
         }
-        if (!$sessionBe->has('WEM_oncopyCallback_ids')) {
-            $sessionBe->set('WEM_oncopyCallback_ids', []);
+        if (!$sessionBe->has('WEMGRID_oncopyCallback_ids')) {
+            $sessionBe->set('WEMGRID_oncopyCallback_ids', []);
         }
 
-        $sessionBe->set('WEM_oncopyCallback_ids', array_merge($sessionBe->get('WEM_oncopyCallback_ids'), [$itemId]));
+        $sessionBe->set('WEMGRID_oncopyCallback_ids', array_merge($sessionBe->get('WEMGRID_oncopyCallback_ids'), [$itemId]));
 
         if (
             \is_array($session->get('CLIPBOARD'))
@@ -143,8 +143,8 @@ class tlContentCallback
             $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
             $this->copyGridElementConfigurationFromOneGridToAnother((int) $itemId, (int) $dc->id);
 
-            $sessionBe->remove('WEM_oncopyCallback_index');
-            $sessionBe->remove('WEM_oncopyCallback_ids');
+            $sessionBe->remove('WEMGRID_oncopyCallback_index');
+            $sessionBe->remove('WEMGRID_oncopyCallback_ids');
 
             return;
         }
@@ -180,22 +180,22 @@ class tlContentCallback
         }
 
         if ($session->has('CURRENT')
-            // && count($session->get('CURRENT')['IDS']) === (int) $sessionBe->get('WEM_oncopyCallback_index')
-            && \count($session->get('CURRENT')['IDS']) === \count($sessionBe->get('WEM_oncopyCallback_ids'))
+            // && count($session->get('CURRENT')['IDS']) === (int) $sessionBe->get('WEMGRID_oncopyCallback_index')
+            && \count($session->get('CURRENT')['IDS']) === \count($sessionBe->get('WEMGRID_oncopyCallback_ids'))
         ) {
             $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
             // for each copied items
-            // get original id (index of WEM_oncopyCallback_ids === index of CURRENT[IDS])
+            // get original id (index of WEMGRID_oncopyCallback_ids === index of CURRENT[IDS])
             // retrieve gridstart referencing its original id
             // if found, find gridstart referencing its new id
             // if found, merge data
 
-            foreach ($sessionBe->get('WEM_oncopyCallback_ids') as $index => $newId) {
+            foreach ($sessionBe->get('WEMGRID_oncopyCallback_ids') as $index => $newId) {
                 $this->copyGridElementConfigurationFromOneGridToAnother((int) $newId, (int) $session->get('CURRENT')['IDS'][$index]);
             }
 
-            $sessionBe->remove('WEM_oncopyCallback_index');
-            $sessionBe->remove('WEM_oncopyCallback_ids');
+            $sessionBe->remove('WEMGRID_oncopyCallback_index');
+            $sessionBe->remove('WEMGRID_oncopyCallback_ids');
         }
     }
 
@@ -209,6 +209,20 @@ class tlContentCallback
         if (!$objItem) {
             return;
         }
+
+        $session = System::getContainer()->get('request_stack')->getSession();
+        $sessionBe = $session->getBag('contao_backend');
+
+        if (!$sessionBe->has('WEMGRID_ondeleteCallback_index')) {
+            $sessionBe->set('WEMGRID_ondeleteCallback_index', 0);
+        } else {
+            $sessionBe->set('WEMGRID_ondeleteCallback_index', ((int) $sessionBe->get('WEMGRID_ondeleteCallback_index')) + 1);
+        }
+        if (!$sessionBe->has('WEMGRID_ondeleteCallback_ids')) {
+            $sessionBe->set('WEMGRID_ondeleteCallback_ids', []);
+        }
+
+        $sessionBe->set('WEMGRID_ondeleteCallback_ids', array_merge($sessionBe->get('WEMGRID_ondeleteCallback_ids'), [$objItem->id]));
 
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
 
@@ -226,8 +240,16 @@ class tlContentCallback
             $this->deleteCorrespondingGridStartFromGridStop($objItem);
         }
 
-        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
         $session->remove($sessionKey);
+
+        if ($session->has('CURRENT')
+            && \count($session->get('CURRENT')['IDS']) === \count($sessionBe->get('WEMGRID_ondeleteCallback_ids'))
+        ) {
+            $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+
+            $sessionBe->remove('WEMGRID_ondeleteCallback_index');
+            $sessionBe->remove('WEMGRID_ondeleteCallback_ids');
+        }
     }
 
     public function onundoCallback(string $table, array $data, DataContainer $dc): void
