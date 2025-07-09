@@ -44,37 +44,37 @@ class GridOpened
 
     public function getItemClassesForAllResolution(): array
     {
-        return $this->item_classes['all'];
+        return $this->item_classes['all'] ?? [];
     }
 
     public function getItemClassesColsForItemId(string $itemId): ?string
     {
-        return $this->item_classes['items'][$itemId.'_cols'];
+        return $this->item_classes['items'][$itemId.'_cols'] ?? null;
     }
 
     public function getItemClassesRowsForItemId(string $itemId): ?string
     {
-        return $this->item_classes['items'][$itemId.'_rows'];
+        return $this->item_classes['items'][$itemId.'_rows'] ?? null;
     }
 
     public function getItemClassesFormColsForItemIdAndResolution(string $itemId, string $resolution): ?string
     {
-        return $this->item_classes_form['items'][$itemId.'_cols'][$resolution];
+        return $this->item_classes_form['items'][$itemId.'_cols'][$resolution] ?? null;
     }
 
     public function getItemClassesFormRowsForItemIdAndResolution(string $itemId, string $resolution): ?string
     {
-        return $this->item_classes_form['items'][$itemId.'_rows'][$resolution];
+        return $this->item_classes_form['items'][$itemId.'_rows'][$resolution] ?? null;
     }
 
     public function getItemClassesClassesForItemId(string $itemId): ?string
     {
-        return $this->item_classes['items'][$itemId.'_classes'];
+        return $this->item_classes['items'][$itemId.'_classes'] ?? null;
     }
 
     public function getItemClassesFormClassesForItemId(string $itemId): ?string
     {
-        return $this->item_classes_form['items'][$itemId.'_classes'];
+        return $this->item_classes_form['items'][$itemId.'_classes'] ?? null;
     }
 
     public function hasChildByItemId(string $itemId): bool

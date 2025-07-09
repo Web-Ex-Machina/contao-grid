@@ -60,6 +60,7 @@ class GridElementsCalculator
 
             if (GridStart::ELEMENT_TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
+
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
             }
         }
@@ -157,6 +158,8 @@ class GridElementsCalculator
             if (GridStart::ELEMENT_TYPE === $objItem->type) {
                 $objItemsIdsToSkip[] = $objItem->id;
                 $objItemsIdsToSkip = array_merge($objItemsIdsToSkip, $this->recalculateGridItems($objItem, $objItemsIdsToSkip, $objItems, $itemsClasses, $isAfterACopy));
+                // DO NOT RETURN, GRID-START ELEMENT SHOULD BE A CHILD OF THE PARENT GRID !
+                // return $objItemsIdsToSkip;
             }
 
             if (!$gsm->isItemInGrid($objItem)) {
@@ -164,14 +167,22 @@ class GridElementsCalculator
                     // we will replace items IDS, based on the index
                     $oldKeys = array_keys($gridItemsSave);
 
-                    $oldContentFirstKey = $oldKeys[$itemIndexInGrid * 3]; // 3 because we set 3 properties !
-                    $oldContentId = substr($oldContentFirstKey, 0, strpos($oldContentFirstKey, '_'));
+                    if (\array_key_exists($itemIndexInGrid * 3, $oldKeys)) {
+                        $oldContentFirstKey = $oldKeys[$itemIndexInGrid * 3]; // 3 because we set 3 properties !
+                        $oldContentId = substr($oldContentFirstKey, 0, strpos($oldContentFirstKey, '_'));
 
-                    $gsm->setGridItemsSettingsForItem((int) $objItem->id,
-                        $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_COLS] ?? [],
-                        $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
-                        $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
-                    );
+                        $gsm->setGridItemsSettingsForItem((int) $objItem->id,
+                            $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_COLS] ?? [],
+                            $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_ROWS] ?? [],
+                            $gridItemsSave[$oldContentId.'_'.GridStartManipulator::PROPERTY_CLASSES] ?? ''
+                        );
+                    } else {
+                        $gsm->setGridItemsSettingsForItem((int) $objItem->id,
+                            [],
+                            [],
+                            ''
+                        );
+                    }
 
                     ++$itemIndexInGrid;
                 } else {

@@ -19,6 +19,7 @@ use Contao\ContentModel;
 use Contao\Widget;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Elements\GridStart;
+use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Helper\GridBuilder;
 
 class GridElementWizard extends Widget
@@ -84,7 +85,7 @@ class GridElementWizard extends Widget
 
             // Check if the _classes item for this key contains stuff
             // If true, concat the values
-            if ($varValue[$k.'_classes']) {
+            if ($varValue[$k.'_classes'] ?? false) {
                 $v .= ' '.$varValue[$k.'_classes'];
             }
         }
