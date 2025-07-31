@@ -33,7 +33,7 @@ class tlContentCallback
 
     public function __construct(
         Connection $connection,
-        GridElementsCalculator $gridElementsCalculator
+        GridElementsCalculator $gridElementsCalculator,
     ) {
         $this->connection = $connection;
         $this->gridElementsCalculator = $gridElementsCalculator;
@@ -112,7 +112,7 @@ class tlContentCallback
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
 
         $sessionKey = 'WEMGRID_ondeleteCallback';
-        $session = System::getContainer()->get('session');
+        $session = System::getContainer()->get('request_stack')->getSession();
         if ($session->has($sessionKey)) {
             return;
         }
@@ -132,7 +132,7 @@ class tlContentCallback
     public function onundoCallback(string $table, array $data, DataContainer $dc): void
     {
         $sessionKey = 'WEMGRID_onundoCallback';
-        $session = System::getContainer()->get('session');
+        $session = System::getContainer()->get('request_stack')->getSession();
         if ($session->has($sessionKey)) {
             return;
         }
