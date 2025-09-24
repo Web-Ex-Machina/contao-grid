@@ -1,7 +1,7 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
-1.0.11 - 2025-XX-XX
+1.0.11 - 2025-09-24
 ---
 - FIXED : Grid recalculates its elements after a copy
 
