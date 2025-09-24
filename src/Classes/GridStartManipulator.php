@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -16,7 +16,7 @@ namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
 use Contao\System;
-use InvalidArgumentException;
+use WEM\GridBundle\Elements\GridStart;
 
 class GridStartManipulator
 {
@@ -113,8 +113,8 @@ class GridStartManipulator
 
     public function setGridStart(ContentModel $gridStart): self
     {
-        if ('grid-start' !== $gridStart->type) {
-            throw new InvalidArgumentException('The argument is not a grid-start content element !');
+        if (GridStart::ELEMENT_TYPE !== $gridStart->type) {
+            throw new \InvalidArgumentException('The argument is not a grid-start content element !');
         }
 
         $this->gridStart = $gridStart;
@@ -151,13 +151,12 @@ class GridStartManipulator
      * Allow to set the grid cols settings.
      *
      * @param int|null $all The settings for all resolutions
-     * @param int|null $xl The settings for the XL resolution
-     * @param int|null $lg The settings for the LG resolution
-     * @param int|null $md The settings for the MD resolution
-     * @param int|null $sm The settings for the SM resolution
-     * @param int|null $xs The settings for the XS resolution
+     * @param int|null $xl  The settings for the XL resolution
+     * @param int|null $lg  The settings for the LG resolution
+     * @param int|null $md  The settings for the MD resolution
+     * @param int|null $sm  The settings for the SM resolution
+     * @param int|null $xs  The settings for the XS resolution
      * @param int|null $xxs The settings for the XXS resolution
-     * @return GridStartManipulator
      */
     public function setGridCols(?int $all, ?int $xl, ?int $lg, ?int $md, ?int $sm, ?int $xs, ?int $xxs): self
     {
@@ -176,7 +175,6 @@ class GridStartManipulator
      * Set the grid cols value for all resolution.
      *
      * @param int|null $value the value
-     * @return GridStartManipulator
      */
     public function setGridColsAll(?int $value): self
     {
@@ -189,7 +187,6 @@ class GridStartManipulator
      * Set the grid cols value for XXS resolution.
      *
      * @param int|null $value the value
-     * @return GridStartManipulator
      */
     public function setGridColsXxs(?int $value): self
     {
@@ -202,7 +199,6 @@ class GridStartManipulator
      * Set the grid cols value for XS resolution.
      *
      * @param int|null $value the value
-     * @return GridStartManipulator
      */
     public function setGridColsXs(?int $value): self
     {
@@ -215,7 +211,6 @@ class GridStartManipulator
      * Set the grid cols value for SM resolution.
      *
      * @param int|null $value the value
-     * @return GridStartManipulator
      */
     public function setGridColsSm(?int $value): self
     {
@@ -228,7 +223,6 @@ class GridStartManipulator
      * Set the grid cols value for MD resolution.
      *
      * @param int|null $value the value
-     * @return GridStartManipulator
      */
     public function setGridColsMd(?int $value): self
     {
@@ -241,7 +235,6 @@ class GridStartManipulator
      * Set the grid cols value for LG resolution.
      *
      * @param int|null $value the value
-     * @return GridStartManipulator
      */
     public function setGridColsLg(?int $value): self
     {
@@ -254,7 +247,6 @@ class GridStartManipulator
      * Set the grid cols value for XL resolution.
      *
      * @param int|null $value the value
-     * @return GridStartManipulator
      */
     public function setGridColsXl(?int $value): self
     {
@@ -363,11 +355,10 @@ class GridStartManipulator
     /**
      * Set the value of a property on a certain resolution for a specified item ID.
      *
-     * @param int $itemId The item's ID
-     * @param string $property The property
+     * @param int         $itemId     The item's ID
+     * @param string      $property   The property
      * @param string|null $resolution The resolution
-     * @param string $value The value
-     * @return GridStartManipulator
+     * @param string      $value      The value
      */
     public function setGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, ?string $resolution, string $value): self
     {
@@ -587,10 +578,9 @@ class GridStartManipulator
     /**
      * Get the value of a property on a certain resolution for a specified item ID.
      *
-     * @param int $itemId The item's ID
-     * @param string $property The property
+     * @param int         $itemId     The item's ID
+     * @param string      $property   The property
      * @param string|null $resolution The resolution
-     * @return mixed
      */
     public function getGridItemsSettingsForItemAndPropertyAndResolution(int $itemId, string $property, ?string $resolution = null)
     {
@@ -800,7 +790,7 @@ class GridStartManipulator
     public function validateProperty(string $property): void
     {
         if (!\in_array($property, self::PROPERTIES, true)) {
-            throw new InvalidArgumentException('The property value must be one of the following : "'.implode('", "', self::PROPERTIES).'"');
+            throw new \InvalidArgumentException('The property value must be one of the following : "'.implode('", "', self::PROPERTIES).'"');
         }
     }
 
@@ -812,7 +802,7 @@ class GridStartManipulator
     public function validateResolution(string $resolution): void
     {
         if (!\in_array($resolution, self::RESOLUTIONS, true)) {
-            throw new InvalidArgumentException('The resolution value must be one of the following : "'.implode('", "', self::RESOLUTIONS).'"');
+            throw new \InvalidArgumentException('The resolution value must be one of the following : "'.implode('", "', self::RESOLUTIONS).'"');
         }
     }
 

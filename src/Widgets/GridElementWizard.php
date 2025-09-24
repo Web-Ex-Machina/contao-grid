@@ -19,6 +19,7 @@ use Contao\ContentModel;
 use Contao\Widget;
 use WEM\GridBundle\Classes\GridOpenedManager;
 use WEM\GridBundle\Elements\GridStart;
+use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Helper\GridBuilder;
 
 class GridElementWizard extends Widget
@@ -84,7 +85,7 @@ class GridElementWizard extends Widget
 
             // Check if the _classes item for this key contains stuff
             // If true, concat the values
-            if ($varValue[$k.'_classes']) {
+            if ($varValue[$k.'_classes'] ?? false) {
                 $v .= ' '.$varValue[$k.'_classes'];
             }
         }
@@ -137,14 +138,14 @@ class GridElementWizard extends Widget
             }
 
             // And break the loop if we hit the grid-stop element corresponding to the very first grid
-            if ('grid-stop' === $objItems->type && (string)$this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
+            if (GridStop::ELEMENT_TYPE === $objItems->type && (string)$this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
                 break;
             }
 
             $objItems->isForGridElementWizard = true;
-            if ('grid-start' === $objItems->type) {
+            if (GridStart::ELEMENT_TYPE === $objItems->type) {
                 $strElement = $this->getContentElement($objItems->current());
-            } elseif ('grid-stop' === $objItems->type) {
+            } elseif (GridStop::ELEMENT_TYPE === $objItems->type) {
                 $strElement = $this->BEGridItemSettings(
                     $this->gridOpenedManager->getPreviousLastOpenedGridId(),
                     (string) $this->gridOpenedManager->getLastOpenedGridId(),

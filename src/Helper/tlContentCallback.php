@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -17,13 +17,16 @@ namespace WEM\GridBundle\Helper;
 use Contao\ContentModel;
 use Contao\CoreBundle\Exception\AjaxRedirectResponseException;
 use Contao\CoreBundle\Exception\RedirectResponseException;
+use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use WEM\GridBundle\Classes\GridElementsCalculator;
+use WEM\GridBundle\Classes\GridStartManipulator;
 use WEM\GridBundle\Elements\GridStart;
+use WEM\GridBundle\Elements\GridStop;
 
 class tlContentCallback
 {
@@ -42,6 +45,17 @@ class tlContentCallback
     public function includeJSCSS(): void
     {
         $GLOBALS['TL_CSS'][] = 'bundles/wemgrid/css/backend.css';
+
+        $session = System::getContainer()->get('request_stack')->getSession();
+        if (
+            \is_array($session->get('CLIPBOARD'))
+            && \array_key_exists('tl_content', $session->get('CLIPBOARD'))
+            && 0 === \count($session->get('CLIPBOARD')['tl_content'])
+        ) {
+            $sessionBe = $session->getBag('contao_backend');
+            $sessionBe->remove('WEMGRID_oncopyCallback_index');
+            $sessionBe->remove('WEMGRID_oncopyCallback_ids');
+        }
     }
 
     public function onsubmitCallback(DataContainer $dc): void
@@ -55,47 +69,132 @@ class tlContentCallback
 
     public function oncutCallback(DataContainer $dc): void
     {
+        $session = System::getContainer()->get('request_stack')->getSession();
+
         $objItem = ContentModel::findOneById($dc->id);
         $objItem->refresh();
         // otherwise the $objItem still has its previous "sorting" value ...
+        $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
+        $objItem->save();
+
         $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
     }
 
     public function oncopyCallback(int $itemId, DataContainer $dc): void
     {
+        // copy 1 tl_article
+        // GET act=copy&do=article
+        // CLIPBOARD => tl_content && tl_article
+        // copy 1 tl_content
+        // GET act=copy&id=XXX => copy item XXX
+        // copy 2 tl_content
+        // GET act=copyAll => copy multiple items
+
+        $blnJustForceGridItemsRecalculation = false;
+
+        $session = System::getContainer()->get('request_stack')->getSession();
+        $sessionBe = $session->getBag('contao_backend');
+
+        if (!$sessionBe->has('WEMGRID_oncopyCallback_index')) {
+            $sessionBe->set('WEMGRID_oncopyCallback_index', 0);
+        } else {
+            $sessionBe->set('WEMGRID_oncopyCallback_index', ((int) $sessionBe->get('WEMGRID_oncopyCallback_index')) + 1);
+        }
+        if (!$sessionBe->has('WEMGRID_oncopyCallback_ids')) {
+            $sessionBe->set('WEMGRID_oncopyCallback_ids', []);
+        }
+
+        $sessionBe->set('WEMGRID_oncopyCallback_ids', array_merge($sessionBe->get('WEMGRID_oncopyCallback_ids'), [$itemId]));
+
+        if (
+            \is_array($session->get('CLIPBOARD'))
+            && \array_key_exists('tl_content', $session->get('CLIPBOARD'))
+        ) {
+            // We are copying tl_content ONLY
+            if ('copy' === \Contao\Input::get('act')) {
+                // only 1 item copied
+                $blnJustForceGridItemsRecalculation = true;
+            }
+
+            if ('copyAll' === \Contao\Input::get('act')) {
+                // multiple items copied
+                $idsToCopy = $session->get('CURRENT')['IDS'];
+
+                $nbGridStart = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], [GridStart::ELEMENT_TYPE]);
+                $nbGridStop = ContentModel::countBy(['id IN ('.implode(',', array_map('\intval', $idsToCopy)).') AND type = ?'], [GridStop::ELEMENT_TYPE]);
+                if ($nbGridStart !== $nbGridStop
+                    // || (0 === $nbGridStart && 0 === $nbGridStop)
+                ) {
+                    // not the same number of grid start & stop
+                    // do not take any chance, just recalculate everything
+                    $blnJustForceGridItemsRecalculation = true;
+                }
+            }
+        }
+
+        if ($blnJustForceGridItemsRecalculation) {
+            $objItem = ContentModel::findOneById($itemId);
+            $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
+            // ugly fix to allow duplication of element in grid edition
+            $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
+            $objItem->save();
+            $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+            $this->copyGridElementConfigurationFromOneGridToAnother((int) $itemId, (int) $dc->id);
+
+            $sessionBe->remove('WEMGRID_oncopyCallback_index');
+            $sessionBe->remove('WEMGRID_oncopyCallback_ids');
+
+            return;
+        }
+
+        // we are copying article or page or whatever
         $objItem = ContentModel::findOneById($itemId);
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
         // ugly fix to allow duplication of element in grid edition
         $objItem->tstamp = 0 !== (int) $objItem->tstamp ? $objItem->tstamp : time();
         $objItem->save();
         // end of ugly fix
-        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
 
-        // Cannot work !
-        // Contao executes the callback after each copy and not after the copies are done
-        // START
-        // $objItem->refresh(); // just in case
-        // $objItemSource = ContentModel::findOneById($dc->id);
-        // if (!$objItemSource) {
-        //     return;
-        // }
+        if (GridStart::ELEMENT_TYPE === $objItem->type) {
+            $sessionKey = 'WEMGRID_oncopyCallback_'.$objItem->id;
+            if ($sessionBe->has($sessionKey)) {
+                return;
+            }
 
-        // $gridItemsSource = null !== $objItemSource->grid_items ? unserialize($objItemSource->grid_items) : [];
-        // $gridItemsDest = null !== $objItem->grid_items ? unserialize($objItem->grid_items) : [];
+            $sessionBe->set($sessionKey, $dc->id); // new grid-start ID reference old grid-start ID
+        } elseif (GridStop::ELEMENT_TYPE === $objItem->type) {
+            $objNewGridStart = $this->gridElementsCalculator->getGridStartCorrespondingToGridStop($objItem);
+            if (null === $objNewGridStart) {
+                return;
+            }
 
-        // if (\count($gridItemsDest) !== \count($gridItemsSource)) {
-        //     return;
-        // }
+            $sessionKey = 'WEMGRID_oncopyCallback_'.$objNewGridStart->id;
+            if (!$sessionBe->has($sessionKey)) {
+                return;
+            }
 
-        // $gridItemsSourceKeys = array_keys($gridItemsSource);
-        // $gridItemsDestKeys = array_keys($gridItemsDest);
+            $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable, (int) $objNewGridStart->sorting, (int) $objItem->sorting, true);
+            $sessionBe->remove($sessionKey);
+        }
 
-        // foreach ($gridItemsSourceKeys as $index => $sourceKey) {
-        //     $gridItemsDest[$gridItemsDestKeys[$index]] = $gridItemsSource[$sourceKey];
-        // }
-        // $objItem->grid_items = serialize($gridItemsDest);
-        // $objItem->save();
-        // END
+        if ($session->has('CURRENT')
+            // && count($session->get('CURRENT')['IDS']) === (int) $sessionBe->get('WEMGRID_oncopyCallback_index')
+            && \count($session->get('CURRENT')['IDS']) === \count($sessionBe->get('WEMGRID_oncopyCallback_ids'))
+        ) {
+            $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+            // for each copied items
+            // get original id (index of WEMGRID_oncopyCallback_ids === index of CURRENT[IDS])
+            // retrieve gridstart referencing its original id
+            // if found, find gridstart referencing its new id
+            // if found, merge data
+
+            foreach ($sessionBe->get('WEMGRID_oncopyCallback_ids') as $index => $newId) {
+                $this->copyGridElementConfigurationFromOneGridToAnother((int) $newId, (int) $session->get('CURRENT')['IDS'][$index]);
+            }
+
+            $sessionBe->remove('WEMGRID_oncopyCallback_index');
+            $sessionBe->remove('WEMGRID_oncopyCallback_ids');
+        }
     }
 
     public function ondeleteCallback(DataContainer $dc, int $undoItemId): void
@@ -109,39 +208,61 @@ class tlContentCallback
             return;
         }
 
+        $session = System::getContainer()->get('request_stack')->getSession();
+        $sessionBe = $session->getBag('contao_backend');
+
+        if (!$sessionBe->has('WEMGRID_ondeleteCallback_index')) {
+            $sessionBe->set('WEMGRID_ondeleteCallback_index', 0);
+        } else {
+            $sessionBe->set('WEMGRID_ondeleteCallback_index', ((int) $sessionBe->get('WEMGRID_ondeleteCallback_index')) + 1);
+        }
+        if (!$sessionBe->has('WEMGRID_ondeleteCallback_ids')) {
+            $sessionBe->set('WEMGRID_ondeleteCallback_ids', []);
+        }
+
+        $sessionBe->set('WEMGRID_ondeleteCallback_ids', array_merge($sessionBe->get('WEMGRID_ondeleteCallback_ids'), [$objItem->id]));
+
         $objItem->refresh(); // otherwise the $objItem still has its previous "sorting" value ...
 
         $sessionKey = 'WEMGRID_ondeleteCallback';
-        $session = System::getContainer()->get('request_stack')->getSession();
+        $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
         if ($session->has($sessionKey)) {
             return;
         }
 
         $session->set($sessionKey, 1);
 
-        if ('grid-start' === $objItem->type) {
+        if (GridStart::ELEMENT_TYPE === $objItem->type) {
             $this->deleteCorrespondingGridStopFromGridStart($objItem);
-        } elseif ('grid-stop' === $objItem->type) {
+        } elseif (GridStop::ELEMENT_TYPE === $objItem->type) {
             $this->deleteCorrespondingGridStartFromGridStop($objItem);
         }
 
-        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
         $session->remove($sessionKey);
+
+        if ($session->has('CURRENT')
+            && \count($session->get('CURRENT')['IDS']) === \count($sessionBe->get('WEMGRID_ondeleteCallback_ids'))
+        ) {
+            $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $objItem->pid, $objItem->ptable);
+
+            $sessionBe->remove('WEMGRID_ondeleteCallback_index');
+            $sessionBe->remove('WEMGRID_ondeleteCallback_ids');
+        }
     }
 
     public function onundoCallback(string $table, array $data, DataContainer $dc): void
     {
         $sessionKey = 'WEMGRID_onundoCallback';
-        $session = System::getContainer()->get('request_stack')->getSession();
+        $session = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
         if ($session->has($sessionKey)) {
             return;
         }
 
         $session->set($sessionKey, 1);
-        if (ContentModel::getTable() === $table && 'grid-start' === $data['type']) {
+        if (ContentModel::getTable() === $table && GridStart::ELEMENT_TYPE === $data['type']) {
             // restore the grid-stop
             $this->restoreClosestGridStopFromGridStart($data, $dc);
-        } elseif (ContentModel::getTable() === $table && 'grid-stop' === $data['type']) {
+        } elseif (ContentModel::getTable() === $table && GridStop::ELEMENT_TYPE === $data['type']) {
             // restore the grid-start
             $this->restoreClosestGridStartFromGridStop($data, $dc);
         }
@@ -176,9 +297,9 @@ class tlContentCallback
 
             // only work on elements placed AFTER the grid-start
             if ((int) $sorting > (int) $gridStartUndoData['sorting']) {
-                if ('grid-start' === $row['data'][ContentModel::getTable()][0]['type']) {
+                if (GridStart::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     ++$nbGridOpened;
-                } elseif ('grid-stop' === $row['data'][ContentModel::getTable()][0]['type']) {
+                } elseif (GridStop::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     if (0 === $nbGridOpened) {
                         // it's the one
                         $gridStopUndoId = $row['undo_id'];
@@ -228,9 +349,9 @@ class tlContentCallback
 
             // only work on elements placed BEFORE the grid-stop
             if ((int) $sorting < (int) $gridStopUndoData['sorting']) {
-                if ('grid-stop' === $row['data'][ContentModel::getTable()][0]['type']) {
+                if (GridStop::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     ++$nbGridOpened;
-                } elseif ('grid-start' === $row['data'][ContentModel::getTable()][0]['type']) {
+                } elseif (GridStart::ELEMENT_TYPE === $row['data'][ContentModel::getTable()][0]['type']) {
                     if (0 === $nbGridOpened) {
                         // it's the one
                         $gridStartUndoId = $row['undo_id'];
@@ -291,9 +412,9 @@ class tlContentCallback
     protected function createMissingGridStartStop(DataContainer $dc): void
     {
         if (null !== $dc->activeRecord) {
-            if ('grid-start' === $dc->activeRecord->type) {
+            if (GridStart::ELEMENT_TYPE === $dc->activeRecord->type) {
                 $this->createMissingGridStop($dc);
-            } elseif ('grid-stop' === $dc->activeRecord->type) {
+            } elseif (GridStop::ELEMENT_TYPE === $dc->activeRecord->type) {
                 $this->createMissingGridStart($dc);
             }
         }
@@ -340,8 +461,8 @@ class tlContentCallback
             && \array_key_exists('type', $rowData[ContentModel::getTable()][0])
             && \array_key_exists('sorting', $rowData[ContentModel::getTable()][0])
             && (
-                'grid-start' === $rowData[ContentModel::getTable()][0]['type']
-                || 'grid-stop' === $rowData[ContentModel::getTable()][0]['type']
+                GridStart::ELEMENT_TYPE === $rowData[ContentModel::getTable()][0]['type']
+                || GridStop::ELEMENT_TYPE === $rowData[ContentModel::getTable()][0]['type']
             )
             ) {
                 $arrDataFormatted[$rowData[ContentModel::getTable()][0]['sorting']] = [
@@ -361,16 +482,16 @@ class tlContentCallback
      */
     protected function createMissingGridStop(DataContainer $dc): void
     {
-        if (null !== $dc->activeRecord && 'grid-start' === $dc->activeRecord->type) {
-            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-start']);
-            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-stop']);
+        if (null !== $dc->activeRecord && GridStart::ELEMENT_TYPE === $dc->activeRecord->type) {
+            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStart::ELEMENT_TYPE]);
+            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStop::ELEMENT_TYPE]);
 
             if ($gridStarts > $gridStops) {
                 $objElement = new ContentModel();
                 $objElement->tstamp = time();
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
-                $objElement->type = 'grid-stop';
+                $objElement->type = GridStop::ELEMENT_TYPE;
                 $objElement->sorting = $dc->activeRecord->sorting + 1;
                 $objElement->save();
             }
@@ -384,16 +505,16 @@ class tlContentCallback
      */
     protected function createMissingGridStart(DataContainer $dc): void
     {
-        if (null !== $dc->activeRecord && 'grid-stop' === $dc->activeRecord->type) {
-            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-start']);
-            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, 'grid-stop']);
+        if (null !== $dc->activeRecord && GridStop::ELEMENT_TYPE === $dc->activeRecord->type) {
+            $gridStarts = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStart::ELEMENT_TYPE]);
+            $gridStops = ContentModel::countBy(['pid = ?', 'ptable = ?', 'type = ?'], [$dc->activeRecord->pid, $dc->activeRecord->ptable, GridStop::ELEMENT_TYPE]);
 
             if ($gridStarts < $gridStops) {
                 $objElement = new ContentModel();
                 $objElement->tstamp = time();
                 $objElement->pid = $dc->activeRecord->pid;
                 $objElement->ptable = $dc->activeRecord->ptable;
-                $objElement->type = 'grid-start';
+                $objElement->type = GridStart::ELEMENT_TYPE;
                 $objElement->grid_mode = GridStart::MODE_AUTOMATIC;
                 $objElement->sorting = $dc->activeRecord->sorting - 1;
                 $objElement->save();
@@ -424,5 +545,32 @@ class tlContentCallback
         }
 
         return $objRecordUndo;
+    }
+
+    protected function copyGridElementConfigurationFromOneGridToAnother(int $newId, int $oldId): void
+    {
+        $db = Database::getInstance();
+        $objGridStartOldData = $db->prepare('SELECT id FROM tl_content WHERE type=? AND grid_items LIKE ?')->execute(GridStart::ELEMENT_TYPE, '%'.$oldId.'_cols%')->fetchAssoc();
+        $objGridStartNewData = $db->prepare('SELECT id FROM tl_content WHERE type=? AND grid_items LIKE ?')->execute(GridStart::ELEMENT_TYPE, '%'.$newId.'_cols%')->fetchAssoc();
+
+        if (false === $objGridStartOldData || false === $objGridStartNewData) {
+            return;
+        }
+
+        $objGridStartOld = ContentModel::findByPk($objGridStartOldData['id']);
+        $objGridStartNew = ContentModel::findByPk($objGridStartNewData['id']);
+
+        $objGSMOld = GridStartManipulator::create($objGridStartOld);
+        $objGSMNew = GridStartManipulator::create($objGridStartNew);
+
+        $oldItemData = $objGSMOld->getGridItemsSettingsForItem($oldId);
+
+        $arrayKeys = array_keys($oldItemData);
+
+        $objGSMNew->setGridItemsSettingsForItem($newId, $oldItemData[$arrayKeys[0]] ?? [], $oldItemData[$arrayKeys[1]] ?? [], $oldItemData[$arrayKeys[2]] ?? '');
+
+        $objGridStartNew = $objGSMNew->getGridStart();
+
+        $objGridStartNew->save();
     }
 }

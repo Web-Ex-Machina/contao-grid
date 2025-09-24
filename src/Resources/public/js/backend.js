@@ -242,6 +242,7 @@ WEM.Grid  = WEM.Grid || {};
             if(-1 < element.className.indexOf(self.selectors.grid.substring(1))
             // ||  -1 < element.className.indexOf('d-grid')
             || -1 < element.className.indexOf('ce_grid-start')
+            // || -1 < element.className.indexOf('grid_preview')
             ){
                 return element;
             }else{

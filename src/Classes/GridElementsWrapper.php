@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -20,7 +20,9 @@ use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use WEM\GridBundle\Elements\GridItemEmpty;
 use WEM\GridBundle\Elements\GridStart;
+use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Helper\GridBuilder;
 
 /**
@@ -34,7 +36,7 @@ class GridElementsWrapper
 
     protected GridCssClassesInheritance $gridCssClassesInheritance;
 
-    protected static array $arrSkipContentTypes = ['grid-start', 'grid-stop'];
+    protected static array $arrSkipContentTypes = [GridStart::ELEMENT_TYPE, GridStop::ELEMENT_TYPE];
 
     public function __construct(
         TranslatorInterface $translator,
@@ -58,6 +60,7 @@ class GridElementsWrapper
     public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
         $gop = GridOpenedManager::getInstance();
+        // dump($gop);
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
         // Skip elements we never want to wrap or if we are not in a grid
         if (($scopeMatcher->isBackend() && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
@@ -66,25 +69,31 @@ class GridElementsWrapper
 
         // Get the last open grid
         $openGrid = $gop->getLastOpenedGrid();
+        // dump($openGrid);
         $currentGridId = $gop->getLastOpenedGridId();
 
         // Yep, same code in FE/BE, but FE here if we want it to work /shrug
         // We won't need this grid anymore so we pop the global grid array
-        if (!$scopeMatcher->isBackend() && 'grid-stop' === $objElement->type) {
+        if (!$scopeMatcher->isBackend() && GridStop::ELEMENT_TYPE === $objElement->type) {
             $gop->closeLastOpenedGrid();
         }
 
         // If we used grids elements, we had to adjust the behaviour
-        if ('grid-start' === $objElement->type && true === $openGrid->isSubGrid()) {
+        if (GridStart::ELEMENT_TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
             $gop->openGrid($objElement);
             // For nested grid - starts, we want to add only the start of the item wrapper
             // Retrieve the parent
             $openGrid = $gop->getParentGrid($objElement);
+        // dump($openGrid);
+        // if(null === $openGrid){
+        //     dump($GLOBALS['WEM']['GRID']);
+        //     die;
+        // }
 
             return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
         }
 
-        if ('grid-stop' === $objElement->type && true === $openGrid->isSubGrid()) {
+        if (GridStop::ELEMENT_TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
             $str = $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
 
             // Yep, same code in FE/BE, but BE here if we want it to work /shrug
@@ -121,14 +130,14 @@ class GridElementsWrapper
 
             $buttons = '';
 
-            if ('grid-item-empty' !== $objElement->type) {
+            if (GridItemEmpty::ELEMENT_TYPE !== $objElement->type) {
                 $buttons .= \sprintf('
                 <a
                 href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1&amp;rt=%s"
                 title="%s"
                 onclick="WEM.Grid.Utils.openModalIframe({\'title\':\'%s\',\'url\':this.href,\'onHide\':function(){window.location.reload();}});return false">
                 %s
-                </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
+                </a>', $do, $objElement->id, System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(), StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
             }
 
             $buttons .= \sprintf('
@@ -185,7 +194,7 @@ class GridElementsWrapper
                 title="%s"
                 target="_blank">
                 %s
-                </a>', $do, $objElement->id, REQUEST_TOKEN, StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
+                </a>', $do, $objElement->id, System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(), StringUtil::specialchars($titleEdit), Image::getHtml('edit.svg', $titleEdit));
 
             $buttons .= \sprintf('
                 <a class="item-delete"
@@ -270,7 +279,7 @@ class GridElementsWrapper
                 GridStart::MODE_AUTOMATIC === $openGrid->getMode() ? '' : ($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
                 $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
                 true === $openGrid->isSubGrid() ? 'be_subgrid_item' : '',
-                'grid-item-empty' === $objElement->type ? 'be_grid_item_empty' : '',
+                GridItemEmpty::ELEMENT_TYPE === $objElement->type ? 'be_grid_item_empty' : '',
                 $objElement->id,
                 $objElement->type,
                 $this->getBackendActionsForContentElement($objElement, $do, true),
