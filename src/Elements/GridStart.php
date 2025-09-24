@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -26,8 +26,8 @@ use WEM\GridBundle\Classes\GridOpenedManager;
  */
 class GridStart extends ContentElement
 {
+    public const ELEMENT_TYPE = 'grid-start';
     public const MODE_CUSTOM = 'custom';
-
     public const MODE_AUTOMATIC = 'automatic';
 
     /**
@@ -77,7 +77,7 @@ class GridStart extends ContentElement
                     }
 
                     if (0 !== (int) $val) {
-                        $breakpoints[] = $breakpoint['label'].': '.sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
+                        $breakpoints[] = $breakpoint['label'].': '.\sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
                     }
                 }
 
@@ -88,7 +88,7 @@ class GridStart extends ContentElement
         }
 
         // Check if the very next element is a grid-stop element
-        $objNextElement = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute([$this->pid, $this->ptable, $this->sorting]);
+        $objNextElement = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute($this->pid, $this->ptable, $this->sorting);
 
         // Update : I need it opened otherwise empty nested grid is buggy in BE
         if (1 > $objNextElement->numRows) {
@@ -124,6 +124,7 @@ class GridStart extends ContentElement
                 return $b;
             }
         }
+
         return null;
     }
 }

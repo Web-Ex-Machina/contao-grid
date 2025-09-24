@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * GRID for Contao Open Source CMS
- * Copyright (c) 2015-2024 Web ex Machina
+ * Copyright (c) 2015-2025 Web ex Machina
  *
  * @category ContaoBundle
  * @package  Web-Ex-Machina/contao-grid
@@ -238,14 +238,15 @@ class GridOpenedManager
     {
         if (!(
             is_a($element, DbResult::class)
+            || is_a($element, 'stdClass')
             || is_a($element, ContentModel::class)
             || is_a($element, GridStartElement::class)
             // || $element instanceof ContentModel::class
             // || $element instanceof GridStartElement::class
         )
-            || 'grid-start' !== $element->type
+            || GridStartElement::ELEMENT_TYPE !== $element->type
         ) {
-            throw new \InvalidArgumentException('The element "'.\get_class($element).'" is not a "grid-start"');
+            throw new \InvalidArgumentException('The element "'.$element::class.'" is not a "grid-start"');
         }
     }
 
