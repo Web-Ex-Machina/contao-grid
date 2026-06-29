@@ -44,7 +44,6 @@ $GLOBALS['TL_DCA']['tl_content']['subpalettes']['grid_mode_'.GridStart::MODE_AUT
 
 // Update tl_content fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_row_class'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_row_class'],
     'default' => 'row',
     'exclude' => true,
     'inputType' => 'select',
@@ -54,28 +53,24 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['grid_row_class'] = [
     'sql' => "varchar(32) NOT NULL default ''",
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_cols'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_cols'],
     'exclude' => true,
     'inputType' => 'gridBreakpointsValuesWizard',
     'eval' => ['tl_class' => ''],
     'sql' => 'blob NULL',
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_gap'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_gap'],
     'exclude' => true,
     'inputType' => 'gridGapValuesWizard',
     'eval' => ['tl_class' => ''],
     'sql' => 'blob NULL',
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_items'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_items'],
     'exclude' => true,
     'inputType' => 'gridElementWizard',
     'eval' => ['tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['grid_mode'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['grid_mode'],
     'exclude' => true,
     'inputType' => 'select',
     'options' => [
