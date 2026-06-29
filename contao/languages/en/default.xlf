@@ -23,17 +23,35 @@
       </trans-unit>
       <trans-unit id="CTE.grid-item-empty.0">
         <source>Grid | Empty item</source>
+        <target>Grid | Empty item</target>
       </trans-unit>
       <trans-unit id="CTE.grid-item-empty.1">
         <source>An empty element for a grid</source>
+        <target>An empty element for a grid</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.valuesLabel">
         <source>Values</source>
         <target>Values</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.resolutionLabel">
+        <source>Resolution</source>
+        <target>Resolution</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsLabel">
+        <source>Number of columns</source>
+        <target>Number of columns</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.gapValueLabel">
+        <source>Gap space between elements</source>
+        <target>Gap space between elements</target>
+      </trans-unit>
       <trans-unit id="WEM.GRID.BE.nbColsSelectLabel">
-        <source>Nb of cols for this item:</source>
-        <target>Nb of cols for this item:</target>
+        <source>Nb of cols :</source>
+        <target>Nb of cols :</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbRowsSelectLabel">
+        <source>Nb of rows :</source>
+        <target>Nb of rows :</target>
       </trans-unit>
       <trans-unit id="WEM.GRID.BE.additionalClassesLabel">
         <source>Additional classes:</source>
@@ -43,9 +61,57 @@
         <source>%s column(s)</source>
         <target>%s column(s)</target>
       </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbRowsOptionLabel">
+        <source>%s row(s)</source>
+        <target>%s row(s)</target>
+      </trans-unit>
       <trans-unit id="WEM.GRID.BE.inputItemPlaceholder">
         <source>Add a class to this item's wrapper</source>
         <target>Add a class to this item's wrapper</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridStart">
+        <source>Drag and drop the element here to place it at the grid's start</source>
+        <target>Drag and drop the element here to place it at the grid's start</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridEnd">
+        <source>Drag and drop the element here to place it at the grid's end</source>
+        <target>Drag and drop the element here to place it at the grid's end</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inheritedColumns">
+        <source>- (%s column(s) - Inherited from %s resolution)</source>
+        <target>- (%s column(s) - Inherited from %s resolution)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inheritedRows">
+        <source>- (%s row(s) - Inherited from %s resolution)</source>
+        <target>- (%s row(s) - Inherited from %s resolution)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointAll">
+        <source>Desktop</source>
+        <target>Desktop</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXl">
+        <source>XL</source>
+        <target>XL</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointLg">
+        <source>LG</source>
+        <target>LG</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointMd">
+        <source>MD</source>
+        <target>MD</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointSm">
+        <source>SM</source>
+        <target>SM</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXs">
+        <source>XS</source>
+        <target>XS</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXxs">
+        <source>XXS</source>
+        <target>XXS</target>
       </trans-unit>
     </body>
   </file>
