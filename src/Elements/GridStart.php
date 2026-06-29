@@ -47,7 +47,7 @@ class GridStart extends AbstractContentElementController
     ): Response 
     {
         // Check if the very next element is a grid-stop element
-        $objNextElement = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute($this->pid, $this->ptable, $this->sorting);
+        $objNextElement = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute($model->pid, $model->ptable, $model->sorting);
 
         // Update : I need it opened otherwise empty nested grid is buggy in BE
         if (1 > $objNextElement->numRows) {
@@ -56,24 +56,24 @@ class GridStart extends AbstractContentElementController
 
         $gop = GridOpenedManager::getInstance();
         try {
-            $arrGrid = $gop->getGridById((string) $this->id);
+            $arrGrid = $gop->getGridById((string) $model->id);
         } catch (\Exception $exception) {
-            $gop->openGrid($this);
-            $arrGrid = $gop->getGridById((string) $this->id);
+            $gop->openGrid($model);
+            $arrGrid = $gop->getGridById((string) $model->id);
         }
 
         // Add the classes to the Model so the main class can use it correct
-        if (\is_array($this->objModel->classes)) {
-            $this->objModel->classes = array_merge($arrGrid->getWrapperClasses(), $this->objModel->classes);
+        if (\is_array($model->classes)) {
+            $model->classes = array_merge($arrGrid->getWrapperClasses(), $model->classes);
         } else {
-            $this->objModel->classes = $arrGrid->getWrapperClasses();
+            $model->classes = $arrGrid->getWrapperClasses();
         }
 
         $gridCssClassesInheritance = new GridCssClassesInheritance();
-        $this->objModel->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
+        $model->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
 
         // Send the grid_id to template
-        $template->grid_id = $this->id;
+        $template->grid_id = $model->id;
 
         return $template->getResponse();
     }
