@@ -29,7 +29,7 @@
 						</option>
 					<?php endif; ?>
 					<?php for($i = 1; $i <= 12; $i++): ?>
-						<option value="<?php echo $i; ?>" <?php echo $i === (int) $b['value'] ? 'selected' : '' ?>>
+						<option value="<?php echo $i; ?>" <?php echo array_key_exists('value', $b) && $i === (int) $b['value'] ? 'selected' : '' ?>>
 							<?php echo $i; ?>
 						</option>
 					<?php endfor; ?>
