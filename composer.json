@@ -12,7 +12,7 @@
         }
     ],
     "support":{
-        "website":"https://www.webexmachina.fr/",
+        "website":"https://www.webexmachina.fr",
         "issues":"https://github.com/web-ex-machina/contao-grid/issues",
         "source":"https://github.com/web-ex-machina/contao-grid"
     },
@@ -33,16 +33,7 @@
     "autoload":{
         "psr-4": {
             "WEM\\GridBundle\\": "src/"
-        },
-        "classmap": [
-            "src/Resources/contao/"
-        ],
-        "exclude-from-classmap": [
-            "src/Resources/contao/config/",
-            "src/Resources/contao/dca/",
-            "src/Resources/contao/languages/",
-            "src/Resources/contao/templates/"
-        ]
+        }
     },
     "extra":{
         "contao-manager-plugin": "WEM\\GridBundle\\ContaoManager\\Plugin"

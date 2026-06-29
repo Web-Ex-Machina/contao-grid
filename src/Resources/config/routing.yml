@@ -1,3 +1,0 @@
-wem_gridbuilder.controller:
-    resource: '@WEMGridBundle/Controller'
-    type: annotation

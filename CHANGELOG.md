@@ -1,6 +1,12 @@
 Extension "Grid" for Contao Open Source CMS
 ========
 
+2.x - 2026-06-yy
+---
+- UPDATED: Compatibility with Contao 5.7
+- UPDATED: Drop compatibility with Contao 4.13
+- UPDATED: Modernize code
+
 1.0.11 - 2025-09-24
 ---
 - FIXED : Grid recalculates its elements after a copy

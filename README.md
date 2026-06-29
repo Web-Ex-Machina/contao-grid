@@ -13,14 +13,14 @@ Functionnalities
 System requirements
 -------------------
 
- * Contao 4.13 (Manager Edition)
  * Contao 5.3
-
+ * Contao 5.7
 
 Installation
 ------------
 
-Clone the extension from Packagist (Contao 4 - Manager Edition)
+Clone the extension from Packagist
+`composer require webexmachina/contao-grid`
 
 Unit-testing with docker
 -------------------
@@ -64,5 +64,5 @@ You can get the extension with this repository URL : [Github][2]
 
 [1]: CHANGELOG.md
 [2]: https://github.com/webexmachina/contao-grid
-[3]: https://www.webexmachina.fr/
+[3]: https://www.webexmachina.fr
 [4]: docker/.env
