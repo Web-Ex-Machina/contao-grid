@@ -15,18 +15,15 @@ declare(strict_types=1);
 namespace WEM\GridBundle\EventListener;
 
 use Contao\ContentModel;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\Input;
 use WEM\GridBundle\Classes\GridElementsWrapper;
 
-/**
- * Grid Hooks.
- */
+#[AsHook('getContentElement', priority: 100)]
 class GetContentElementListener
 {
-    protected GridElementsWrapper $gridElementsWrapper;
-
     public function __construct(
-        GridElementsWrapper $gridElementsWrapper,
+        protected GridElementsWrapper $gridElementsWrapper,
     ) {
         $this->gridElementsWrapper = $gridElementsWrapper;
     }

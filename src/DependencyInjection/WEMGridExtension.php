@@ -33,7 +33,6 @@ class WEMGridExtension extends Extension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('controllers.yaml');
-        $loader->load('listeners.yaml');
         $loader->load('services.yaml');
     }
 }

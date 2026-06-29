@@ -25,9 +25,6 @@ $GLOBALS['WEM']['GRID'] = [];
 $GLOBALS['TL_WRAPPERS']['start'][] = GridStart::ELEMENT_TYPE;
 $GLOBALS['TL_WRAPPERS']['stop'][] = GridStop::ELEMENT_TYPE;
 
-// Add Hook
-$GLOBALS['TL_HOOKS']['getContentElement'][] = ['wem.grid.event_listener.get_content_element', '__invoke'];
-
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = Widgets\GridElementWizard::class;
 $GLOBALS['BE_FFL']['gridBreakpointsValuesWizard'] = Widgets\GridBreakpointsValuesWizard::class;
