@@ -77,16 +77,18 @@ class GridElementWizard extends Widget
     {
         $varValue = $this->getPost($this->strName);
 
-        foreach ($varValue as $k => &$v) {
-            // Skip _classes items
-            if (false !== strpos((string) $k, '_classes')) {
-                continue;
-            }
+        if (isset($varValue) && is_array($varValue)) {
+            foreach ($varValue as $k => &$v) {
+                // Skip _classes items
+                if (false !== strpos((string) $k, '_classes')) {
+                    continue;
+                }
 
-            // Check if the _classes item for this key contains stuff
-            // If true, concat the values
-            if ($varValue[$k.'_classes'] ?? false) {
-                $v .= ' '.$varValue[$k.'_classes'];
+                // Check if the _classes item for this key contains stuff
+                // If true, concat the values
+                if ($varValue[$k.'_classes'] ?? false) {
+                    $v .= ' '.$varValue[$k.'_classes'];
+                }
             }
         }
 
@@ -194,12 +196,16 @@ class GridElementWizard extends Widget
             $selectsCols = [];
             $selectsRows = [];
             $cols = $grid->getCols();
+            $v = null;
+
             foreach ($breakpoints as $breakpoint) {
                 // Build a select options html with the number of possibilities
                 $options = '<option value="">-</option>';
+
                 foreach ($cols as $c) {
                     if ($breakpoint === $c['key']) {
                         $v = $grid->getItemClassesFormColsForItemIdAndResolution($objItemId, $breakpoint);
+
                         for ($i = 1; $i <= $c['value']; ++$i) {
                             $optionValue = sprintf('cols-span%s-%s', ('all' !== $breakpoint) ? '-'.$breakpoint : '', $i);
                             $options .= sprintf(
@@ -211,6 +217,7 @@ class GridElementWizard extends Widget
                         }
                     }
                 }
+
 
                 $selectsCols[] = sprintf('
                         <label for="ctrl_%1$s_%2$s_cols_%5$s" class="%8$s" data-force-hidden="%7$s">%4$s</label>
