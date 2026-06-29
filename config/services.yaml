@@ -1,4 +1,13 @@
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  WEM\GridBundle\:
+    resource: ../src/
+    exclude: ../src/{ContaoManager,DependencyInjection}
+
   wem.grid.classes.grid_elements_wrapper:
     class: WEM\GridBundle\Classes\GridElementsWrapper
     arguments:

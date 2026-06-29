@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use WEM\GridBundle\Classes\GridOpenedManager;
 
 #[AsContentElement(
-    type: GridStart::ELEMENT_TYPE,
+    type: GridStop::ELEMENT_TYPE,
     category: 'texts',
     template: 'ce_grid_stop', 
     nestedFragments: true,

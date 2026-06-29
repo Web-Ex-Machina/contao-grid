@@ -77,15 +77,4 @@ class GridStart extends AbstractContentElementController
 
         return $template->getResponse();
     }
-
-    protected function getBreakpointData($name)
-    {
-        foreach ($this->arrGridBreakpoints as $b) {
-            if ($name === $b['name']) {
-                return $b;
-            }
-        }
-
-        return null;
-    }
 }

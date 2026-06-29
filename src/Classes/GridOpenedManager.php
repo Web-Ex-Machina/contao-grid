@@ -28,7 +28,7 @@ class GridOpenedManager
 
     private GridBuilder $gridBuilder;
 
-    private function __construct()
+    public function __construct()
     {
     }
 
