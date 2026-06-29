@@ -14,41 +14,41 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Elements;
 
-use Contao\BackendTemplate;
-use Contao\ContentElement;
+use Contao\ContentModel;
+use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use WEM\GridBundle\Classes\GridOpenedManager;
 
-/**
- * Content Element "grid-stop".
- */
-class GridStop extends ContentElement
+#[AsContentElement(
+    type: GridStart::ELEMENT_TYPE,
+    category: 'texts',
+    template: 'ce_grid_stop', 
+    nestedFragments: true,
+)]
+class GridStop extends AbstractContentElementController
 {
     public const ELEMENT_TYPE = 'grid-stop';
-    /**
-     * Template.
-     *
-     * @var string
-     */
-    protected $strTemplate = 'ce_grid_stop';
 
     /**
      * Generate the content element.
      */
-    protected function compile(): void
+    protected function getResponse(
+        FragmentTemplate $template, 
+        ContentModel $model, 
+        Request $request
+    ): Response 
     {
-        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
-        if ($scopeMatcher->isBackend() && !$this->isForGridElementWizard) {
-            $this->strTemplate = 'be_wildcard';
-            $this->Template = new BackendTemplate($this->strTemplate);
-            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
-        }
-
         // Get the last open grid
         if (\is_array($GLOBALS['WEM']['GRID'])) {
             $gop = GridOpenedManager::getInstance();
             // Send the grid_id to template
-            $this->Template->grid_id = $gop->getLastOpenedGridId();
+            $template->grid_id = $gop->getLastOpenedGridId();
         }
+
+        return $template->getResponse();
     }
 }

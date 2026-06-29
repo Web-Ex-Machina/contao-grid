@@ -18,19 +18,6 @@ use WEM\GridBundle\Elements\GridStart;
 use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Widgets;
 
-// Add the Grid Wrapper Content Element
-ArrayUtil::arrayInsert(
-    $GLOBALS['TL_CTE'],
-    \count($GLOBALS['TL_CTE']) + 1,
-    [
-        'grid' => [
-            GridStart::ELEMENT_TYPE => GridStart::class,
-            GridStop::ELEMENT_TYPE => GridStop::class,
-            GridItemEmpty::ELEMENT_TYPE => GridItemEmpty::class,
-        ],
-    ]
-);
-
 // Generate Global Wrapper
 $GLOBALS['WEM']['GRID'] = [];
 
