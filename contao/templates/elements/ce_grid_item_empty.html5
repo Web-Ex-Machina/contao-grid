@@ -1,3 +1,0 @@
-<div class="<?= $this->class ?>"<?= $this->cssID ?>>
-	<!-- empty grid item -->
-</div>

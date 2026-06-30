@@ -24,9 +24,7 @@ use WEM\GridBundle\Classes\GridOpenedManager;
 
 #[AsContentElement(
     type: GridItemEmpty::ELEMENT_TYPE,
-    category: 'texts',
-    template: 'ce_grid_item_empty', 
-    nestedFragments: false,
+    category: 'miscellaneous',
 )]
 class GridItemEmpty extends AbstractContentElementController
 {
