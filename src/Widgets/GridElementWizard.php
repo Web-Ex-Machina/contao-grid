@@ -106,7 +106,7 @@ class GridElementWizard extends Widget
         // Since it's only tl_content for the moment, it's a bit overkill, but it's to ease the future integrations.
         switch ($this->strTable) {
             case 'tl_content':
-                $objItems = ContentModel::findPublishedByPidAndTable($this->objDca->activeRecord->pid, $this->objDca->activeRecord->ptable);
+                $objItems = ContentModel::findPublishedByPidAndTable($this->objDca->activeRecord->id, $this->strTable);
                 break;
 
             default:
@@ -128,38 +128,11 @@ class GridElementWizard extends Widget
 
         // Now, we will only fetch the items in the grid
         while ($objItems->next()) {
-            // If we start a grid, start fetching items for the wizard
-            if ((int) $objItems->id === (int) $this->activeRecord->id) {
-                $blnGridStart = true;
-                continue;
-            }
-
-            // Skip if we are not in a grid
-            if (!$blnGridStart) {
-                continue;
-            }
-
-            // And break the loop if we hit the grid-stop element corresponding to the very first grid
-            if (GridStop::ELEMENT_TYPE === $objItems->type && (string)$this->activeRecord->id === $this->gridOpenedManager->getLastOpenedGridId()) {
-                break;
-            }
-
-            $objItems->isForGridElementWizard = true;
-            if (GridStart::ELEMENT_TYPE === $objItems->type) {
-                $strElement = $this->getContentElement($objItems->current());
-            } elseif (GridStop::ELEMENT_TYPE === $objItems->type) {
-                $strElement = $this->BEGridItemSettings(
-                    $this->gridOpenedManager->getPreviousLastOpenedGridId(),
-                    (string) $this->gridOpenedManager->getLastOpenedGridId(),
-                    $this->getContentElement($objItems->current())
-                );
-            } else {
-                $strElement = $this->BEGridItemSettings(
-                    $this->gridOpenedManager->getLastOpenedGridId(),
-                    (string) $objItems->id,
-                    $this->getContentElement($objItems->current())
-                );
-            }
+            $strElement = $this->BEGridItemSettings(
+                $this->gridOpenedManager->getLastOpenedGridId(),
+                (string) $objItems->id,
+                $this->getContentElement($objItems->current())
+            );
 
             $strGrid .= $strElement;
         }
@@ -268,23 +241,6 @@ class GridElementWizard extends Widget
                 $grid->getItemClassesFormClassesForItemId($objItemId),
                 $this->User->isAdmin ? '' : 'hidden'
             );
-
-            // $itemSettings = sprintf(
-            //     '<div class="item-classes">
-            //         <div class="d-grid cols-1">
-            //             <div>
-            //             %s
-            //             </div>
-            //             <div>
-            //             %s
-            //             </div>
-            //         </div>
-            //         %s
-            //     </div>',
-            //     implode('', $selectsCols),
-            //     implode('', $selectsRows),
-            //     $inputClasses
-            // );
 
             $itemSettings = sprintf(
                 '<div class="item-classes">

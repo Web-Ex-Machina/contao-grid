@@ -134,14 +134,14 @@ WEM.Grid  = WEM.Grid || {};
                 return;
             }
 
-            if('grid-start' == dropzone.getAttribute('data-type') 
+            /**if('grid-start' == dropzone.getAttribute('data-type') 
             && 'after' == position
             ){
                 var gridStopElements = dropzone.querySelectorAll('[data-type="grid-stop"]');
                 pid = gridStopElements[gridStopElements.length-1].getAttribute('data-id');
-            }
+            }**/
 
-            if('grid-start' == draggableElement.getAttribute('data-type')){
+            /**if('grid-start' == draggableElement.getAttribute('data-type')){
                 // if we move a grid-start, we have to move all children elements before the dropzone
                 // move the grid start
                 requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
@@ -162,12 +162,12 @@ WEM.Grid  = WEM.Grid || {};
                 if(doDoublePositionning){
                     requests.push(self.getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid));
                 }
-            }else{
+            }else{**/
                 requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
                 if(doDoublePositionning){
                     requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
                 }
-            }
+            //}
 
             self.runFakeQueue(requests);
 
@@ -231,10 +231,10 @@ WEM.Grid  = WEM.Grid || {};
                 elementIndex--;
                 element = elements[elementIndex];
             }
-            if('grid-start' == element.getAttribute('data-type')){
+            /**if('grid-start' == element.getAttribute('data-type')){
                 var gridStops = element.querySelectorAll('[data-type="grid-stop"]');
                 element = gridStops[gridStops.length-1];
-            }
+            }**/
 
             return -1 < element.getAttribute('data-type').indexOf('fake-') ? null : element;
         }
@@ -744,20 +744,21 @@ window.addEvent("domready", function () {
             while('A' != target.nodeName){
                 target = target.parentNode;
             }
-            var id = target.getAttribute('data-element-id');
 
-            var urlCopy = window.location.href.replace('act=edit','act=paste&mode=copy').replace(/\&id=([0-9]+)/,'&id='+id);
-            var urlPaste = window.location.href.replace('act=edit','act=copy&mode=1').replace(/\&id=([0-9]+)/,'&id='+id+'&pid='+id);
+            var elDo = target.getAttribute('data-element-do');
+            var elId = target.getAttribute('data-element-id');
+            var rt = target.getAttribute('data-element-rt');
+
+            var urlCopy = '/contao?do='+elDo+'&amp;id='+elId+'&amp;ptable=tl_content&amp;table=tl_content&amp;act=paste&amp;mode=copy';
+            var urlPaste = '/contao?do='+elDo+'&amp;id='+elId+'&amp;ptable=tl_content&amp;table=tl_content&amp;act=copy&amp;mode=1&amp;pid='+elId+'&amp;rt='+rt;
 
             AjaxRequest.displayBox(Contao.lang.loading + ' …');
             fetch(urlCopy,{
-                method:'get',
-                redirect:'manual'
+                method: 'post'
             })
             .then(data => {
                 fetch(urlPaste,{
-                    method:'get',
-                    redirect:'manual'
+                    method:'post',
                 })
                 .then(data => {
                     window.location.reload();

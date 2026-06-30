@@ -110,25 +110,39 @@ class GridElementsWrapper
             $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $this->translator->trans('MSC.deleteConfirm', [$objElement->id], 'contao_default') : null;
 
             $buttons = '';
-
             if (GridItemEmpty::ELEMENT_TYPE !== $objElement->type) {
                 $buttons .= \sprintf('
-                <a
-                href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1&amp;rt=%s"
-                title="%s"
-                onclick="WEM.Grid.Utils.openModalIframe({\'title\':\'%s\',\'url\':this.href,\'onHide\':function(){window.location.reload();}});return false">
-                %s
-                </a>', $do, $objElement->id, System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(), StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
+                    <a
+                    href="/contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1"
+                    title="%s"
+                    onclick="WEM.Grid.Utils.openModalIframe({\'title\':\'%s\',\'url\':this.href,\'onHide\':function(){window.location.reload();}});return false">
+                    %s
+                    </a>', 
+                    $do, 
+                    $objElement->id,
+                    StringUtil::specialchars($titleEdit), 
+                    StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), 
+                    Image::getHtml('edit.svg', $titleEdit)
+                );
             }
 
             $buttons .= \sprintf('
-                <a class="item-copy"
-                href="#"
-                data-element-id="%s"
-                title="%s"
-                >
-                %s
-                </a>', $objElement->id, StringUtil::specialchars($titleCopy), Image::getHtml('copy.svg', $titleCopy));
+                    <a class="item-copy"
+                    href="#"
+                    data-element-do="%s"
+                    data-element-id="%s"
+                    data-element-rt="%s"
+                    title="%s"
+                    >
+                    %s
+                    </a>
+                ', 
+                $do, 
+                $objElement->id, 
+                System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
+                StringUtil::specialchars($titleCopy), 
+                Image::getHtml('copy.svg', $titleCopy)
+            );
 
             $buttons .= \sprintf('
                 <a class="item-delete"

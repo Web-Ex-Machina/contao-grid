@@ -193,7 +193,7 @@ class GridBuilder
      *
      * @throws \Exception
      */
-    public function fakeNewGridElementMarkup(string $gridId): string // TODO : One day, delete all the function because she is useless.
+    public function fakeNewGridElementMarkup(string $gridId): string
     {
         $gop = GridOpenedManager::getInstance();
 

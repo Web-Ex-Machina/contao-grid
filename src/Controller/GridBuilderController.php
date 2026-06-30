@@ -24,14 +24,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\ServiceAnnotationBundle\Annotation\ServiceTag;
 use WEM\GridBundle\Classes\GridStartManipulator;
 
-/**
- * @Route("/contao/grid-builder",
- *     name=GridBuilderController::class,
- *     defaults={"_scope": "backend"}
- * )
- *
- * @ServiceTag("controller.service_arguments")
- */
+#[Route(
+    '/contao/grid-builder',
+    name: GridBuilderController::class,
+    defaults: ['_scope' => 'backend']
+)]
 class GridBuilderController extends Controller
 {
     protected TranslatorInterface $translator;
