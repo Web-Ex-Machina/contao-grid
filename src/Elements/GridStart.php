@@ -17,8 +17,11 @@ namespace WEM\GridBundle\Elements;
 use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
+use Contao\CoreBundle\Fragment\Reference\ContentElementReference;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Database;
+use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +30,7 @@ use WEM\GridBundle\Classes\GridOpenedManager;
 
 #[AsContentElement(
     type: GridStart::ELEMENT_TYPE,
-    category: 'texts',
-    template: 'ce_grid_start', 
+    category: 'miscellaneous',
     nestedFragments: true,
 )]
 class GridStart extends AbstractContentElementController
@@ -37,43 +39,34 @@ class GridStart extends AbstractContentElementController
     public const MODE_CUSTOM = 'custom';
     public const MODE_AUTOMATIC = 'automatic';
 
+    public function __construct(private readonly ContaoFramework $framework)
+    {
+    }
+
     /**
      * Generate the content element.
      */
-    protected function getResponse(
-        FragmentTemplate $template, 
-        ContentModel $model, 
-        Request $request
-    ): Response 
+    protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
-        // Check if the very next element is a grid-stop element
-        $objNextElement = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute($model->pid, $model->ptable, $model->sorting);
+        $elements = [];
 
-        // Update : I need it opened otherwise empty nested grid is buggy in BE
-        if (1 > $objNextElement->numRows) {
-            $template->doNotPrint = true;
+        foreach ($template->get('nested_fragments') as $i => $reference) {
+            $nestedModel = $reference->getContentModel();
+
+            if (!$nestedModel instanceof ContentModel) {
+                $nestedModel = $this->framework->getAdapter(ContentModel::class)->findById($nestedModel);
+            }
+
+            $header = StringUtil::deserialize($nestedModel->sectionHeadline, true);
+
+            $elements[] = [
+                'header' => $header['value'] ?? '',
+                'header_tag' => $header['unit'] ?? 'h2',
+                'reference' => $reference,
+            ];
         }
 
-        $gop = GridOpenedManager::getInstance();
-        try {
-            $arrGrid = $gop->getGridById((string) $model->id);
-        } catch (\Exception $exception) {
-            $gop->openGrid($model);
-            $arrGrid = $gop->getGridById((string) $model->id);
-        }
-
-        // Add the classes to the Model so the main class can use it correct
-        if (\is_array($model->classes)) {
-            $model->classes = array_merge($arrGrid->getWrapperClasses(), $model->classes);
-        } else {
-            $model->classes = $arrGrid->getWrapperClasses();
-        }
-
-        $gridCssClassesInheritance = new GridCssClassesInheritance();
-        $model->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
-
-        // Send the grid_id to template
-        $template->grid_id = $model->id;
+        $template->set('elements', $elements);
 
         return $template->getResponse();
     }
