@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 use WEM\GridBundle\Widgets;
 
+// Generate Global Wrapper
+$GLOBALS['WEM']['GRID'] = [];
+
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = Widgets\GridElementWizard::class;
 $GLOBALS['BE_FFL']['gridBreakpointsValuesWizard'] = Widgets\GridBreakpointsValuesWizard::class;

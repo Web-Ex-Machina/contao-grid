@@ -50,6 +50,33 @@ class GridStart extends AbstractContentElementController
     {
         $elements = [];
 
+        // If there are no grid items, do not display anything
+        if (empty($template->get('nested_fragments'))) {
+            return $template->getResponse();
+        }
+
+        $gop = GridOpenedManager::getInstance();
+        try {
+            $arrGrid = $gop->getGridById((string) $model->id);
+        } catch (\Exception $exception) {
+            $gop->openGrid($model);
+            $arrGrid = $gop->getGridById((string) $model->id);
+        }
+
+        // Add the classes to the Model so the main class can use it correct
+        if (\is_array($model->classes)) {
+            $model->classes = array_merge($arrGrid->getWrapperClasses(), $model->classes);
+        } else {
+            $model->classes = $arrGrid->getWrapperClasses();
+        }
+
+        $gridCssClassesInheritance = new GridCssClassesInheritance();
+        $model->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
+
+        // Send the grid_id to template
+        $template->set('grid_id', $model->id);
+        $template->set('classes', $model->classes);
+
         foreach ($template->get('nested_fragments') as $i => $reference) {
             $nestedModel = $reference->getContentModel();
 
