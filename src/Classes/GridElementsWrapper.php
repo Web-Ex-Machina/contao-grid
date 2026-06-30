@@ -22,7 +22,6 @@ use Contao\System;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use WEM\GridBundle\Elements\GridItemEmpty;
 use WEM\GridBundle\Elements\GridStart;
-use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Helper\GridBuilder;
 
 /**
@@ -36,7 +35,7 @@ class GridElementsWrapper
 
     protected GridCssClassesInheritance $gridCssClassesInheritance;
 
-    protected static array $arrSkipContentTypes = [GridStart::ELEMENT_TYPE, GridStop::ELEMENT_TYPE];
+    protected static array $arrSkipContentTypes = [GridStart::ELEMENT_TYPE];
 
     public function __construct(
         TranslatorInterface $translator,
@@ -72,12 +71,6 @@ class GridElementsWrapper
         // dump($openGrid);
         $currentGridId = $gop->getLastOpenedGridId();
 
-        // Yep, same code in FE/BE, but FE here if we want it to work /shrug
-        // We won't need this grid anymore so we pop the global grid array
-        if (!$scopeMatcher->isBackend() && GridStop::ELEMENT_TYPE === $objElement->type) {
-            $gop->closeLastOpenedGrid();
-        }
-
         // If we used grids elements, we had to adjust the behaviour
         if (GridStart::ELEMENT_TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
             $gop->openGrid($objElement);
@@ -91,18 +84,6 @@ class GridElementsWrapper
         // }
 
             return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
-        }
-
-        if (GridStop::ELEMENT_TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
-            $str = $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
-
-            // Yep, same code in FE/BE, but BE here if we want it to work /shrug
-            if ($scopeMatcher->isBackend()) {
-                // We won't need this grid anymore so we pop the global grid array
-                $gop->closeLastOpenedGrid();
-            }
-
-            return $str;
         }
 
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
@@ -245,25 +226,6 @@ class GridElementsWrapper
             $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
             $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
             $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
-            $strBuffer
-        );
-    }
-
-    protected function getGridStopHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $strBuffer): string
-    {
-        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
-        if ($scopeMatcher->isBackend()) {
-            return \sprintf(
-                '%s<div data-id="%s" data-type="%s">%s</div></div>',
-                !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup((string) $openGrid->getId()) : '',
-                $objElement->id,
-                $objElement->type,
-                $strBuffer
-            );
-        }
-
-        return \sprintf(
-            '<div>%s</div></div>',
             $strBuffer
         );
     }
