@@ -1,3 +1,0 @@
-<?php if(!$this->doNotPrint): ?>
-</div><!--GridStop<?= $this->grid_id ?>-->
-<?php endif; ?>
