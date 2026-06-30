@@ -68,7 +68,7 @@ class GridBuilder
         $arrClasses[] = 'd-grid';
 
         if (GridStart::MODE_AUTOMATIC === $objElement->grid_mode) {
-            $arrClasses[] = 'cols-autofit';
+            $arrClasses[] = 'cols-autofill';
         } elseif (GridStart::MODE_CUSTOM === $objElement->grid_mode) {
             if (isset($cols) && \is_array($cols)) {
                 foreach ($cols as $k => $col) {
