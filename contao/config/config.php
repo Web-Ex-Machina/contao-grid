@@ -12,18 +12,7 @@ declare(strict_types=1);
  * @link     https://github.com/Web-Ex-Machina/contao-grid/
  */
 
-use Contao\ArrayUtil;
-use WEM\GridBundle\Elements\GridItemEmpty;
-use WEM\GridBundle\Elements\GridStart;
-use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Widgets;
-
-// Generate Global Wrapper
-$GLOBALS['WEM']['GRID'] = [];
-
-// Add wrappers
-$GLOBALS['TL_WRAPPERS']['start'][] = GridStart::ELEMENT_TYPE;
-$GLOBALS['TL_WRAPPERS']['stop'][] = GridStop::ELEMENT_TYPE;
 
 // Add Backend Wizard
 $GLOBALS['BE_FFL']['gridElementWizard'] = Widgets\GridElementWizard::class;
