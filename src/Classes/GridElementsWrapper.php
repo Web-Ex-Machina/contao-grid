@@ -116,6 +116,8 @@ class GridElementsWrapper
             $confirmDelete = isset($GLOBALS['TL_LANG']['MSC']['deleteConfirm']) ? $this->translator->trans('MSC.deleteConfirm', [$objElement->id], 'contao_default') : null;
 
             $buttons = '';
+
+            // It is not necessary to edit Grid Empty items
             if (GridItemEmpty::ELEMENT_TYPE !== $objElement->type) {
                 $buttons .= \sprintf('
                     <a
@@ -132,6 +134,7 @@ class GridElementsWrapper
                 );
             }
 
+            // Copy button
             $buttons .= \sprintf('
                     <a class="item-copy"
                     href="#"
@@ -150,6 +153,8 @@ class GridElementsWrapper
                 Image::getHtml('copy.svg', $titleCopy)
             );
 
+
+            // Delete button
             $buttons .= \sprintf('
                 <a class="item-delete"
                 href="#"
@@ -158,8 +163,14 @@ class GridElementsWrapper
                 onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()"
                 >
                 %s
-                </a>', $objElement->id, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
+                </a>', 
+                $objElement->id, 
+                StringUtil::specialchars($titleDelete), 
+                $confirmDelete, 
+                Image::getHtml('delete.svg', $titleDelete)
+            );
 
+            // Drag n Drop button
             $buttons .= \sprintf('
                 <a
                 href="#"

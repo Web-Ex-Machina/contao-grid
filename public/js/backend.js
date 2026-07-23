@@ -541,6 +541,7 @@ WEM.Grid  = WEM.Grid || {};
     }
     var self = WEM.Grid.Drag;
 })();
+
 var WEM = WEM || {};
 WEM.Grid  = WEM.Grid || {};
 (function() {
@@ -583,9 +584,30 @@ WEM.Grid  = WEM.Grid || {};
 
             return false;
         }
+        ,deleteItem:function(itemId){
+            var url = 'contao/grid-builder/delete-item/'+itemId+'/article/tl_content?id='+itemId;
+            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+
+            return fetch(url, {
+                method:'DELETE',
+            })
+            .then(response => {
+                AjaxRequest.hideBox();
+
+                return response;
+            })
+            .catch(error => {
+                AjaxRequest.hideBox();
+
+                alert("Error: " + error);
+            });
+
+            return false;
+        }
     }
     var self = WEM.Grid.Saver;
 })();
+
 var WEM = WEM || {};
 WEM.Grid  = WEM.Grid || {};
 (function() {
@@ -627,6 +649,7 @@ WEM.Grid  = WEM.Grid || {};
     }
     var self = WEM.Grid.Utils;
 })();
+
 window.addEvent("domready", function () {
     WEM.Grid.Drag.init();
     // const regexpBreakpoints = /(-xxs|-xs|-sm|-md|-lg|-xl)/;
@@ -785,19 +808,16 @@ window.addEvent("domready", function () {
             }
             var id = target.getAttribute('data-element-id');
 
-            var url = window.location.href.replace('act=edit','act=delete').replace(/\&id=([0-9]+)/,'&id='+id);
+            WEM.Grid.Saver.deleteItem(id).then((data) => {
+                console.log(data);
 
-            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+                if (data.ok) {
+                    data.json().then(function(json) {
+                        console.log(json);
 
-            fetch(url,{
-                method:'get',
-                redirect:'manual'
-            })
-            .then(data => {
-                window.location.reload();
-            })
-            .catch(error => {
-                AjaxRequest.hideBox();
+                        window.location.reload();
+                    });
+                }
             });
 
             return false;
