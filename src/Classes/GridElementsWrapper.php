@@ -75,11 +75,14 @@ class GridElementsWrapper
         }
 
         // Get the last open grid
-        $openGrid = $gop->getLastOpenedGrid();
+        $openGrid = $gop->getGridById((string) $objParent->id);
         $currentGridId = $gop->getLastOpenedGridId();
 
+        // $openGrid = $gop->getLastOpenedGrid();
+        // $currentGridId = $gop->getLastOpenedGridId();
+
         // If we used grids elements, we had to adjust the behaviour
-        if (GridStart::ELEMENT_TYPE === $objElement->type) {
+        /**if (GridStart::ELEMENT_TYPE === $objElement->type) {
             $gop->openGrid($objElement);
             
             // For nested grid - starts, we want to add only the start of the item wrapper
@@ -87,7 +90,7 @@ class GridElementsWrapper
             $openGrid = $gop->getParentGrid($objElement);
 
             return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
-        }
+        }*/
 
         if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
             return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);

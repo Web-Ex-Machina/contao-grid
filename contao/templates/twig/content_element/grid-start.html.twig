@@ -1,5 +1,4 @@
-{# templates/content_element/grid-start.html.twig #}
-{% extends "@Contao/content_element/_base.html.twig" %}
+{% extends '@Contao/content_element/_base.html.twig' %}
 
 {% set attributes = attrs()
     .addClass(classes)
@@ -7,7 +6,7 @@
 %}
 
 {% block content %}
-    {% for fragment in nested_fragments %}
-        {{ content_element(fragment) }}
+    {% for element in elements %}
+        {{ content_element(element.reference) }}
     {% endfor %}
 {% endblock %}

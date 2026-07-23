@@ -241,8 +241,6 @@ class GridOpenedManager
             || is_a($element, 'stdClass')
             || is_a($element, ContentModel::class)
             || is_a($element, GridStartElement::class)
-            // || $element instanceof ContentModel::class
-            // || $element instanceof GridStartElement::class
         )
             || GridStartElement::ELEMENT_TYPE !== $element->type
         ) {
