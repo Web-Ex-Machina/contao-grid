@@ -84,12 +84,12 @@ WEM.Grid  = WEM.Grid || {};
         }
         ,drop:function(event){
             event.preventDefault();
-        
+
             var dropzone = event.target;
             var id = event
                 .dataTransfer
                 .getData('text');
-            var draggableElement = document.querySelector('[data-id="'+id+'"]');
+            var draggableElement = document.querySelector('.gridelement [data-id="'+id+'"]');
             var pid = dropzone.getAttribute('data-id');
 
             var gridSource = self.getGridFromElement(draggableElement);
@@ -134,40 +134,10 @@ WEM.Grid  = WEM.Grid || {};
                 return;
             }
 
-            /**if('grid-start' == dropzone.getAttribute('data-type') 
-            && 'after' == position
-            ){
-                var gridStopElements = dropzone.querySelectorAll('[data-type="grid-stop"]');
-                pid = gridStopElements[gridStopElements.length-1].getAttribute('data-id');
-            }**/
-
-            /**if('grid-start' == draggableElement.getAttribute('data-type')){
-                // if we move a grid-start, we have to move all children elements before the dropzone
-                // move the grid start
-                requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
-                if(self.isGridFirstLevel(gridSource) && !self.isGridFirstLevel(gridDest)){
-                    requests.push(self.getContaoRequestPutElementAfterAnother(pid, id)); // comment to make subgrid -> grid work on last fake element
-                }
-                
-                // move the grid elements
-                pid = id; // the grid start becomes the PID
-                var gridElements = draggableElement.querySelectorAll('div[data-type]');
-                gridElements.forEach(function(gridElement){
-                    if(-1 == gridElement.getAttribute('data-type').indexOf('fake-')){
-                        id = gridElement.getAttribute('data-id');
-                        requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
-                        pid = id; // grid elements stay behind each others
-                    }
-                });
-                if(doDoublePositionning){
-                    requests.push(self.getContaoRequestPutElementAfterAnother(dropzone.getAttribute('data-id'), pid));
-                }
-            }else{**/
-                requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
-                if(doDoublePositionning){
-                    requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
-                }
-            //}
+            requests.push(self.getContaoRequestPutElementAfterAnother(id, pid));
+            if(doDoublePositionning){
+                requests.push(self.getContaoRequestPutElementAfterAnother(pid, id));
+            }
 
             self.runFakeQueue(requests);
 
@@ -231,18 +201,12 @@ WEM.Grid  = WEM.Grid || {};
                 elementIndex--;
                 element = elements[elementIndex];
             }
-            /**if('grid-start' == element.getAttribute('data-type')){
-                var gridStops = element.querySelectorAll('[data-type="grid-stop"]');
-                element = gridStops[gridStops.length-1];
-            }**/
 
             return -1 < element.getAttribute('data-type').indexOf('fake-') ? null : element;
         }
         ,getGridFromElement:function(element){
             if(-1 < element.className.indexOf(self.selectors.grid.substring(1))
-            // ||  -1 < element.className.indexOf('d-grid')
             || -1 < element.className.indexOf('ce_grid-start')
-            // || -1 < element.className.indexOf('grid_preview')
             ){
                 return element;
             }else{
@@ -254,10 +218,8 @@ WEM.Grid  = WEM.Grid || {};
             return -1 < element.className.indexOf(self.selectors.grid.substring(1));
         }
         ,getContaoRequestPutElementAfterAnother:function(id, pid, params = {}){
-            var req,href;
-            req = window.location.search.replace(/id=[0-9]*/, 'id=' + id) + '&act=cut&mode=1&pid=' + pid;
-            href = window.location.href.replace(/\?.*$/, '');
-            params = Object.assign(params, {'url':href + req, 'followRedirects':false,'id':id,'pid':pid});
+            var url = 'contao/grid-builder/move-item/'+id+'/article/tl_content?id='+id+'&amp;pid='+pid+'&amp;mode=1&amp;ptable=tl_content';
+            params = Object.assign(params, {'url': url});
             return params;
         }
         ,runFakeQueue:function(requests){
@@ -269,8 +231,7 @@ WEM.Grid  = WEM.Grid || {};
         }
         ,runFakeQueueItem:function(requests, index){
             fetch(requests[index].url,{
-                method:'get',
-                redirect:'manual'
+                method: 'POST',
             })
             .then(data => {
                 if("undefined" != typeof requests[index+1]){
@@ -299,7 +260,6 @@ WEM.Grid  = WEM.Grid || {};
                 }else if(self.gridMode.custom === gridMode){
                     var select = item.querySelector('select[name="grid_items['+item.getAttribute('data-id')+'_cols]['+breakpoint+']"]');
                     var dataAttributeName='data-cols-span'+('all' == breakpoint ? '' : '-'+breakpoint);
-                    // var dataAttributeName='data-cols-span';
                     var classNameBase='cols-span'+('all' == breakpoint ? '' : '-'+breakpoint)+'-';
 
                     if(null === select){
@@ -580,6 +540,26 @@ WEM.Grid  = WEM.Grid || {};
             .catch(error => {
                 alert(error.message);
                 AjaxRequest.hideBox();
+            });
+
+            return false;
+        }
+        ,moveItem:function(itemId, itemPid){
+            var url = 'contao/grid-builder/move-item/'+itemId+'/article/tl_content?id='+itemId+'&amp;pid='+itemPid+'&amp;mode=1&amp;ptable=tl_content';
+            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+
+            return fetch(url, {
+                method:'POST',
+            })
+            .then(response => {
+                AjaxRequest.hideBox();
+
+                return response;
+            })
+            .catch(error => {
+                AjaxRequest.hideBox();
+
+                alert("Error: " + error);
             });
 
             return false;

@@ -248,6 +248,23 @@ class GridBuilderController extends Controller
     }
 
     #[Route(
+        '/move-item/{id}/{module}/{table}',
+        name: 'moveGridItem',
+        requirements: ['id' => Requirement::DIGITS],
+        methods: ['POST']
+    )]
+    public function moveGridItem(Request $request, int $id, string $module, string $table): JsonResponse
+    {
+        $dc = $this->getDataContainer($module, $table);
+        $dc->cut(true);   
+
+        return new JsonResponse([
+            'status' => 'success', 
+            'message' => \sprintf('Item %s moved', $id),
+        ], Response::HTTP_OK);
+    }
+
+    #[Route(
         '/copy-item/{id}/{module}/{table}',
         name: 'copyGridItem',
         requirements: ['id' => Requirement::DIGITS],
