@@ -584,6 +584,26 @@ WEM.Grid  = WEM.Grid || {};
 
             return false;
         }
+        ,copyItem:function(itemId){
+            var url = 'contao/grid-builder/copy-item/'+itemId+'/article/tl_content?id='+itemId+'&amp;pid='+itemId+'&amp;mode=1&amp;ptable=tl_content';
+            AjaxRequest.displayBox(Contao.lang.loading + ' …');
+
+            return fetch(url, {
+                method:'POST',
+            })
+            .then(response => {
+                AjaxRequest.hideBox();
+
+                return response;
+            })
+            .catch(error => {
+                AjaxRequest.hideBox();
+
+                alert("Error: " + error);
+            });
+
+            return false;
+        }
         ,deleteItem:function(itemId){
             var url = 'contao/grid-builder/delete-item/'+itemId+'/article/tl_content?id='+itemId;
             AjaxRequest.displayBox(Contao.lang.loading + ' …');
@@ -768,32 +788,18 @@ window.addEvent("domready", function () {
                 target = target.parentNode;
             }
 
-            var elDo = target.getAttribute('data-element-do');
-            var elId = target.getAttribute('data-element-id');
-            var rt = target.getAttribute('data-element-rt');
+            var id = target.getAttribute('data-element-id');
 
-            var urlCopy = '/contao?do='+elDo+'&amp;id='+elId+'&amp;ptable=tl_content&amp;table=tl_content&amp;act=paste&amp;mode=copy';
-            var urlPaste = '/contao?do='+elDo+'&amp;id='+elId+'&amp;ptable=tl_content&amp;table=tl_content&amp;act=copy&amp;mode=1&amp;pid='+elId+'&amp;rt='+rt;
-
-            AjaxRequest.displayBox(Contao.lang.loading + ' …');
-            fetch(urlCopy,{
-                method: 'post'
-            })
-            .then(data => {
-                fetch(urlPaste,{
-                    method:'post',
-                })
-                .then(data => {
-                    window.location.reload();
-                })
-                .catch(error => {
-                    AjaxRequest.hideBox();
-                });
-            })
-            .catch(error => {
-                AjaxRequest.hideBox();
+            WEM.Grid.Saver.copyItem(id).then((data) => {
+                if (data.ok) {
+                    data.json().then(function(json) {
+                        window.location.reload();
+                    });
+                } else {
+                    console.log(data);
+                    alert('Err' + data.status);
+                }
             });
-
 
             return false;
         });
@@ -809,14 +815,13 @@ window.addEvent("domready", function () {
             var id = target.getAttribute('data-element-id');
 
             WEM.Grid.Saver.deleteItem(id).then((data) => {
-                console.log(data);
-
                 if (data.ok) {
                     data.json().then(function(json) {
-                        console.log(json);
-
                         window.location.reload();
                     });
+                } else {
+                    console.log(data);
+                    alert('Err' + data.status);
                 }
             });
 

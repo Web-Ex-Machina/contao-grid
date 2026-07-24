@@ -248,12 +248,43 @@ class GridBuilderController extends Controller
     }
 
     #[Route(
+        '/copy-item/{id}/{module}/{table}',
+        name: 'copyGridItem',
+        requirements: ['id' => Requirement::DIGITS],
+        methods: ['POST']
+    )]
+    public function copyGridItem(Request $request, int $id, string $module, string $table): JsonResponse
+    {
+        $dc = $this->getDataContainer($module, $table);
+        $dc->copy(true);   
+
+        return new JsonResponse([
+            'status' => 'success', 
+            'message' => \sprintf('Item %s duplicated', $id),
+        ], Response::HTTP_OK);
+    }
+
+    #[Route(
         '/delete-item/{id}/{module}/{table}',
         name: 'deleteGridItem',
         requirements: ['id' => Requirement::DIGITS],
         methods: ['DELETE']
     )]
     public function deleteGridItem(Request $request, int $id, string $module, string $table): JsonResponse
+    {
+        $dc = $this->getDataContainer($module, $table);
+        $dc->delete(true);   
+
+        return new JsonResponse([
+            'status' => 'success', 
+            'message' => \sprintf('Item %s deleted', $id),
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Return a datacontainer
+     */
+    protected function getDataContainer(string $module, string $table): DataContainer
     {
         $arrModule = array();
 
@@ -305,13 +336,6 @@ class GridBuilderController extends Controller
 
         /** @var class-string<DataContainer> $dataContainer */
         $dataContainer = DataContainer::getDriverForTable($table);
-        $dc = new $dataContainer($table, $arrModule);
-
-        $dc->delete(true);   
-
-        return new JsonResponse([
-            'status' => 'success', 
-            'message' => \sprintf('Item %s deleted', $id),
-        ], Response::HTTP_OK);
+        return new $dataContainer($table, $arrModule);
     }
 }
