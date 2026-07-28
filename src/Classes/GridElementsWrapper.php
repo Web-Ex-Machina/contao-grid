@@ -67,7 +67,7 @@ class GridElementsWrapper
             return $strBuffer;
         }
 
-        // If item parent is not a grid
+        // If item parent is not a grid, return the item
         $objParent = ContentModel::findOneById($objElement->pid);
 
         if (!$objParent || GridStart::ELEMENT_TYPE !== $objParent->type) {
@@ -78,25 +78,7 @@ class GridElementsWrapper
         $openGrid = $gop->getGridById((string) $objParent->id);
         $currentGridId = $gop->getLastOpenedGridId();
 
-        // $openGrid = $gop->getLastOpenedGrid();
-        // $currentGridId = $gop->getLastOpenedGridId();
-
-        // If we used grids elements, we had to adjust the behaviour
-        /**if (GridStart::ELEMENT_TYPE === $objElement->type) {
-            $gop->openGrid($objElement);
-            
-            // For nested grid - starts, we want to add only the start of the item wrapper
-            // Retrieve the parent
-            $openGrid = $gop->getParentGrid($objElement);
-
-            return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
-        }*/
-
-        if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
-            return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
-        }
-
-        return $strBuffer;
+        return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
     }
 
     /**
@@ -229,36 +211,6 @@ class GridElementsWrapper
         }
 
         return \sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
-    }
-
-    protected function getSubGridStartHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
-    {
-        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
-        if ($scopeMatcher->isBackend()) {
-            return \sprintf(
-                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s" data-grid-mode="%s">%s%s%s',
-                implode(' ', $openGrid->getItemClassesForAllResolution()),
-                $openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: '',
-                $openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: '',
-                $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
-                $objElement->id,
-                $objElement->type,
-                !\is_array($objElement->grid_cols) ? StringUtil::deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
-                $objElement->grid_mode,
-                $this->getBackendActionsForGridStartContentElement($objElement, $do, true),
-                $strBuffer,
-                $this->gridBuilder->fakeFirstGridElementMarkup($currentGridId)
-            );
-        }
-
-        return \sprintf(
-            '<div class="%s %s %s %s">%s',
-            implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
-            $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
-            $strBuffer
-        );
     }
 
     protected function getGridElementHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
