@@ -16,10 +16,10 @@ namespace WEM\GridBundle\Classes;
 
 use Contao\ContentModel;
 use Contao\Database\Result as DbResult;
+use Contao\StringUtil;
 use Contao\System;
 use WEM\GridBundle\Elements\GridStart as GridStartElement;
 use WEM\GridBundle\Helper\GridBuilder;
-
 class GridOpenedManager
 {
     protected int $level = 0;
@@ -71,13 +71,15 @@ class GridOpenedManager
             ->setLevel($this->level)
             ->setMode($element->grid_mode)
         ;
+
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
         if ($scopeMatcher->isBackend()) {
             $grid->addItemClassesForAllResolution('be_item_grid helper');
         }
 
-        if (!empty($element->cssID[1])) {
-            $grid->addWrapperClasses($element->cssID[1]);
+        $arrCssID = StringUtil::deserialize($element->cssID, true);
+        if (!empty($arrCssID[1])) {
+            $grid->addWrapperClasses($arrCssID[1]);
         }
 
         $GLOBALS['WEM']['GRID'][(string) $element->id] = $grid;
