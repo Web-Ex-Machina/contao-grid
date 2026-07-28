@@ -50,6 +50,9 @@ class GridStart extends AbstractContentElementController
     {
         $elements = [];
 
+        $template->set('classes', '');
+        $template->set('elements', '');
+
         // If there are no grid items, do not display anything
         if (empty($template->get('nested_fragments'))) {
             return $template->getResponse();
