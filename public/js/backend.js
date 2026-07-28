@@ -218,7 +218,7 @@ WEM.Grid  = WEM.Grid || {};
             return -1 < element.className.indexOf(self.selectors.grid.substring(1));
         }
         ,getContaoRequestPutElementAfterAnother:function(id, pid, params = {}){
-            var url = 'contao/grid-builder/move-item/'+id+'/article/tl_content?id='+id+'&amp;pid='+pid+'&amp;mode=1&amp;ptable=tl_content';
+            var url = 'contao/grid-builder/move-item/'+id+'/article/tl_content?id='+id+'&pid='+pid+'&mode=1&ptable=tl_content';
             params = Object.assign(params, {'url': url});
             return params;
         }
@@ -232,6 +232,7 @@ WEM.Grid  = WEM.Grid || {};
         ,runFakeQueueItem:function(requests, index){
             fetch(requests[index].url,{
                 method: 'POST',
+                headers:{ 'X-Requested-With':'XMLHttpRequest' }
             })
             .then(data => {
                 if("undefined" != typeof requests[index+1]){
@@ -527,7 +528,8 @@ WEM.Grid  = WEM.Grid || {};
 
             fetch(url,{
                 method:'get',
-                redirect:'manual'
+                redirect:'manual',
+                headers:{ 'X-Requested-With':'XMLHttpRequest' }
             })
             .then(response => {
                 if(!response.ok){
@@ -545,11 +547,12 @@ WEM.Grid  = WEM.Grid || {};
             return false;
         }
         ,moveItem:function(itemId, itemPid){
-            var url = 'contao/grid-builder/move-item/'+itemId+'/article/tl_content?id='+itemId+'&amp;pid='+itemPid+'&amp;mode=1&amp;ptable=tl_content';
+            var url = 'contao/grid-builder/move-item/'+itemId+'/article/tl_content?id='+itemId+'&pid='+itemPid+'&mode=1&ptable=tl_content';
             AjaxRequest.displayBox(Contao.lang.loading + ' …');
 
             return fetch(url, {
                 method:'POST',
+                headers:{ 'X-Requested-With':'XMLHttpRequest' }
             })
             .then(response => {
                 AjaxRequest.hideBox();
@@ -565,11 +568,12 @@ WEM.Grid  = WEM.Grid || {};
             return false;
         }
         ,copyItem:function(itemId){
-            var url = 'contao/grid-builder/copy-item/'+itemId+'/article/tl_content?id='+itemId+'&amp;pid='+itemId+'&amp;mode=1&amp;ptable=tl_content';
+            var url = 'contao/grid-builder/copy-item/'+itemId+'/article/tl_content?id='+itemId+'&pid='+itemId+'&mode=1&ptable=tl_content';
             AjaxRequest.displayBox(Contao.lang.loading + ' …');
 
             return fetch(url, {
                 method:'POST',
+                headers:{ 'X-Requested-With':'XMLHttpRequest' }
             })
             .then(response => {
                 AjaxRequest.hideBox();
@@ -590,6 +594,7 @@ WEM.Grid  = WEM.Grid || {};
 
             return fetch(url, {
                 method:'DELETE',
+                headers:{ 'X-Requested-With':'XMLHttpRequest' }
             })
             .then(response => {
                 AjaxRequest.hideBox();
