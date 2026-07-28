@@ -31,13 +31,8 @@ class WEMGridExtension extends Extension
      */
     public function load(array $mergedConfig, ContainerBuilder $container): void
     {
-        $loader = new YamlFileLoader(
-            $container,
-            new FileLocator(__DIR__.'/../Resources/config')
-        );
-
-        $loader->load('services.yml');
-        $loader->load('listeners.yml');
-        $loader->load('controllers.yml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
+        $loader->load('controllers.yaml');
+        $loader->load('services.yaml');
     }
 }

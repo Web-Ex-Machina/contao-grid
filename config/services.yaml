@@ -1,0 +1,33 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  WEM\GridBundle\:
+    resource: ../src/
+    exclude: ../src/{ContaoManager,DependencyInjection}
+
+  wem.grid.classes.grid_elements_wrapper:
+    class: WEM\GridBundle\Classes\GridElementsWrapper
+    arguments:
+      $translator: '@contao.translation.translator'
+      $gridBuilder: '@wem.grid.helper.grid_builder'
+      $gridCssClassesInheritance: '@wem.grid.classes.grid_css_classes_inheritance'
+    public: true
+
+  wem.grid.classes.grid_start_manipulator:
+    class: WEM\GridBundle\Classes\GridStartManipulator
+    public: true
+
+  wem.grid.classes.grid_elements_calculator:
+    class: WEM\GridBundle\Classes\GridElementsCalculator
+    public: true
+
+  wem.grid.classes.grid_css_classes_inheritance:
+    class: WEM\GridBundle\Classes\GridCssClassesInheritance
+    public: true
+
+  wem.grid.helper.grid_builder:
+    class: WEM\GridBundle\Helper\GridBuilder
+    public: true

@@ -22,7 +22,6 @@ use Contao\System;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use WEM\GridBundle\Elements\GridItemEmpty;
 use WEM\GridBundle\Elements\GridStart;
-use WEM\GridBundle\Elements\GridStop;
 use WEM\GridBundle\Helper\GridBuilder;
 
 /**
@@ -36,7 +35,7 @@ class GridElementsWrapper
 
     protected GridCssClassesInheritance $gridCssClassesInheritance;
 
-    protected static array $arrSkipContentTypes = [GridStart::ELEMENT_TYPE, GridStop::ELEMENT_TYPE];
+    protected static array $arrSkipContentTypes = [GridStart::ELEMENT_TYPE];
 
     public function __construct(
         TranslatorInterface $translator,
@@ -60,56 +59,26 @@ class GridElementsWrapper
     public function wrapGridElements(ContentModel $objElement, string $strBuffer, string $do): string
     {
         $gop = GridOpenedManager::getInstance();
-        // dump($gop);
+
         $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
+        
         // Skip elements we never want to wrap or if we are not in a grid
         if (($scopeMatcher->isBackend() && 'edit' !== Input::get('act')) || null === $gop->getLastOpenedGridId()) {
             return $strBuffer;
         }
 
+        // If item parent is not a grid, return the item
+        $objParent = ContentModel::findOneById($objElement->pid);
+
+        if (!$objParent || GridStart::ELEMENT_TYPE !== $objParent->type) {
+            return $strBuffer;
+        }
+
         // Get the last open grid
-        $openGrid = $gop->getLastOpenedGrid();
-        // dump($openGrid);
+        $openGrid = $gop->getGridById((string) $objParent->id);
         $currentGridId = $gop->getLastOpenedGridId();
 
-        // Yep, same code in FE/BE, but FE here if we want it to work /shrug
-        // We won't need this grid anymore so we pop the global grid array
-        if (!$scopeMatcher->isBackend() && GridStop::ELEMENT_TYPE === $objElement->type) {
-            $gop->closeLastOpenedGrid();
-        }
-
-        // If we used grids elements, we had to adjust the behaviour
-        if (GridStart::ELEMENT_TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
-            $gop->openGrid($objElement);
-            // For nested grid - starts, we want to add only the start of the item wrapper
-            // Retrieve the parent
-            $openGrid = $gop->getParentGrid($objElement);
-        // dump($openGrid);
-        // if(null === $openGrid){
-        //     dump($GLOBALS['WEM']['GRID']);
-        //     die;
-        // }
-
-            return $this->getSubGridStartHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
-        }
-
-        if (GridStop::ELEMENT_TYPE === $objElement->type && true === $openGrid->isSubGrid()) {
-            $str = $this->getGridStopHTMLMarkup($openGrid, $objElement, $strBuffer);
-
-            // Yep, same code in FE/BE, but BE here if we want it to work /shrug
-            if ($scopeMatcher->isBackend()) {
-                // We won't need this grid anymore so we pop the global grid array
-                $gop->closeLastOpenedGrid();
-            }
-
-            return $str;
-        }
-
-        if (!\in_array($objElement->type, static::$arrSkipContentTypes, true)) {
-            return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
-        }
-
-        return $strBuffer;
+        return $this->getGridElementHTMLMarkup($openGrid, $objElement, $currentGridId, $strBuffer, $do);
     }
 
     /**
@@ -130,25 +99,44 @@ class GridElementsWrapper
 
             $buttons = '';
 
+            // It is not necessary to edit Grid Empty items
             if (GridItemEmpty::ELEMENT_TYPE !== $objElement->type) {
                 $buttons .= \sprintf('
-                <a
-                href="contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1&amp;rt=%s"
-                title="%s"
-                onclick="WEM.Grid.Utils.openModalIframe({\'title\':\'%s\',\'url\':this.href,\'onHide\':function(){window.location.reload();}});return false">
-                %s
-                </a>', $do, $objElement->id, System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(), StringUtil::specialchars($titleEdit), StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), Image::getHtml('edit.svg', $titleEdit));
+                    <a
+                    href="/contao?do=%s&id=%s&table=tl_content&act=edit&popup=1&nc=1"
+                    title="%s"
+                    onclick="WEM.Grid.Utils.openModalIframe({\'title\':\'%s\',\'url\':this.href,\'onHide\':function(){window.location.reload();}});return false">
+                    %s
+                    </a>', 
+                    $do, 
+                    $objElement->id,
+                    StringUtil::specialchars($titleEdit), 
+                    StringUtil::specialchars(str_replace("'", "\\'", $titleEdit)), 
+                    Image::getHtml('edit.svg', $titleEdit)
+                );
             }
 
+            // Copy button
             $buttons .= \sprintf('
-                <a class="item-copy"
-                href="#"
-                data-element-id="%s"
-                title="%s"
-                >
-                %s
-                </a>', $objElement->id, StringUtil::specialchars($titleCopy), Image::getHtml('copy.svg', $titleCopy));
+                    <a class="item-copy"
+                    href="#"
+                    data-element-do="%s"
+                    data-element-id="%s"
+                    data-element-rt="%s"
+                    title="%s"
+                    >
+                    %s
+                    </a>
+                ', 
+                $do, 
+                $objElement->id, 
+                System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
+                StringUtil::specialchars($titleCopy), 
+                Image::getHtml('copy.svg', $titleCopy)
+            );
 
+
+            // Delete button
             $buttons .= \sprintf('
                 <a class="item-delete"
                 href="#"
@@ -157,8 +145,14 @@ class GridElementsWrapper
                 onclick="if(!confirm(\'%s\'))return false;Backend.getScrollOffset()"
                 >
                 %s
-                </a>', $objElement->id, StringUtil::specialchars($titleDelete), $confirmDelete, Image::getHtml('delete.svg', $titleDelete));
+                </a>', 
+                $objElement->id, 
+                StringUtil::specialchars($titleDelete), 
+                $confirmDelete, 
+                Image::getHtml('delete.svg', $titleDelete)
+            );
 
+            // Drag n Drop button
             $buttons .= \sprintf('
                 <a
                 href="#"
@@ -217,55 +211,6 @@ class GridElementsWrapper
         }
 
         return \sprintf('<div class="item-actions">%s (ID %s)%s%s</div>', $objElement->type, $objElement->id, $withActions ? ' - ' : '', $withActions ? $buttons : '');
-    }
-
-    protected function getSubGridStartHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string
-    {
-        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
-        if ($scopeMatcher->isBackend()) {
-            return \sprintf(
-                '<div class="%s %s %s %s be_subgrid" data-id="%s" data-type="%s" data-nb-cols="%s" data-grid-mode="%s">%s%s%s',
-                implode(' ', $openGrid->getItemClassesForAllResolution()),
-                $openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: '',
-                $openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: '',
-                $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
-                $objElement->id,
-                $objElement->type,
-                !\is_array($objElement->grid_cols) ? StringUtil::deserialize($objElement->grid_cols)[0]['value'] : $objElement->grid_cols[0]['value'],
-                $objElement->grid_mode,
-                $this->getBackendActionsForGridStartContentElement($objElement, $do, true),
-                $strBuffer,
-                $this->gridBuilder->fakeFirstGridElementMarkup($currentGridId)
-            );
-        }
-
-        return \sprintf(
-            '<div class="%s %s %s %s">%s',
-            implode(' ', $openGrid->getItemClassesForAllResolution()),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesColsForItemId((string) $objElement->id) ?: ''),
-            $this->gridCssClassesInheritance->cleanForFrontendDisplay($openGrid->getItemClassesRowsForItemId((string) $objElement->id) ?: ''),
-            $openGrid->getItemClassesClassesForItemId((string) $objElement->id) ?: '',
-            $strBuffer
-        );
-    }
-
-    protected function getGridStopHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $strBuffer): string
-    {
-        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
-        if ($scopeMatcher->isBackend()) {
-            return \sprintf(
-                '%s<div data-id="%s" data-type="%s">%s</div></div>',
-                !Input::get('grid_preview') ? $this->gridBuilder->fakeLastGridElementMarkup((string) $openGrid->getId()) : '',
-                $objElement->id,
-                $objElement->type,
-                $strBuffer
-            );
-        }
-
-        return \sprintf(
-            '<div>%s</div></div>',
-            $strBuffer
-        );
     }
 
     protected function getGridElementHTMLMarkup(GridOpened $openGrid, ContentModel $objElement, string $currentGridId, string $strBuffer, string $do): string

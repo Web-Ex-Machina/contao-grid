@@ -14,117 +14,90 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Elements;
 
-use Contao\BackendTemplate;
-use Contao\ContentElement;
+use Contao\ContentModel;
+use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
+use Contao\CoreBundle\Fragment\Reference\ContentElementReference;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Database;
+use Contao\StringUtil;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use WEM\GridBundle\Classes\GridCssClassesInheritance;
 use WEM\GridBundle\Classes\GridOpenedManager;
 
-/**
- * Content Element "grid-start".
- */
-class GridStart extends ContentElement
+#[AsContentElement(
+    type: GridStart::ELEMENT_TYPE,
+    category: 'miscellaneous',
+    nestedFragments: true,
+)]
+class GridStart extends AbstractContentElementController
 {
     public const ELEMENT_TYPE = 'grid-start';
     public const MODE_CUSTOM = 'custom';
     public const MODE_AUTOMATIC = 'automatic';
 
-    /**
-     * Template.
-     *
-     * @var string
-     */
-    protected $strTemplate = 'ce_grid_start';
+    public function __construct(private readonly ContaoFramework $framework)
+    {
+    }
 
     /**
      * Generate the content element.
      */
-    protected function compile(): void
+    protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
-        // Backend template
-        $scopeMatcher = System::getContainer()->get('wem.scope_matcher');
-        if ($scopeMatcher->isBackend() && !$this->isForGridElementWizard) {
-            $this->strTemplate = 'be_wildcard';
-            $this->Template = new BackendTemplate($this->strTemplate);
-            $this->Template->title = $GLOBALS['TL_LANG']['CTE'][$this->type][1];
+        $elements = [];
 
-            if (self::MODE_CUSTOM === $this->grid_mode) {
-                $this->arrGridBreakpoints = [
-                    ['name' => 'all', 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointAll'], 'required' => true],
-                    ['name' => 'xl', 'start' => 1400, 'stop' => 0, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXl']],
-                    ['name' => 'lg', 'start' => 1200, 'stop' => 1399, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointLg']],
-                    ['name' => 'md', 'start' => 992, 'stop' => 1199, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointMd']],
-                    ['name' => 'sm', 'start' => 768, 'stop' => 991, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointSm']],
-                    ['name' => 'xs', 'start' => 620, 'stop' => 767, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXs']],
-                    ['name' => 'xxs', 'start' => 0, 'stop' => 619, 'label' => $GLOBALS['TL_LANG']['WEM']['GRID']['BE']['breakpointXxs']],
-                ]; /** @todo - make it generic per grid */
-                $breakpoints = [];
-                // $arrGridValues = GridBuilder::getWrapperClasses($this);
-                $arrGridValues = System::getContainer()->get('wem.grid.helper.grid_builder')->getWrapperClasses($this);
-                foreach ($arrGridValues as $b) {
-                    $b = explode('-', $b);
-                    if ('cols' !== $b[0]) {
-                        continue;
-                    }
+        $template->set('classes', '');
+        $template->set('elements', '');
 
-                    if (2 === \count($b)) {
-                        $breakpoint = $this->getBreakpointData('all');
-                        $val = $b[1];
-                    } elseif (3 === \count($b)) {
-                        $breakpoint = $this->getBreakpointData($b[1]);
-                        $val = $b[2];
-                    }
-
-                    if (0 !== (int) $val) {
-                        $breakpoints[] = $breakpoint['label'].': '.\sprintf($GLOBALS['TL_LANG']['WEM']['GRID']['BE']['nbColsOptionLabel'], $val);
-                    }
-                }
-
-                $this->Template->wildcard = 'Config: '.implode(', ', $breakpoints);
-            } else {
-                $this->Template->wildcard = 'Config: '.$GLOBALS['TL_LANG']['tl_content']['grid_mode']['automatic'];
-            }
-        }
-
-        // Check if the very next element is a grid-stop element
-        $objNextElement = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE pid = ? AND ptable = ? AND sorting > ? AND invisible = "" ORDER BY sorting ASC')->limit(1)->execute($this->pid, $this->ptable, $this->sorting);
-
-        // Update : I need it opened otherwise empty nested grid is buggy in BE
-        if (1 > $objNextElement->numRows) {
-            $this->Template->doNotPrint = true;
+        // If there are no grid items, do not display anything
+        if (empty($template->get('nested_fragments'))) {
+            return $template->getResponse();
         }
 
         $gop = GridOpenedManager::getInstance();
         try {
-            $arrGrid = $gop->getGridById((string) $this->id);
+            $arrGrid = $gop->getGridById((string) $model->id);
         } catch (\Exception $exception) {
-            $gop->openGrid($this);
-            $arrGrid = $gop->getGridById((string) $this->id);
+            $gop->openGrid($model);
+            $arrGrid = $gop->getGridById((string) $model->id);
         }
 
         // Add the classes to the Model so the main class can use it correct
-        if (\is_array($this->objModel->classes)) {
-            $this->objModel->classes = array_merge($arrGrid->getWrapperClasses(), $this->objModel->classes);
+        if (\is_array($model->classes)) {
+            $model->classes = array_merge($arrGrid->getWrapperClasses(), $model->classes);
         } else {
-            $this->objModel->classes = $arrGrid->getWrapperClasses();
+            $model->classes = $arrGrid->getWrapperClasses();
         }
 
         $gridCssClassesInheritance = new GridCssClassesInheritance();
-        $this->objModel->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
+        $model->classes = explode(' ', $gridCssClassesInheritance->cleanForFrontendDisplay(implode(' ', $arrGrid->getWrapperClasses())));
 
         // Send the grid_id to template
-        $this->Template->grid_id = $this->id;
-    }
+        $template->set('grid_id', $model->id);
+        $template->set('classes', $model->classes);
 
-    protected function getBreakpointData($name)
-    {
-        foreach ($this->arrGridBreakpoints as $b) {
-            if ($name === $b['name']) {
-                return $b;
+        foreach ($template->get('nested_fragments') as $i => $reference) {
+            $nestedModel = $reference->getContentModel();
+
+            if (!$nestedModel instanceof ContentModel) {
+                $nestedModel = $this->framework->getAdapter(ContentModel::class)->findById($nestedModel);
             }
+
+            $header = StringUtil::deserialize($nestedModel->sectionHeadline, true);
+
+            $elements[] = [
+                'header' => $header['value'] ?? '',
+                'header_tag' => $header['unit'] ?? 'h2',
+                'reference' => $reference,
+            ];
         }
 
-        return null;
+        $template->set('elements', $elements);
+
+        return $template->getResponse();
     }
 }

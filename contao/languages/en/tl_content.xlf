@@ -1,0 +1,74 @@
+<?xml version="1.0" ?><xliff version="1.1">
+  <file datatype="php" original="contao/languages/en/tl_content.php" source-language="en" target-language="fr">
+    <body>
+      <trans-unit id="tl_content.grid_legend">
+        <source>Grid settings</source>
+        <target>Grid settings</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_rows.0">
+        <source>Rows</source>
+        <target>Rows</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_rows.1">
+        <source>Enter the number of rows</source>
+        <target>Enter the number of rows</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.0">
+        <source>Row class</source>
+        <target>Row class</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.1">
+        <source>Select the row class</source>
+        <target>Select the row class</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.row">
+        <source>Row</source>
+        <target>Row</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_row_class.container">
+        <source>Container</source>
+        <target>Container</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.0">
+        <source>Mode</source>
+        <target>Mode</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.1">
+        <source>Select the grid mode</source>
+        <target>Select the grid mode</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.custom">
+        <source>Custom</source>
+        <target>Custom</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_mode.automatic">
+        <source>Automatic</source>
+        <target>Automatic</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_cols.0">
+        <source>Columns</source>
+        <target>Columns</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_cols.1">
+        <source>Enter the number of columns</source>
+        <target>Enter the number of columns</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_gap.0">
+        <source>Gap</source>
+        <target>Gap</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_gap.1">
+        <source>Enter the gap between elements</source>
+        <target>Enter the gap between elements</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_items.0">
+        <source>Items</source>
+        <target>Items</target>
+      </trans-unit>
+      <trans-unit id="tl_content.grid_items.1">
+        <source>Add - if you want - settings to each item in the grid</source>
+        <target>Add - if you want - settings to each item in the grid</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

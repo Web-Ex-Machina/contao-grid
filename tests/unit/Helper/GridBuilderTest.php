@@ -158,7 +158,7 @@ class GridBuilderTest extends ContaoTestCase
                 'expectedResultGen' => function () {
                     return [
                         'd-grid',
-                        'cols-autofit',
+                        'cols-autofill',
                         'gap-1-rem',
                     ];
                 },

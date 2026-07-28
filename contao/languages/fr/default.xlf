@@ -1,0 +1,118 @@
+<?xml version="1.0" ?><xliff version="1.1">
+  <file datatype="php" original="contao/languages/en/default.php" source-language="en" target-language="fr">
+    <body>
+      <trans-unit id="CTE.grid">
+        <source>Grid elements</source>
+        <target>Éléments de grille</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-start.0">
+        <source>Grid | Start</source>
+        <target>Grille | Début</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-start.1">
+        <source>Start a Grid</source>
+        <target>Début d'une grille CSS</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-stop.0">
+        <source>Grid | Stop</source>
+        <target>Grille | Fin</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-stop.1">
+        <source>End a Grid</source>
+        <target>Fin d'une grille CSS</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-item-empty.0">
+        <source>Grid | Empty item</source>
+        <target>Grille | Elément vide</target>
+      </trans-unit>
+      <trans-unit id="CTE.grid-item-empty.1">
+        <source>An empty element for a grid</source>
+        <target>Elément vide pour une grille</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.valuesLabel">
+        <source>Values</source>
+        <target>Valeurs</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.resolutionLabel">
+        <source>Resolution</source>
+        <target>Résolution</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsLabel">
+        <source>Number of columns</source>
+        <target>Nombre de colonnes</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.gapValueLabel">
+        <source>Gap space between elements</source>
+        <target>Espace inter-éléments</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsSelectLabel">
+        <source>Nb of cols :</source>
+        <target>Nb de colonnes :</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbRowsSelectLabel">
+        <source>Nb of rows :</source>
+        <target>Nb de lignes :</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.additionalClassesLabel">
+        <source>Additional classes:</source>
+        <target>Classes additionnelles:</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbColsOptionLabel">
+        <source>%s column(s)</source>
+        <target>%s colonne(s)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.nbRowsOptionLabel">
+        <source>%s row(s)</source>
+        <target>%s ligne(s)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inputItemPlaceholder">
+        <source>Add a class to this item's wrapper</source>
+        <target>Ajoutez une classe au conteneur de cet item</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridStart">
+        <source>Drag and drop the element here to place it at the grid's start</source>
+        <target>Glissez l'élement de contenu ici pour le placer au début de la grille</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.placeToGridEnd">
+        <source>Drag and drop the element here to place it at the grid's end</source>
+        <target>Glissez l'élement de contenu ici pour le placer à la fin de la grille</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inheritedColumns">
+        <source>- (%s column(s) - Inherited from %s resolution)</source>
+        <target>- (%s colonne(s) - Hérité de la résolution %s)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.inheritedRows">
+        <source>- (%s row(s) - Inherited from %s resolution)</source>
+        <target>- (%s ligne(s) - Hérité de la résolution %s)</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointAll">
+        <source>Desktop</source>
+        <target>Général</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXl">
+        <source>XL</source>
+        <target>XL</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointLg">
+        <source>LG</source>
+        <target>LG</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointMd">
+        <source>MD</source>
+        <target>MD</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointSm">
+        <source>SM</source>
+        <target>SM</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXs">
+        <source>XS</source>
+        <target>XS</target>
+      </trans-unit>
+      <trans-unit id="WEM.GRID.BE.breakpointXxs">
+        <source>XXS</source>
+        <target>XXS</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

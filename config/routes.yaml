@@ -1,0 +1,3 @@
+wem.gridbuilder.controller:
+  resource: '../src/Controller'
+  type: attribute

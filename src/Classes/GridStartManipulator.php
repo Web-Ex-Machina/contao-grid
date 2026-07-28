@@ -99,11 +99,8 @@ class GridStartManipulator
 
     private ContentModel $gridStart;
 
-    private GridElementsCalculator $gridElementsCalculator;
-
-    public function __construct(GridElementsCalculator $gridElementsCalculator)
+    public function __construct()
     {
-        $this->gridElementsCalculator = $gridElementsCalculator;
     }
 
     public function getGridStart(): ContentModel
@@ -134,17 +131,6 @@ class GridStartManipulator
         return (new self(System::getContainer()->get('wem.grid.classes.grid_elements_calculator')))
             ->setGridStart($gridStart)
         ;
-    }
-
-    /**
-     * Recalculate grid items for all grids sharing the same pid & ptable.
-     */
-    public function recalculateElementsForAllGridSharingTheSamePidAndPtable(): self
-    {
-        $this->gridElementsCalculator->recalculateGridItemsByPidAndPtable((int) $this->gridStart->pid, $this->gridStart->ptable);
-        $this->gridStart->refresh();
-
-        return $this;
     }
 
     /**
@@ -828,21 +814,6 @@ class GridStartManipulator
     public function isItemIdInGrid(int $id): bool
     {
         return \array_key_exists($id.'_'.self::PROPERTY_CLASSES, unserialize($this->gridStart->grid_items));
-    }
-
-    public function getGridElementsCalculator(): ?GridElementsCalculator
-    {
-        return $this->gridElementsCalculator;
-    }
-
-    /**
-     * @param mixed $gridElementsCalculator
-     */
-    public function setGridElementsCalculator(GridElementsCalculator $gridElementsCalculator): self
-    {
-        $this->gridElementsCalculator = $gridElementsCalculator;
-
-        return $this;
     }
 
     /**

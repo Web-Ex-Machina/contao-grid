@@ -12,39 +12,28 @@
         }
     ],
     "support":{
-        "website":"https://www.webexmachina.fr/",
+        "website":"https://www.webexmachina.fr",
         "issues":"https://github.com/web-ex-machina/contao-grid/issues",
         "source":"https://github.com/web-ex-machina/contao-grid"
     },
     "require": {
-        "php": "^7.4|^8.2",
-        "contao/core-bundle": "^4.13 || ^5.3",
-        "contao-community-alliance/composer-plugin": "*",
-        "contao/manager-plugin": "^2.0",
         "ext-json": "*",
+        "contao/core-bundle": "^5.3 || ^5.7",
+        "contao/manager-plugin": "^2.0",
         "webexmachina/contao-utils": "^2.0"
     },
     "require-dev":
     {
-        "phpunit/phpunit": "^9.5",
-        "codeception/codeception": "^4",
-        "codeception/module-asserts": "^2.0",
-        "contao/test-case": "^5.3",
-        "rector/rector": "^1.1"
+        "contao/manager-plugin": "@stable",
+        "contao/easy-coding-standard": "@stable",
+        "rector/rector": "@stable",
+        "phpstan/phpstan": "@stable",
+        "contao/contao-rector": "dev-main"
     },
     "autoload":{
         "psr-4": {
             "WEM\\GridBundle\\": "src/"
-        },
-        "classmap": [
-            "src/Resources/contao/"
-        ],
-        "exclude-from-classmap": [
-            "src/Resources/contao/config/",
-            "src/Resources/contao/dca/",
-            "src/Resources/contao/languages/",
-            "src/Resources/contao/templates/"
-        ]
+        }
     },
     "extra":{
         "contao-manager-plugin": "WEM\\GridBundle\\ContaoManager\\Plugin"

@@ -1,0 +1,12 @@
+{% extends '@Contao/content_element/_base.html.twig' %}
+
+{% set attributes = attrs()
+    .addClass(classes)
+    .mergeWith(attributes|default)
+%}
+
+{% block content %}
+    {% for element in elements %}
+        {{ content_element(element.reference) }}
+    {% endfor %}
+{% endblock %}

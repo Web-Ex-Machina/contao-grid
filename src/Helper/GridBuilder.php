@@ -68,18 +68,20 @@ class GridBuilder
         $arrClasses[] = 'd-grid';
 
         if (GridStart::MODE_AUTOMATIC === $objElement->grid_mode) {
-            $arrClasses[] = 'cols-autofit';
+            $arrClasses[] = 'cols-autofill';
         } elseif (GridStart::MODE_CUSTOM === $objElement->grid_mode) {
-            foreach ($cols as $k => $col) {
-                // Quickfix : we need the first col to be generic, no matter what is the breakpoint
-                if (0 === $k) {
-                    $arrClasses[] = \sprintf('cols-%d', $col['value']);
-                } elseif (!$scopeMatcher->isBackend()) {
-                    if (0 !== (int) $col['value']) {
+            if (isset($cols) && \is_array($cols)) {
+                foreach ($cols as $k => $col) {
+                    // Quickfix : we need the first col to be generic, no matter what is the breakpoint
+                    if (0 === $k) {
+                        $arrClasses[] = \sprintf('cols-%d', $col['value']);
+                    } elseif (!$scopeMatcher->isBackend()) {
+                        if (0 !== (int) $col['value']) {
+                            $arrClasses[] = \sprintf('cols-%s-%d', $col['key'], $col['value']);
+                        }
+                    } else {
                         $arrClasses[] = \sprintf('cols-%s-%d', $col['key'], $col['value']);
                     }
-                } else {
-                    $arrClasses[] = \sprintf('cols-%s-%d', $col['key'], $col['value']);
                 }
             }
 
@@ -191,7 +193,7 @@ class GridBuilder
      *
      * @throws \Exception
      */
-    public function fakeNewGridElementMarkup(string $gridId): string // TODO : One day, delete all the function because she is useless.
+    public function fakeNewGridElementMarkup(string $gridId): string
     {
         $gop = GridOpenedManager::getInstance();
 

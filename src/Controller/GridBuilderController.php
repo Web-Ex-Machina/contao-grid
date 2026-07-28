@@ -14,24 +14,29 @@ declare(strict_types=1);
 
 namespace WEM\GridBundle\Controller;
 
+use Contao\BackendUser;
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Security\ContaoCorePermissions;
+use Contao\DataContainer;
 use Contao\Input;
+use Contao\System;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\ServiceAnnotationBundle\Annotation\ServiceTag;
 use WEM\GridBundle\Classes\GridStartManipulator;
 
-/**
- * @Route("/contao/grid-builder",
- *     name=GridBuilderController::class,
- *     defaults={"_scope": "backend"}
- * )
- *
- * @ServiceTag("controller.service_arguments")
- */
+#[Route(
+    '/contao/grid-builder',
+    name: GridBuilderController::class,
+    defaults: ['_scope' => 'backend']
+)]
 class GridBuilderController extends Controller
 {
     protected TranslatorInterface $translator;
@@ -240,5 +245,114 @@ class GridBuilderController extends Controller
         }
 
         return $grid;
+    }
+
+    #[Route(
+        '/move-item/{id}/{module}/{table}',
+        name: 'moveGridItem',
+        requirements: ['id' => Requirement::DIGITS],
+        methods: ['POST']
+    )]
+    public function moveGridItem(Request $request, int $id, string $module, string $table): JsonResponse
+    {
+        $dc = $this->getDataContainer($module, $table);
+        $dc->cut(true);   
+
+        return new JsonResponse([
+            'status' => 'success', 
+            'message' => \sprintf('Item %s moved', $id),
+        ], Response::HTTP_OK);
+    }
+
+    #[Route(
+        '/copy-item/{id}/{module}/{table}',
+        name: 'copyGridItem',
+        requirements: ['id' => Requirement::DIGITS],
+        methods: ['POST']
+    )]
+    public function copyGridItem(Request $request, int $id, string $module, string $table): JsonResponse
+    {
+        $dc = $this->getDataContainer($module, $table);
+        $dc->copy(true);   
+
+        return new JsonResponse([
+            'status' => 'success', 
+            'message' => \sprintf('Item %s duplicated', $id),
+        ], Response::HTTP_OK);
+    }
+
+    #[Route(
+        '/delete-item/{id}/{module}/{table}',
+        name: 'deleteGridItem',
+        requirements: ['id' => Requirement::DIGITS],
+        methods: ['DELETE']
+    )]
+    public function deleteGridItem(Request $request, int $id, string $module, string $table): JsonResponse
+    {
+        $dc = $this->getDataContainer($module, $table);
+        $dc->delete(true);   
+
+        return new JsonResponse([
+            'status' => 'success', 
+            'message' => \sprintf('Item %s deleted', $id),
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Return a datacontainer
+     */
+    protected function getDataContainer(string $module, string $table): DataContainer
+    {
+        $arrModule = array();
+
+        foreach ($GLOBALS['BE_MOD'] as &$arrGroup)
+        {
+            if (isset($arrGroup[$module]))
+            {
+                $arrModule = &$arrGroup[$module];
+                break;
+            }
+        }
+
+        unset($arrGroup);
+
+        $blnAccess = (isset($arrModule['disablePermissionChecks']) && $arrModule['disablePermissionChecks'] === true) || System::getContainer()->get('security.helper')->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, $module);
+
+        // Check whether the current user has access to the current module
+        if (!$blnAccess)
+        {
+            throw new AccessDeniedException('Back end module "' . $module . '" is not allowed for user "' . BackendUser::getInstance()->username . '".');
+        }
+
+        // The module does not exist
+        if (empty($arrModule))
+        {
+            throw new \InvalidArgumentException('Back end module "' . $module . '" is not defined in the BE_MOD array');
+        }
+
+        $arrTables = (array) ($arrModule['tables'] ?? array());
+
+        $dc = null;
+
+        // Create the data container object
+        if (!\in_array($table, $arrTables))
+        {
+            throw new AccessDeniedException('Table "' . $table . '" is not allowed in module "' . $module . '".');
+        }
+
+        // Load the language and DCA file
+        System::loadLanguageFile($table);
+        $this->loadDataContainer($table);
+
+        // Fabricate a new data container object
+        if (!isset($GLOBALS['TL_DCA'][$table]['config']['dataContainer']))
+        {
+            System::getContainer()->get('monolog.logger.contao.error')->error('Missing data container for table "' . $table . '"');
+            trigger_error('Could not create a data container object', E_USER_ERROR);
+        }
+
+        /** @var class-string<DataContainer> $dataContainer */
+        $dataContainer = DataContainer::getDriverForTable($table);
+        return new $dataContainer($table, $arrModule);
     }
 }
